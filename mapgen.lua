@@ -44,7 +44,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		end
 
 		--Information:
-		local geninfo = "-#- Swamp generated: [x= ("..minp.x..", "..maxp.x..")] [z= ("..minp.z..", "..maxp.z..")]"
+		local geninfo = "-#- Swamp generates: x=["..minp.x.."; "..maxp.x.."] z=["..minp.z.."; "..maxp.z.."]"
 		print(geninfo)
 		minetest.chat_send_all(geninfo)
 
@@ -91,18 +91,21 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						elseif pr:next(1,3) == 1 then
 							env:add_node({x=x,y=ground_y+1,z=z}, {name="default:junglegrass"})
 						end
-					end --Sumpfwasser:			doesn't work
+					end --Sumpfwasser:			not tested yet
 					if pr:next(1,4) == 1 then
-						if notnod == "air"
-						or notnod == "group:snappy" then
-							if	env:get_node({x=x+1,y=ground_y,z=z}).name ~= notnod
-							and env:get_node({x=x-1,y=ground_y,z=z}).name ~= notnod
-							and env:get_node({x=x,y=ground_y,z=z+1}).name ~= notnod
-							and env:get_node({x=x,y=ground_y,z=z-1}).name ~= notnod  then
-								for s=0,-30,-1 do
-									env:add_node({x=x,y=ground_y+s,z=z}, {name="sumpf:dirtywater_source"})
-									env:add_node({x=x,y=ground_y+1,z=z}, {name="air"}) --because of the plants
-								end
+						local notnod = "air"
+						local notnoe = "group:snappy"
+						if	env:get_node({x=x+1,y=ground_y,z=z}).name ~= notnod
+						and env:get_node({x=x-1,y=ground_y,z=z}).name ~= notnod
+						and env:get_node({x=x,y=ground_y,z=z+1}).name ~= notnod
+						and env:get_node({x=x,y=ground_y,z=z-1}).name ~= notnod
+						and	env:get_node({x=x+1,y=ground_y,z=z}).name ~= notnoe
+						and env:get_node({x=x-1,y=ground_y,z=z}).name ~= notnoe
+						and env:get_node({x=x,y=ground_y,z=z+1}).name ~= notnoe
+						and env:get_node({x=x,y=ground_y,z=z-1}).name ~= notnoe	then
+							for s=0,-30,-1 do
+								env:add_node({x=x,y=ground_y+s,z=z}, {name="sumpf:dirtywater_source"})
+								env:add_node({x=x,y=ground_y+1,z=z}, {name="air"}) --because of the plants
 							end
 						end
 					else --Sumpfboden:
