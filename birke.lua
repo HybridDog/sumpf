@@ -91,8 +91,8 @@ tree_crafts("sumpf:tree")
 
 local function add_tree_branch(pos, dir)	
 	minetest.env:set_node(pos, {name="sumpf:tree_horizontal", param2=dir})
-	for i = math.floor(math.random(2)), -math.floor(math.random(2)), -1 do		
-		for k = math.floor(math.random(2)), -math.floor(math.random(2)), -1 do
+	for i = math.random(2), -math.random(2), -1 do		
+		for k = math.random(2), -math.random(2), -1 do
 			local p = {x=pos.x+i, y=pos.y, z=pos.z+k}
 			local n = minetest.env:get_node(p)
 			if (n.name=="air") then	
