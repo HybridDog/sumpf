@@ -6,28 +6,6 @@ I looked at snow mod for mapgen and
 at the jungletree mod for birches.
 ]]
 
-local MUSH = {
-		type = "fixed",
-		fixed = {
-			{-0.15, -0.2, -0.15, 0.15, -0.1, 0.15},
-			{-0.2, -0.3, -0.2, 0.2, -0.2, 0.2},
-			{-0.05, -0.5, -0.05, 0.05, -0.3, 0.05},
-		},
-	}
-
-minetest.register_node("sumpf:pilz", {
-	description = "Mushroom",
-	tile_images = {"sumpf_pilz_oben.png","sumpf_pilz_unten.png","sumpf_pilz_seite.png"},
-	inventory_image = "sumpf_pilz_item.png",
-	drawtype = "nodebox",
-	paramtype = "light",
-	node_box = MUSH,
-	selection_box = MUSH,
-	walkable = false,
-	groups = {snappy=3,flammable=2},
-	sounds = default.node_sound_leaves_defaults(),
-})
-
 minetest.register_node("sumpf:gras", {
 	description = "Swamp Grass",
 	tile_images = {"sumpfgrass.png"},
