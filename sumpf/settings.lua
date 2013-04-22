@@ -8,3 +8,6 @@ sumpf.smooth = true
 
 --Enables swampwater - be careful, it doesn't work right.
 sumpf.swampwater = false
+
+--Enables birches (habitat).
+sumpf.enable_birches = true
