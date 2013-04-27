@@ -1,13 +1,17 @@
 --This file contains configuration options for swamp mod.
 
---Enables mapgen.
 sumpf.enable_mapgen = true
 
 --Enables smooth transition of biomes.
 sumpf.smooth = true
 
---Enables swampwater - be careful, it doesn't work right.
+sumpf.enable_plants = true
+
+--Enables swampwater - be careful, it doesn't work right but it looks great.
 sumpf.swampwater = false
 
 --Enables birches (habitat).
 sumpf.enable_birches = true
+
+--says some information.
+sumpf.info = true

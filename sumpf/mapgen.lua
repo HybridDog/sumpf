@@ -101,9 +101,11 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		end
 
 		--Information:
-		local geninfo = "-#- Swamp generates: x=["..minp.x.."; "..maxp.x.."] z=["..minp.z.."; "..maxp.z.."]"
-		print(geninfo)
-		minetest.chat_send_all(geninfo)
+		if sumpf.info then
+			local geninfo = "-#- Swamp generates: x=["..minp.x.."; "..maxp.x.."] z=["..minp.z.."; "..maxp.z.."]"
+			print(geninfo)
+			minetest.chat_send_all(geninfo)
+		end
 
 		local smooth = sumpf.smooth
 		local swampwater = sumpf.swampwater
@@ -135,20 +137,22 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					if ground_y
 					and find_ground({x=x,y=ground_y,z=z}, SUMPFGROUND) then	--Pflanzen (und Pilz):
 						local boden = {x=x,y=ground_y+1,z=z}
-						if pr:next(1,80) == 1 then
-							mache_birke(boden)
-						elseif pr:next(1,20) == 1 then
-							env:add_node(boden, {name="jungletree:sapling"})
-						elseif pr:next(1,50) == 1 then
-							env:add_node(boden, {name="riesenpilz:brown"})
-						elseif pr:next(1,100) == 1 then
-							env:add_node(boden, {name="riesenpilz:red"})
-						elseif pr:next(1,200) == 1 then
-							env:add_node(boden, {name="riesenpilz:fly_agaric"})
-						elseif pr:next(1,4) == 1 then
-							env:add_node(boden, {name="sumpf:gras"})
-						elseif pr:next(1,6) == 1 then
-							env:add_node(boden, {name="default:junglegrass"})
+						if sumpf.enable_plants then
+							if pr:next(1,80) == 1 then
+								mache_birke(boden)
+							elseif pr:next(1,20) == 1 then
+								sumpf_make_jungletree(boden)
+							elseif pr:next(1,50) == 1 then
+								env:add_node(boden, {name="riesenpilz:brown"})
+							elseif pr:next(1,100) == 1 then
+								env:add_node(boden, {name="riesenpilz:red"})
+							elseif pr:next(1,200) == 1 then
+								env:add_node(boden, {name="riesenpilz:fly_agaric"})
+							elseif pr:next(1,4) == 1 then
+								env:add_node(boden, {name="sumpf:gras"})
+							elseif pr:next(1,6) == 1 then
+								env:add_node(boden, {name="default:junglegrass"})
+							end
 						end	--Sumpfwasser:
 						if swampwater
 						and pr:next(1,2) == 2
@@ -184,7 +188,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						end --Dreckseen:
 					elseif ground_y
 					and env:get_node(ground).name == "default:water_source"
-					and env:find_node_near(ground, 2+math.random(3), "group:crumbly") then
+					and env:find_node_near(ground, 3+pr:next(1,2), "group:crumbly") then
 						for y=0,-30,-1 do
 							local pos = {x=x,y=ground_y+y,z=z}
 							if env:get_node(pos).name == "default:water_source" then
