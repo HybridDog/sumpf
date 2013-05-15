@@ -2,6 +2,8 @@
 
 sumpf.enable_mapgen = true
 
+sumpf.always_generate = false
+
 --Enables smooth transition of biomes.
 sumpf.smooth = true
 

@@ -1,7 +1,7 @@
 --[[
 sumpf
 Textures from: gimp, gamiano.de
-sounds: GPL
+sounds: supertux (GPL)
 I looked at snow mod for mapgen and
 at the jungletree mod for birches.
 ]]
@@ -117,4 +117,4 @@ if sumpf.enable_mapgen then
 	dofile(minetest.get_modpath("sumpf") .. "/mapgen.lua")
 end
 
-print("[Swamps] {13.01.12} Loaded!") 
+print("[sumpf] Loaded!") 

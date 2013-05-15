@@ -89,6 +89,12 @@ end
 
 tree_crafts("sumpf:tree")
 
+minetest.register_craft({
+	output = 'default:wood 4',
+	recipe = {{"sumpf:mossytree"},}
+})
+
+
 local function add_tree_branch(pos, dir)	
 	minetest.env:set_node(pos, {name="sumpf:tree_horizontal", param2=dir})
 	for i = math.random(2), -math.random(2), -1 do		

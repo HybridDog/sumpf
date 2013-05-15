@@ -79,7 +79,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		--[[if not (perlin1:get2d({x=x0, y=z0}) > 0.53) and not (perlin1:get2d({x=x1, y=z1}) > 0.53)
 		and not (perlin1:get2d({x=x0, y=z1}) > 0.53) and not (perlin1:get2d({x=x1, y=z0}) > 0.53)
 		and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) then]]
-		if not ( perlin1:get2d( {x=x0, y=z0} ) > 0.53 ) 					--top left
+		if not sumpf.always_generate
+		and not ( perlin1:get2d( {x=x0, y=z0} ) > 0.53 ) 					--top left
 		and not ( perlin1:get2d( { x = x0 + ( (x1-x0)/2), y=z0 } ) > 0.53 )--top middle
 		and not (perlin1:get2d({x=x1, y=z1}) > 0.53) 						--bottom right
 		and not (perlin1:get2d({x=x1, y=z0+((z1-z0)/2)}) > 0.53) 			--right middle
@@ -118,7 +119,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				local in_biome = false
 				local test = perlin1:get2d({x=x, y=z})
 				--smooth mapgen
-				if smooth and (test > 0.73 or (test > 0.43 and pr:next(0,29) > (0.73 - test) * 100 )) then
+				if sumpf.always_generate then
+					in_biome = true
+				elseif smooth and (test > 0.73 or (test > 0.43 and pr:next(0,29) > (0.73 - test) * 100 )) then
 					in_biome = true
 				elseif (not smooth) and test > 0.53 then
 					in_biome = true
