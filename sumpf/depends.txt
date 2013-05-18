@@ -2,3 +2,4 @@ default
 riesenpilz
 jungletree
 habitat
+bucket

@@ -5,6 +5,20 @@ sounds: supertux (GPL)
 I looked at snow mod for mapgen and
 at the jungletree mod for birches.
 ]]
+minetest.register_craft({
+	output = "sumpf:junglestonebrick",
+	recipe = {
+		{"sumpf:junglestone", "sumpf:junglestone"},
+		{"sumpf:junglestone", "sumpf:junglestone"},
+	}
+})
+
+minetest.register_craft({
+	output = "sumpf:junglestone 4",
+	recipe = {
+		{"sumpf:junglestonebrick"},
+	}
+})
 
 minetest.register_node("sumpf:gras", {
 	description = "Swamp Grass",
@@ -21,10 +35,17 @@ minetest.register_node("sumpf:gras", {
 
 minetest.register_node("sumpf:junglestone", {
 	description = "Swamp Stone",
-	tile_images = {"sumpfstein.png"},
+	tile_images = {"sumpf_swampstone.png"},
 	groups = {cracky=3},
 	legacy_mineral = true,
-	sounds = SOUND,
+	sounds = default.node_sound_stone_defaults(),
+})
+
+minetest.register_node("sumpf:junglestonebrick", {
+	description = "Swamp Stone Brick",
+	tiles = {"sumpf_swampstone_brick.png"},
+	groups = {cracky=2, stone=1},
+	sounds = default.node_sound_stone_defaults(),
 })
 
 minetest.register_node("sumpf:peat", {
@@ -39,7 +60,7 @@ minetest.register_node("sumpf:peat", {
 
 minetest.register_node("sumpf:kohle", {
 	description = "Coal Ore",
-	tiles = {"sumpfstein.png^default_mineral_coal.png"},
+	tiles = {"sumpf_swampstone.png^default_mineral_coal.png"},
 	groups = {cracky=3},
 	drop = 'default:coal_lump',
 	sounds = default.node_sound_stone_defaults(),
@@ -47,7 +68,7 @@ minetest.register_node("sumpf:kohle", {
 
 minetest.register_node("sumpf:eisen", {
 	description = "Iron Ore",
-	tiles = {"sumpfstein.png^default_mineral_iron.png"},
+	tiles = {"sumpf_swampstone.png^default_mineral_iron.png"},
 	groups = {cracky=3},
 	drop = 'default:iron_lump',
 	sounds = default.node_sound_stone_defaults(),
@@ -63,7 +84,7 @@ minetest.register_node("sumpf:sumpf", {
 })
 
 minetest.register_node("sumpf:sumpf2", {
-	tiles = {"sumpf.png","sumpfstein.png","sumpfstein.png^sumpf2.png"},
+	tiles = {"sumpf.png","sumpf_swampstone.png","sumpf_swampstone.png^sumpf2.png"},
 	groups = {cracky=3},
 	drop = "sumpf:junglestone",
 	sounds = default.node_sound_stone_defaults({
@@ -109,6 +130,14 @@ minetest.register_node("sumpf:dirtywater_source", {
 	post_effect_color = {a=64, r=70, g=90, b=120},
 	groups = {water=3, liquid=3, puts_out_fire=1},
 })
+
+bucket.register_liquid(
+	"sumpf:dirtywater_source",
+	"sumpf:dirtywater_flowing",
+	"sumpf:bucket_dirtywater",
+	"bucket.png^sumpf_bucket_dirtywater.png",
+	"Swampwater Bucket"
+)
 
 sumpf = {}
 dofile(minetest.get_modpath("sumpf").."/settings.lua")

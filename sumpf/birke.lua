@@ -7,13 +7,17 @@ minetest.register_node("sumpf:sapling", {
 	paramtype = "light",	
 	walkable = false,	
 	groups = {snappy=2,dig_immediate=3,flammable=2},
+	sounds = default.node_sound_leaves_defaults(),
+	furnace_burntime = 9,
 })
+
 minetest.register_node("sumpf:birk", {
 	tiles = {"birke_mossytree.png"},	
 	inventory_image = "birke_mossytree.png^birke_sapling.png",	
 	paramtype = "light",	
 	stack_max = 1024,
 	groups = {snappy=2,dig_immediate=3},
+	sounds = default.node_sound_leaves_defaults(),
 	on_construct = function(pos)
 		mache_birke(pos)
 	end,
@@ -45,6 +49,7 @@ minetest.register_node("sumpf:tree", {
 	description = "Birch Trunk",	
 	tiles = {"birke_tree_top.png",	"birke_tree_top.png",	"birke_tree.png"},	
 	groups = {tree=1,snappy=1,choppy=2,oddly_breakable_by_hand=1,flammable=2},
+	sounds = default.node_sound_wood_defaults(),
 })
 
 minetest.register_node("sumpf:tree_horizontal", {
@@ -54,12 +59,14 @@ minetest.register_node("sumpf:tree_horizontal", {
 	paramtype2 = "facedir",
 	legacy_facedir_simple = true,
 	groups = {tree=1,snappy=1,choppy=2,oddly_breakable_by_hand=1,flammable=2},
+	sounds = default.node_sound_wood_defaults(),
 })
 
 minetest.register_node("sumpf:mossytree", {
 	description = "Mossy Birch Trunk",	
 	tiles = {"birke_tree_top.png",	"sumpf.png",	"birke_mossytree.png"},	
 	groups = {tree=1,snappy=1,choppy=2,oddly_breakable_by_hand=1,flammable=2},
+	sounds = default.node_sound_wood_defaults(),
 })
 
 local function tree_crafts(input)
@@ -109,7 +116,7 @@ local function add_tree_branch(pos, dir)
 				p = {x=pos.x+i, y=pos.y+1, z=pos.z+k}	
 				n = minetest.env:get_node(p)	
 				if (n.name=="air") then		
-					minetest.env:add_node(p, {name="sumpf:leaves"})   
+					minetest.env:add_node(p, {name="sumpf:leaves"})
 				end
 			end
 		end	
@@ -137,16 +144,19 @@ end
 minetest.register_abm({	
 	nodenames = {"sumpf:sapling"},	
 	interval = 10,	
-	chance = 6,	
+	chance = 16,	
 	action = function(pos)	
-		mache_birke(pos)
+		if minetest.env:find_node_near(pos, 1, "group:crumbly")
+		and minetest.env:get_node_light(pos, nil) > 7 then
+			mache_birke(pos)
+		end
 	end
 ,})
 
 --function anti_generate(node, surfaces, minp, maxp, height_min, height_max, spread, habitat_size, habitat_nodes)
 if sumpf.enable_birches then
 	minetest.register_on_generated(function(minp, maxp, seed)
-   		generate("sumpf:birk", {"default:dirt_with_grass"}, minp, maxp, 20, 25, 100, 500,
+			generate("sumpf:birk", {"default:dirt_with_grass"}, minp, maxp, 20, 25, 100, 500,
 		{"default:water_source"},30,{"default:desert_sand"})
 	end)
 end
