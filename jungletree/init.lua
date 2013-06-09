@@ -9,7 +9,7 @@ minetest.register_node("jungletree:sapling", {
 	wield_image = "default_sapling.png",	
 	paramtype = "light",	
 	walkable = false,	
-	groups = {snappy=2,dig_immediate=3,flammable=2},
+	groups = {snappy=2,dig_immediate=3,flammable=2,attached_node=1},
 	on_construct = function(pos)
 		sumpf_make_jungletree(pos)
 	end
@@ -28,7 +28,7 @@ for color = 1, 3 do
 		drawtype = "allfaces_optional",
 		tiles = {"jungletree_leaves_"..leaves[color]..".png"},
 		paramtype = "light",
-		groups = {snappy=3, leafdecay=3, flammable=2},
+		groups = {snappy=3, leafdecay=3, flammable=2, leaves=1},
 		drop = {
 			max_items = 1,
 			items = {

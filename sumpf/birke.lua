@@ -6,7 +6,7 @@ minetest.register_node("sumpf:sapling", {
 	wield_image = "birke_sapling.png",	
 	paramtype = "light",	
 	walkable = false,	
-	groups = {snappy=2,dig_immediate=3,flammable=2},
+	groups = {snappy=2,dig_immediate=3,flammable=2,attached_node=1},
 	sounds = default.node_sound_leaves_defaults(),
 	furnace_burntime = 9,
 })
@@ -28,7 +28,7 @@ minetest.register_node("sumpf:leaves", {
 	drawtype = "glasslike",
 	tiles = {"birke_leaves.png"},
 	paramtype = "light",
-	groups = {snappy=3, leafdecay=3, flammable=2},
+	groups = {snappy=3, leafdecay=3, flammable=2, leaves=1},
 	drop = {
 		max_items = 1,
 		items = {

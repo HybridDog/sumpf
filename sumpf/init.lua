@@ -1,7 +1,7 @@
 --[[
 sumpf
 Textures from: gimp, gamiano.de
-sounds: supertux (GPL)
+Sounds from: supertux (GPL)
 I looked at snow mod for mapgen and
 at the jungletree mod for birches.
 ]]
@@ -29,7 +29,7 @@ minetest.register_node("sumpf:gras", {
 	selection_box = {type = "fixed",fixed = {-1/3, -1/2, -1/3, 1/3, -1/5, 1/3},},
 	buildable_to = true,
 	walkable = false,
-	groups = {snappy=3,flammable=2},
+	groups = {snappy=3,flammable=3,flora=1,attached_node=1},
 	sounds = default.node_sound_leaves_defaults(),
 })
 
