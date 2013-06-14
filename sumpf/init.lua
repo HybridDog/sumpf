@@ -1,7 +1,7 @@
 --[[
 sumpf
 Textures from: gimp, gamiano.de
-Sounds from: supertux (GPL)
+Sounds from: supertux (GPL), http://www.freesound.org/people/dobroide/sounds/16771/
 I looked at snow mod for mapgen and
 at the jungletree mod for birches.
 ]]

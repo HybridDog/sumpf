@@ -57,6 +57,18 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		local divs = (maxp.x-minp.x);
 		local pr = PseudoRandom(seed+68)
 
+		--[[for i = minp.x,maxp.x,1 do
+			for j = minp.y,maxp.y,1 do
+				for k = minp.z,maxp.z,1 do
+					if env:get_node({x=i,y=j,z=k}).name == "sumpf:sumpf" then
+						local warning = "[sumpf] wants to generate again at: x=["..minp.x.."; "..maxp.x.."]; z=["..minp.z.."; "..maxp.z.."] ..not aborting"
+						print(warning)
+						minetest.chat_send_all(warning)
+					end
+				end
+			end
+		end]]
+
 		--remove usual stuff
 		local trees = env:find_nodes_in_area(minp, maxp, USUAL_STUFF)
 		for i,v in pairs(trees) do
