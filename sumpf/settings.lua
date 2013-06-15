@@ -1,6 +1,6 @@
 --This file contains configuration options for swamp mod.
 
-sumpf.enable_mapgen = false
+sumpf.enable_mapgen = true
 
 sumpf.always_generate = false
 
