@@ -53,8 +53,10 @@ minetest.register_node("sumpf:peat", {
 	tiles = {"sumpf_peat.png"},
 	groups = {crumbly=3, falling_node=1, sand=1},
 	sounds = default.node_sound_sand_defaults({
-		dig = {name="sumpf", gain=0.4},
 		footstep = {name="sumpf", gain=0.4},
+		place = {name="sumpf", gain=0.4},
+		dig = {name="sumpf", gain=0.4},
+		dug = {name="default_dirt_footstep", gain=0.25}
 	}),
 })
 

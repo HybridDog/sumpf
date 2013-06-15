@@ -1,6 +1,6 @@
 --This file contains configuration options for swamp mod.
 
-sumpf.enable_mapgen = true
+sumpf.enable_mapgen = false
 
 sumpf.always_generate = false
 
@@ -13,7 +13,7 @@ sumpf.enable_plants = true
 sumpf.swampwater = false
 
 --Enables birches (habitat).
-sumpf.enable_birches = true
+sumpf.spawn_plants = true
 
 --says some information.
 sumpf.info = true
