@@ -20,22 +20,17 @@ minetest.register_craft({
 	}
 })
 
-minetest.register_node("sumpf:gras", {
-	description = "Swamp Grass",
-	tile_images = {"sumpfgrass.png"},
-	inventory_image = "sumpfgrass.png",
-	drawtype = "plantlike",
-	paramtype = "light",
-	selection_box = {type = "fixed",fixed = {-1/3, -1/2, -1/3, 1/3, -1/5, 1/3},},
-	buildable_to = true,
-	walkable = false,
-	groups = {snappy=3,flammable=3,flora=1,attached_node=1},
-	sounds = default.node_sound_leaves_defaults(),
-})
-
 minetest.register_node("sumpf:junglestone", {
 	description = "Swamp Stone",
 	tile_images = {"sumpf_swampstone.png"},
+	groups = {cracky=3},
+	legacy_mineral = true,
+	sounds = default.node_sound_stone_defaults(),
+})
+
+minetest.register_node("sumpf:cobble", {
+	description = "Swamp Cobble Stone",
+	tile_images = {"sumpf_cobble.png"},
 	groups = {cracky=3},
 	legacy_mineral = true,
 	sounds = default.node_sound_stone_defaults(),
@@ -94,6 +89,50 @@ minetest.register_node("sumpf:sumpf2", {
 	}),
 })
 
+
+----------------------stairs and slabs------------------
+
+stairs.register_stair_and_slab("swampstone", "sumpf:junglestone",
+		{cracky=3},
+		{"sumpf_swampstone.png"},
+		"Swamp Stone Stair",
+		"Swamp Stone Slab",
+		default.node_sound_stone_defaults()
+)
+
+stairs.register_stair_and_slab("swampcobble", "sumpf:cobble",
+		{cracky=3},
+		{"sumpf_cobble.png"},
+		"Swamp Cobble Stone Stair",
+		"Swamp Cobble Stone Slab",
+		default.node_sound_stone_defaults()
+)
+
+stairs.register_stair_and_slab("swampstonebrick", "sumpf:swampstonebrick",
+		{cracky=2, stone=1},
+		{"sumpf_swampstone_brick.png"},
+		"Swamp Stone Brick Stair",
+		"Swamp Stone Brick Slab",
+		default.node_sound_stone_defaults()
+)
+
+---------------------------------------------------------
+
+
+
+minetest.register_node("sumpf:gras", {
+	description = "Swamp Grass",
+	tile_images = {"sumpfgrass.png"},
+	inventory_image = "sumpfgrass.png",
+	drawtype = "plantlike",
+	paramtype = "light",
+	selection_box = {type = "fixed",fixed = {-1/3, -1/2, -1/3, 1/3, -1/5, 1/3},},
+	buildable_to = true,
+	walkable = false,
+	groups = {snappy=3,flammable=3,flora=1,attached_node=1},
+	sounds = default.node_sound_leaves_defaults(),
+})
+
 minetest.register_node("sumpf:dirtywater_flowing", {
 	drawtype = "flowingliquid",
 	tiles = {"default_water.png"},
@@ -140,6 +179,7 @@ bucket.register_liquid(
 	"bucket.png^sumpf_bucket_dirtywater.png",
 	"Swampwater Bucket"
 )
+
 
 sumpf = {}
 dofile(minetest.get_modpath("sumpf").."/settings.lua")
