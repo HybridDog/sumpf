@@ -21,6 +21,9 @@ minetest.register_node("sumpf:birk", {
 	on_construct = function(pos)
 		mache_birke(pos)
 	end,
+    on_use = function()
+		mache_birke(pos)
+	end,
 })
 
 minetest.register_node("sumpf:leaves", {
@@ -143,15 +146,19 @@ end
 
 minetest.register_abm({	
 	nodenames = {"sumpf:sapling"},	
-	interval = 10,	
-	chance = 16,	
+	neighbors = {"group:soil"},
+	interval = 20,	
+	chance = 8,	
 	action = function(pos)	
-		if minetest.env:find_node_near(pos, 1, "group:crumbly")
-		and minetest.env:get_node_light(pos, nil) > 7 then
+		if minetest.get_item_group(minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z}).name, "soil") ~= 1
+		or not minetest.get_node_light(pos) then
+			return
+		end
+		if minetest.env:get_node_light(pos, nil) > 7 then
 			mache_birke(pos)
 		end
 	end
-,})
+})
 
 if sumpf.spawn_plants
 and minetest.get_modpath("habitat") then

@@ -150,14 +150,31 @@ function sumpf_make_jungletree(pos)
 			end
 		end
 end
-minetest.register_abm({
+--[[minetest.register_abm({
 	nodenames = {"jungletree:sapling"},
 	interval = 1,
 	chance = 1,
 	action = function(pos)
 		sumpf_make_jungletree(pos)
 	end
+})]]
+
+minetest.register_abm({	
+	nodenames = {"jungletree:sapling"},	
+	neighbors = {"group:soil"},
+	interval = 40,	
+	chance = 5,	
+	action = function(pos)	
+		if minetest.get_item_group(minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z}).name, "soil") ~= 1
+		or not minetest.get_node_light(pos) then
+			return
+		end
+		if minetest.env:get_node_light(pos, nil) > 6 then
+			sumpf_make_jungletree(pos)
+		end
+	end
 })
+
 --[[	
 minetest.register_craft({
     output = 'default:wood 4',

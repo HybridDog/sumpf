@@ -46,7 +46,7 @@ minetest.register_node("sumpf:junglestonebrick", {
 minetest.register_node("sumpf:peat", {
 	description = "Peat",
 	tiles = {"sumpf_peat.png"},
-	groups = {crumbly=3, falling_node=1, sand=1},
+	groups = {crumbly=3, falling_node=1, sand=1, soil=1},
 	sounds = default.node_sound_sand_defaults({
 		footstep = {name="sumpf", gain=0.4},
 		place = {name="sumpf", gain=0.4},
@@ -74,7 +74,7 @@ minetest.register_node("sumpf:eisen", {
 minetest.register_node("sumpf:sumpf", {
 	description = "Swamp",
 	tiles = {"sumpf.png"},
-	groups = {crumbly=3},
+	groups = {crumbly=3, soil=1},
 	sounds = default.node_sound_dirt_defaults({
 		footstep = {name="sumpf", gain=0.4},
 	}),
@@ -82,7 +82,7 @@ minetest.register_node("sumpf:sumpf", {
 
 minetest.register_node("sumpf:sumpf2", {
 	tiles = {"sumpf.png","sumpf_swampstone.png","sumpf_swampstone.png^sumpf2.png"},
-	groups = {cracky=3},
+	groups = {cracky=3, soil=1},
 	drop = "sumpf:junglestone",
 	sounds = default.node_sound_stone_defaults({
 		footstep = {name="sumpf", gain=0.4},
@@ -138,13 +138,15 @@ minetest.register_node("sumpf:dirtywater_flowing", {
 	tiles = {"default_water.png"},
 	special_tiles = {
 		{name="sumpfwasser2.png", backface_culling=false,	animation={type="vertical_frames", aspect_w=32, aspect_h=32, length=1}},
-		{name="sumpfwasser2.png", backface_culling=true,	animation={type="vertical_frames", aspect_w=32, aspect_h=32, length=1}},},
+		{name="sumpfwasser2.png", backface_culling=true,	animation={type="vertical_frames", aspect_w=32, aspect_h=32, length=1}}
+	},
 	alpha = WATER_ALPHA,
 	paramtype = "light",
 	walkable = false,
 	pointable = false,
 	diggable = false,
 	buildable_to = true,
+	drop = "",
 	liquidtype = "flowing",
 	liquid_alternative_flowing = "sumpf:dirtywater_flowing",
 	liquid_alternative_source = "sumpf:dirtywater_source",
@@ -156,7 +158,11 @@ minetest.register_node("sumpf:dirtywater_flowing", {
 minetest.register_node("sumpf:dirtywater_source", {
 	description = "Swampwater",
 	drawtype = "liquid",
-	tiles = {{name="sumpfwasser.png", animation={type="vertical_frames", aspect_w=32, aspect_h=32, length=1.0}}},
+	tiles = {
+		{name="sumpfwasser.png", animation={type="vertical_frames", aspect_w=32, aspect_h=32, length=1.0}},
+		{name="sumpfwasser.png", animation={type="vertical_frames", aspect_w=32, aspect_h=32, length=1.0}},
+		{name="sumpfwasser2.png", animation={type="vertical_frames", aspect_w=32, aspect_h=32, length=1.0}}
+	},
 	special_tiles = {{name="sumpfwasser.png", backface_culling=false},},
 	alpha = WATER_ALPHA,
 	paramtype = "light",

@@ -77,7 +77,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 		--Information:
 		if sumpf.info then
-			local geninfo = "[sumpf] tries to generate a swamp at: x=["..minp.x.."; "..maxp.x.."]; z=["..minp.z.."; "..maxp.z.."]"
+			local geninfo = "[sumpf] tries to generate a swamp at: x=["..minp.x.."; "..maxp.x.."]; y=["..minp.y.."; "..maxp.y.."]; z=["..minp.z.."; "..maxp.z.."]"
 			print(geninfo)
 			minetest.chat_send_all(geninfo)
 		end
