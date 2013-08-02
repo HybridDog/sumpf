@@ -11,7 +11,9 @@ minetest.register_node("jungletree:sapling", {
 	walkable = false,	
 	groups = {snappy=2,dig_immediate=3,flammable=2,attached_node=1},
 	on_construct = function(pos)
-		sumpf_make_jungletree(pos)
+		if minetest.setting_getbool("creative_mode") then
+			sumpf_make_jungletree(pos)
+		end
 	end
 })
 

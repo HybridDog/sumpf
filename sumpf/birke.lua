@@ -21,9 +21,9 @@ minetest.register_node("sumpf:birk", {
 	on_construct = function(pos)
 		mache_birke(pos)
 	end,
-	on_use = function()
+--[[	on_use = function()
 		mache_birke(pos)
-	end,
+	end,]]
 })
 
 minetest.register_node("sumpf:leaves", {

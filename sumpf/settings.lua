@@ -12,7 +12,7 @@ sumpf.enable_plants = true
 --Enables swampwater - be careful, it doesn't work right but it looks great.
 sumpf.swampwater = false
 
---Enables birches (habitat).
+--habitat stuff
 sumpf.spawn_plants = true
 
 --says some information.
