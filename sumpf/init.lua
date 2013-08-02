@@ -163,7 +163,7 @@ minetest.register_node("sumpf:dirtywater_source", {
 		{name="sumpfwasser.png", animation={type="vertical_frames", aspect_w=32, aspect_h=32, length=1.0}},
 		{name="sumpfwasser2.png", animation={type="vertical_frames", aspect_w=32, aspect_h=32, length=1.0}}
 	},
-	special_tiles = {{name="sumpfwasser.png", backface_culling=false},},
+	special_tiles = {{name="sumpfwasser.png", animation={type="vertical_frames", aspect_w=32, aspect_h=32, length=1.0}, backface_culling=false},},
 	alpha = WATER_ALPHA,
 	paramtype = "light",
 	walkable = false,
