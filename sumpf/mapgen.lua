@@ -75,10 +75,10 @@ local c_stonebrick = minetest.get_content_id("default:stonebrick")
 local c_cloud = minetest.get_content_id("default:cloud")
 
 
-EVSUMPFGROUND =	{"default:dirt_with_grass","default:dirt","default:sand","default:water_source","default:desert_sand"}
-GROUND =	{c_gr, c_sand, c_dirt, c_desert_sand, c_water}
+local EVSUMPFGROUND =	{"default:dirt_with_grass","default:dirt","default:sand","default:water_source","default:desert_sand"}
+local GROUND =	{c_gr, c_sand, c_dirt, c_desert_sand, c_water}
 --USUAL_STUFF =	{"default:leaves","default:apple","default:tree","default:dry_shrub","default:cactus","default:papyrus"}
-USUAL_STUFF =	{c_dry_shrub, c_cactus, c_papyrus}
+local USUAL_STUFF =	{c_dry_shrub, c_cactus, c_papyrus}
 minetest.register_on_generated(function(minp, maxp, seed)
 	if maxp.y <= -2
 	or minp.y >= 150 then --avoid generation in the sky
@@ -109,6 +109,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 		--Information:
 	if sumpf.info then
+		t1 = os.clock()
 		local geninfo = "[sumpf] tries to generate a swamp at: x=["..minp.x.."; "..maxp.x.."]; y=["..minp.y.."; "..maxp.y.."]; z=["..minp.z.."; "..maxp.z.."]"
 		print(geninfo)
 		minetest.chat_send_all(geninfo)
@@ -263,7 +264,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 	vm:set_data(data)
 	--vm:set_lighting({day=0, night=0})
-	vm:calc_lighting()
+	vm:calc_lighting(
+		{x=minp.x-16, y=minp.y, z=minp.z-16},
+		{x=maxp.x+16, y=maxp.y, z=maxp.z+16}
+	)
 	vm:update_liquids()
 	vm:write_to_map()
 
@@ -276,5 +280,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		for _,v in ipairs(jgtrees) do
 			sumpf_make_jungletree(v)
 		end
+	end
+	if sumpf.info then
+		local geninfo = string.format("[sumpf] done in: %.2fs", os.clock() - t1)
+		print(geninfo)
+		minetest.chat_send_all(geninfo)
 	end
 end)

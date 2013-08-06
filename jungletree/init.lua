@@ -1,4 +1,5 @@
 local leaves = {"green","yellow","red"}
+local say_jg_info = true
 
 minetest.register_node("jungletree:sapling", {
 	description = "Jungle Tree Sapling",	
@@ -63,6 +64,172 @@ end
 
 --minetest.register_alias("jungletree:tree", "default:jungletree")
 
+
+local function tree_branch(ignore, area, nodes, pos)
+
+	--chooze random leave
+	--green leaves are more common
+	local num = 1
+	local tab = {}
+	local chance = math.random(5)
+	local leaf = 2
+--	local leaf = "jungletree:leaves_"..leaves[1]
+	if (chance < 2) then
+		leaf = math.random(2,4)
+--		leave = "jungletree:leaves_"..leaves[math.random(1,3)]
+	end
+	
+	tab[num] = {1, pos.x, pos.y, pos.z}
+	num = num+1
+	for i = math.random(2), -math.random(2), -1 do
+		for k =math.random(2), -math.random(2), -1 do
+			local p = {x=pos.x+i, y=pos.y, z=pos.z+k}
+			local n = minetest.env:get_node(p)
+			if (n.name=="air")
+			and nodes[area:index(p.x, p.y, p.z)] == ignore then
+				tab[num] = {leaf, p.x, p.y, p.z}
+				num = num+1
+			end
+			local chance = math.abs(i+k)
+			if (chance < 1) then
+				p = {x=pos.x+i, y=pos.y+1, z=pos.z+k}
+				n = minetest.env:get_node(p)
+				if (n.name=="air")
+				and nodes[area:index(p.x, p.y, p.z)] == ignore then
+					tab[num] = {leaf, p.x, p.y, p.z}
+					num = num+1
+				end
+			end
+		end
+	end
+	return tab
+end
+
+
+function sumpf_make_jungletree(pos, generated)
+
+	local t1 = os.clock()
+	local manip = minetest.get_voxel_manip()
+	local vwidth = 7
+	local vheight = 25
+	local emerged_pos1, emerged_pos2 = manip:read_from_map({x=pos.x-vwidth, y=pos.y-3, z=pos.z-vwidth},
+		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
+	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
+
+	local nodes = {}
+	local ignore = minetest.get_content_id("ignore")
+	for i = 1, sumpf_get_volume(emerged_pos1, emerged_pos2) do
+		nodes[i] = ignore
+	end
+
+	local c_jungletree = minetest.get_content_id("default:jungletree")
+	local c_leaves_green = minetest.get_content_id("jungletree:leaves_green")
+	local c_leaves_red = minetest.get_content_id("jungletree:leaves_red")
+	local c_leaves_yellow = minetest.get_content_id("jungletree:leaves_yellow")
+	local ndtable = {c_jungletree, c_leaves_green, c_leaves_red, c_leaves_yellow}
+
+		local height = 5 + math.random(15)
+		if height < 10 then
+			for i = height, -1, -1 do
+				local p = {x=pos.x, y=pos.y+i, z=pos.z}
+				nodes[area:index(pos.x, pos.y+i, pos.z)] = c_jungletree
+				if i == height then
+					local branches = {
+						tree_branch(ignore, area, nodes, {x=pos.x, y=pos.y+height+math.random(0, 1), z=pos.z}),
+						tree_branch(ignore, area, nodes, {x=pos.x, y=pos.y+height+math.random(0, 1), z=pos.z}),
+						tree_branch(ignore, area, nodes, {x=pos.x+1, y=pos.y+i-math.random(2), z=pos.z}),
+						tree_branch(ignore, area, nodes, {x=pos.x-1, y=pos.y+i-math.random(2), z=pos.z}),
+
+						tree_branch(ignore, area, nodes, {x=pos.x, y=pos.y+i-math.random(2), z=pos.z+1}),
+						tree_branch(ignore, area, nodes, {x=pos.x, y=pos.y+i-math.random(2), z=pos.z-1})
+					}
+					for _,tbr in ipairs(branches) do
+						for _,nds in ipairs(tbr) do
+							nodes[area:index(nds[2], nds[3], nds[4])] = ndtable[nds[1] ]
+						end
+					end
+
+				end
+				if height <= 0 then
+
+					nodes[area:index(pos.x+1, pos.y+i-math.random(2), pos.z)] = c_jungletree
+					nodes[area:index(pos.x, pos.y+i-math.random(2), pos.z+1)] = c_jungletree
+					nodes[area:index(pos.x-1, pos.y+i-math.random(2), pos.z)] = c_jungletree
+					nodes[area:index(pos.x, pos.y+i-math.random(2), pos.z-1)] = c_jungletree
+				end
+
+				if (math.sin(i/height*i) < 0.2 and i > 3 and math.random(0,2) < 1.5) then
+					branch_pos = {x=pos.x+math.random(0,1), y=pos.y+i, z=pos.z-math.random(0,1)}				
+					for _,nds in ipairs(tree_branch(ignore, area, nodes, branch_pos)) do
+						nodes[area:index(nds[2], nds[3], nds[4])] = ndtable[nds[1] ]
+					end
+				end
+			end
+
+		else
+			for i = height, -2, -1 do
+				if (math.sin(i/height*i) < 0.2 and i > 3 and math.random(0,2) < 1.5) then
+					branch_pos = {x=pos.x+math.random(0,1), y=pos.y+i, z=pos.z-math.random(0,1)}
+					for _,nds in ipairs(tree_branch(ignore, area, nodes, branch_pos)) do
+						nodes[area:index(nds[2], nds[3], nds[4])] = ndtable[nds[1] ]
+					end
+
+				end
+				if i < math.random(0,1) then
+					nodes[area:index(pos.x+1, pos.y+i, pos.z+1)] = c_jungletree
+					nodes[area:index(pos.x+2, pos.y+i, pos.z-1)] = c_jungletree
+					nodes[area:index(pos.x, pos.y+i, pos.z-2)] = c_jungletree
+
+					nodes[area:index(pos.x-1, pos.y+i, pos.z)] = c_jungletree
+				end
+				if i == height then
+					local branches = {
+						tree_branch(ignore, area, nodes, {x=pos.x+1, y=pos.y+i, z=pos.z+1}),
+						tree_branch(ignore, area, nodes, {x=pos.x+2, y=pos.y+i, z=pos.z-1}),
+
+						tree_branch(ignore, area, nodes, {x=pos.x, y=pos.y+i, z=pos.z-2}),
+						tree_branch(ignore, area, nodes, {x=pos.x-1, y=pos.y+i, z=pos.z}),
+						tree_branch(ignore, area, nodes, {x=pos.x+1, y=pos.y+i, z=pos.z+2}),
+						tree_branch(ignore, area, nodes, {x=pos.x+3, y=pos.y+i, z=pos.z-1}),
+						tree_branch(ignore, area, nodes, {x=pos.x, y=pos.y+i, z=pos.z-3}),
+
+						tree_branch(ignore, area, nodes, {x=pos.x-2, y=pos.y+i, z=pos.z}),
+						tree_branch(ignore, area, nodes, {x=pos.x+1, y=pos.y+i, z=pos.z}),
+						tree_branch(ignore, area, nodes, {x=pos.x+1, y=pos.y+i, z=pos.z-1}),
+						tree_branch(ignore, area, nodes, {x=pos.x, y=pos.y+i, z=pos.z-1}),
+						tree_branch(ignore, area, nodes, {x=pos.x, y=pos.y+i, z=pos.z})
+					}
+					for _,tbr in ipairs(branches) do
+						for _,nds in ipairs(tbr) do
+							nodes[area:index(nds[2], nds[3], nds[4])] = ndtable[nds[1] ]
+						end
+					end
+
+				else
+					nodes[area:index(pos.x+1, pos.y+i, pos.z)] = c_jungletree
+					nodes[area:index(pos.x+1, pos.y+i, pos.z-1)] = c_jungletree
+					nodes[area:index(pos.x, pos.y+i, pos.z-1)] = c_jungletree
+					nodes[area:index(pos.x, pos.y+i, pos.z)] = c_jungletree
+
+				end
+			end
+		end
+
+	manip:set_data(nodes)
+	manip:write_to_map()
+	if not generated then	--info
+		if say_jg_info then
+			print(string.format("[sumpf] a jungletree grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") in: %.2fms", (os.clock() - t1) * 1000))
+			local t1 = os.clock()
+			manip:update_map()
+			print(string.format("[sumpf] map updated in: %.2fms", (os.clock() - t1) * 1000))
+		else
+			manip:update_map()
+		end
+	end
+end
+
+--[[
 local function add_tree_branch(pos)
 
 	--chooze random leave
@@ -94,6 +261,7 @@ local function add_tree_branch(pos)
 end
 
 function sumpf_make_jungletree(pos)
+		local t1 = os.clock()
 		local height = 5 + math.random(15)
 		if height < 10 then
 			for i = height, -1, -1 do
@@ -151,7 +319,10 @@ function sumpf_make_jungletree(pos)
 				end
 			end
 		end
-end
+	if say_jg_info then
+		print(string.format("[sumpf] a jungletree grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") in: %.2fms", (os.clock() - t1) * 1000))
+	end
+end]]
 --[[minetest.register_abm({
 	nodenames = {"jungletree:sapling"},
 	interval = 1,
@@ -177,15 +348,7 @@ minetest.register_abm({
 	end
 })
 
---[[	
-minetest.register_craft({
-    output = 'default:wood 4',
-    recipe = {
-        {'default:jungletree'},
-    }
-})]]
-
---old mod compatible
+--very old mod compatible
 --minetest.register_alias("jungletree:leaves", "jungletree:leaves_green")
 
 print("[Jungletree] Loaded!")
