@@ -1,5 +1,3 @@
-local say_birch_info = true
-
 minetest.register_node("sumpf:sapling", {
 	description = "Birch",	
 	drawtype = "plantlike",	
@@ -195,7 +193,7 @@ function mache_birke(pos, generated)
 	manip:set_data(nodes)
 	manip:write_to_map()
 	if not generated then	--info
-		if say_birch_info then
+		if sumpf_info_birch then
 			print(string.format("[sumpf] a birch grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") in: %.2fms", (os.clock() - t1) * 1000))
 			local t1 = os.clock()
 			manip:update_map()
@@ -245,7 +243,7 @@ function mache_birke(pos)
 	add_tree_branch({x=pos.x-1, y=pos.y+height-math.random(2), z=pos.z}, 1)		
 	add_tree_branch({x=pos.x, y=pos.y+height-math.random(2), z=pos.z+1}, 2)		
 	add_tree_branch({x=pos.x, y=pos.y+height-math.random(2), z=pos.z-1}, 2)		
-	if say_birch_info then
+	if sumpf_info_birch then
 		print(string.format("[sumpf] a birch grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") in: %.2fms", (os.clock() - t1) * 1000))
 	end
 end]]

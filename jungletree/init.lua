@@ -1,5 +1,4 @@
 local leaves = {"green","yellow","red"}
-local say_jg_info = true
 
 minetest.register_node("jungletree:sapling", {
 	description = "Jungle Tree Sapling",	
@@ -218,7 +217,7 @@ function sumpf_make_jungletree(pos, generated)
 	manip:set_data(nodes)
 	manip:write_to_map()
 	if not generated then	--info
-		if say_jg_info then
+		if sumpf_info_jg then
 			print(string.format("[sumpf] a jungletree grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") in: %.2fms", (os.clock() - t1) * 1000))
 			local t1 = os.clock()
 			manip:update_map()
@@ -319,7 +318,7 @@ function sumpf_make_jungletree(pos)
 				end
 			end
 		end
-	if say_jg_info then
+	if sumpf_info_jg then
 		print(string.format("[sumpf] a jungletree grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") in: %.2fms", (os.clock() - t1) * 1000))
 	end
 end]]

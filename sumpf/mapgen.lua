@@ -75,6 +75,11 @@ local c_stonebrick = minetest.get_content_id("default:stonebrick")
 local c_cloud = minetest.get_content_id("default:cloud")
 
 
+local smooth = sumpf.smooth
+local swampwater = sumpf.swampwater
+local plants_enabled = sumpf.enable_plants
+local env = minetest.env	--Should make things a bit faster.
+
 local EVSUMPFGROUND =	{"default:dirt_with_grass","default:dirt","default:sand","default:water_source","default:desert_sand"}
 local GROUND =	{c_gr, c_sand, c_dirt, c_desert_sand, c_water}
 --USUAL_STUFF =	{"default:leaves","default:apple","default:tree","default:dry_shrub","default:cactus","default:papyrus"}
@@ -85,7 +90,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		return
 	end
 	local x0,z0,x1,z1 = minp.x,minp.z,maxp.x,maxp.z	-- Assume X and Z lengths are equal
-	local env = minetest.env	--Should make things a bit faster.
 	local perlin1 = env:get_perlin(11,3, 0.5, 200)	--Get map specific perlin
 
 	--[[if not (perlin1:get2d({x=x0, y=z0}) > 0.53) and not (perlin1:get2d({x=x1, y=z1}) > 0.53)
@@ -133,9 +137,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		end
 	end
 
-	local smooth = sumpf.smooth
-	local swampwater = sumpf.swampwater
-	local plants_enabled = sumpf.enable_plants
+	local num = 1
+	local tab = {}
 
 	for j=0,divs do
 		for i=0,divs do
@@ -185,7 +188,12 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					local boden =	{x=x,y=ground_y+1,	z=z}
 
 					if d_p_ground == c_water then	--Dreckseen:
-						if env:find_node_near(ground, 3+pr:next(1,2), "group:crumbly") then
+						if smooth then
+							h = pr:next(1,2)
+						else
+							h = 2 --untested
+						end
+						if env:find_node_near(ground, 3+h, "group:crumbly") then
 						--if data[area:index(x, ground_y-(3+pr:next(1,2)), z)] ~= c_water then
 							for y=0,-pr:next(26,30),-1 do
 								local p_pos = area:index(x, ground_y+y, z)
@@ -199,7 +207,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							end
 						end
 					else
-						if swampwater	--Sumpfwasser:
+						if swampwater	--Sumpfwasser: doesn't work like cave detection
 						and pr:next(1,2) == 2
 						and data[area:index(x+1, ground_y, z)] ~= c_air
 						and data[area:index(x-1, ground_y, z)] ~= c_air
@@ -240,10 +248,12 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						if plants_enabled then	--Pflanzen (und Pilz):
 
 							if pr:next(1,80) == 1 then
-								data[p_boden] = c_stonebrick
 --								mache_birke(boden)	this didn't work, so...
+								tab[num] = {1, boden}
+								num = num+1
 							elseif pr:next(1,20) == 1 then
-								data[p_boden] = c_cloud
+								tab[num] = {2, boden}
+								num = num+1
 --								sumpf_make_jungletree(boden)
 							elseif pr:next(1,50) == 1 then
 								data[p_boden] = c_brown_shroom
@@ -272,15 +282,16 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	vm:write_to_map()
 
 	if plants_enabled then	--Trees:
-		local birches = env:find_nodes_in_area(minp, maxp, {"default:stonebrick"})
-		local jgtrees = env:find_nodes_in_area(minp, maxp, {"default:cloud"})
-		for _,v in ipairs(birches) do
-			mache_birke(v)
-		end
-		for _,v in ipairs(jgtrees) do
-			sumpf_make_jungletree(v)
+		for _,v in ipairs(tab) do
+			local p = v[2]
+			if v[1] == 1 then
+				mache_birke(p)
+			else
+				sumpf_make_jungletree(p)
+			end
 		end
 	end
+
 	if sumpf.info then
 		local geninfo = string.format("[sumpf] done in: %.2fs", os.clock() - t1)
 		print(geninfo)
