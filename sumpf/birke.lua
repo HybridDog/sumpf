@@ -1,3 +1,9 @@
+local sumpf_birch_seed = 113
+
+function sumpf_birch_get_random(pos)
+	return PseudoRandom(math.abs(pos.x+pos.y*3+pos.z*5)+sumpf_birch_seed)
+end
+
 minetest.register_node("sumpf:sapling", {
 	description = "Birch",	
 	drawtype = "plantlike",	
@@ -108,40 +114,37 @@ function sumpf_get_volume(pos1, pos2)
 	return (pos2.x - pos1.x + 1) * (pos2.y - pos1.y + 1) * (pos2.z - pos1.z + 1)
 end
 
+sumpf_c_air = minetest.get_content_id("air")
+sumpf_c_mossytree = minetest.get_content_id("sumpf:mossytree")
+sumpf_c_tree = minetest.get_content_id("sumpf:tree")
+sumpf_c_tree_horizontal = minetest.get_content_id("sumpf:tree_horizontal")
+sumpf_c_leaves = minetest.get_content_id("sumpf:leaves")
+sumpf_ndtable = {sumpf_c_tree_horizontal, sumpf_c_leaves}
 
-local function tree_branch(ignore, area, nodes, pos, dir)	
-	local num = 1
-	local tab = {}
 
-	if dir ~= 0 then
-		minetest.env:set_node(pos, {name="sumpf:tree_horizontal", param2=dir})
+local function tree_branch(pos, dir)	
+
+	if dir == 0 then
+		nodes[area:index(pos.x, pos.y, pos.z)] = sumpf_c_tree_horizontal
+	else
+		tab[num] = pos
+		num = num+1
 	end
-	for i = math.random(2), -math.random(2), -1 do		
-		for k = math.random(2), -math.random(2), -1 do
-			local p = {x=pos.x+i, y=pos.y, z=pos.z+k}
-			local n = minetest.env:get_node(p)
-			if (n.name=="air")
-			and nodes[area:index(p.x, p.y, p.z)] == ignore then	
-				tab[num] = {2, p.x, p.y, p.z}
-				num = num+1
+	for i = sumpf_birch_pr:next(1,2), -sumpf_birch_pr:next(1,2), -1 do		
+		for k = sumpf_birch_pr:next(1,2), -sumpf_birch_pr:next(1,2), -1 do
+			local p_p = area:index(pos.x+i, pos.y, pos.z+k)
+			if nodes[p_p] == sumpf_c_air then
+				nodes[p_p] = sumpf_c_leaves
 			end
 			local chance = math.abs(i+k)
 			if (chance < 1) then	
-				p = {x=pos.x+i, y=pos.y+1, z=pos.z+k}
-				n = minetest.env:get_node(p)	
-				if (n.name=="air")
-				and nodes[area:index(p.x, p.y, p.z)] == ignore then
-					tab[num] = {2, p.x, p.y, p.z}
-					num = num+1
+				local p_p = area:index(pos.x+i, pos.y+1, pos.z+k)
+				if nodes[p_p] == sumpf_c_air then
+					nodes[p_p] = sumpf_c_leaves
 				end
 			end
 		end	
 	end
-	if dir == 0 then
-		tab[num] = {1, pos.x, pos.y, pos.z}
-		num = num+1
-	end
-	return tab
 end
 
 function mache_birke(pos, generated)	
@@ -152,55 +155,47 @@ function mache_birke(pos, generated)
 	local vheight = 13
 	local emerged_pos1, emerged_pos2 = manip:read_from_map({x=pos.x-vwidth, y=pos.y-3, z=pos.z-vwidth},
 		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
-	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
+	area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
+	nodes = manip:get_data()
 
-	local nodes = {}
-	local ignore = minetest.get_content_id("ignore")
-	for i = 1, sumpf_get_volume(emerged_pos1, emerged_pos2) do
-		nodes[i] = ignore
-	end
+	sumpf_birch_pr = sumpf_birch_get_random(pos)
+	num = 1
+	tab = {}
 
-	local c_mossytree = minetest.get_content_id("sumpf:mossytree")
-	local c_tree = minetest.get_content_id("sumpf:tree")
-	local c_tree_horizontal = minetest.get_content_id("sumpf:tree_horizontal")
-	local c_leaves = minetest.get_content_id("sumpf:leaves")
-	local ndtable = {c_tree_horizontal, c_leaves}
-
-	nodes[area:index(pos.x, pos.y, pos.z)] = c_mossytree
-	local height = 3 + math.random(2)
+	nodes[area:index(pos.x, pos.y, pos.z)] = sumpf_c_mossytree
+	local height = 3 + sumpf_birch_pr:next(1,2)
 	for i = height, 1, -1 do
 		local p = {x=pos.x, y=pos.y+i, z=pos.z}
-		nodes[area:index(p.x, p.y, p.z)] = c_tree
-		if (math.sin(i/height*i) < 0.2 and i > 3 and math.random(0,2) < 1.5) then
-			branch_pos = {x=pos.x+math.random(0,1), y=pos.y+i, z=pos.z-math.random(0,1)}
-			for _,nds in ipairs(area, nodes, tree_branch(ignore, area, nodes, branch_pos, math.random(0,1))) do
-				nodes[area:index(nds[2], nds[3], nds[4])] = ndtable[nds[1] ]
-			end
+		nodes[area:index(p.x, p.y, p.z)] = sumpf_c_tree
+		if (math.sin(i/height*i) < 0.2 and i > 3 and sumpf_birch_pr:next(0,2) < 1.5) then
+			branch_pos = {x=pos.x+sumpf_birch_pr:next(0,1), y=pos.y+i, z=pos.z-sumpf_birch_pr:next(0,1)}
+			tree_branch(branch_pos, sumpf_birch_pr:next(0,1))
 		end
 	end
-	local branches = {
-		tree_branch(ignore, area, nodes, {x=pos.x, y=pos.y+height+math.random(0, 1),z=pos.z}, math.random(0,1)),
-		tree_branch(ignore, area, nodes, {x=pos.x+1, y=pos.y+height-math.random(2), z=pos.z,}, 1),
-		tree_branch(ignore, area, nodes, {x=pos.x-1, y=pos.y+height-math.random(2), z=pos.z}, 1),
-		tree_branch(ignore, area, nodes, {x=pos.x, y=pos.y+height-math.random(2), z=pos.z+1}, 0),
-		tree_branch(ignore, area, nodes, {x=pos.x, y=pos.y+height-math.random(2), z=pos.z-1}, 0)
-	}
-	for _,tbr in ipairs(branches) do
-		for _,nds in ipairs(tbr) do
-			nodes[area:index(nds[2], nds[3], nds[4])] = ndtable[nds[1] ]
-		end
-	end
+	tree_branch({x=pos.x, y=pos.y+height+sumpf_birch_pr:next(0,1),z=pos.z}, sumpf_birch_pr:next(0,1))
+	tree_branch({x=pos.x+1, y=pos.y+height-sumpf_birch_pr:next(1,2), z=pos.z,}, 1)
+	tree_branch({x=pos.x-1, y=pos.y+height-sumpf_birch_pr:next(1,2), z=pos.z}, 1)
+	tree_branch({x=pos.x, y=pos.y+height-sumpf_birch_pr:next(1,2), z=pos.z+1}, 0)
+	tree_branch({x=pos.x, y=pos.y+height-sumpf_birch_pr:next(1,2), z=pos.z-1}, 0)
+
 	manip:set_data(nodes)
 	manip:write_to_map()
 	if not generated then	--info
 		if sumpf_info_birch then
-			print(string.format("[sumpf] a birch grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") in: %.2fms", (os.clock() - t1) * 1000))
+			print(string.format("[sumpf] a birch grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") in: %.2fs", os.clock() - t1))
 			local t1 = os.clock()
 			manip:update_map()
-			print(string.format("[sumpf] map updated in: %.2fms", (os.clock() - t1) * 1000))
+			print(string.format("[sumpf] map updated in: %.2fs", os.clock() - t1))
+			t1 = os.clock()
 		else
 			manip:update_map()
 		end
+	end
+	for _,p in ipairs(tab) do
+		minetest.set_node(p, {name="sumpf:tree_horizontal", param2=1})
+	end
+	if sumpf_info_birch then
+		print(string.format("[sumpf] h1trees set after %.2fs", os.clock() - t1))
 	end
 end
 
