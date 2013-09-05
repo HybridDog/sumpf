@@ -1,10 +1,3 @@
---[[
-sumpf
-Textures from: gimp, gamiano.de
-Sounds from: supertux (GPL), http://www.freesound.org/people/dobroide/sounds/16771/
-I looked at snow mod for mapgen and
-at the jungletree mod for birches.
-]]
 minetest.register_craft({
 	output = "sumpf:junglestonebrick",
 	recipe = {
@@ -22,7 +15,7 @@ minetest.register_craft({
 
 minetest.register_node("sumpf:junglestone", {
 	description = "Swamp Stone",
-	tile_images = {"sumpf_swampstone.png"},
+	tiles = {"sumpf_swampstone.png"},
 	groups = {cracky=3},
 	legacy_mineral = true,
 	sounds = default.node_sound_stone_defaults(),
@@ -30,7 +23,7 @@ minetest.register_node("sumpf:junglestone", {
 
 minetest.register_node("sumpf:cobble", {
 	description = "Swamp Cobble Stone",
-	tile_images = {"sumpf_cobble.png"},
+	tiles = {"sumpf_cobble.png"},
 	groups = {cracky=3},
 	legacy_mineral = true,
 	sounds = default.node_sound_stone_defaults(),
@@ -122,7 +115,7 @@ stairs.register_stair_and_slab("swampstonebrick", "sumpf:swampstonebrick",
 
 minetest.register_node("sumpf:gras", {
 	description = "Swamp Grass",
-	tile_images = {"sumpfgrass.png"},
+	tiles = {"sumpfgrass.png"},
 	inventory_image = "sumpfgrass.png",
 	drawtype = "plantlike",
 	paramtype = "light",

@@ -1,6 +1,6 @@
 --This file contains configuration options for swamp mod.
 
-sumpf.enable_mapgen = true
+sumpf.enable_mapgen = false
 
 --Always generate swamps (causes some lag)
 sumpf.always_generate = false
@@ -15,7 +15,7 @@ sumpf.enable_plants = true
 sumpf.swampwater = false
 
 --habitat stuff (no vm yet)
-sumpf.spawn_plants = true
+sumpf.spawn_plants = false
 
 --says some information.
 sumpf.info = true
