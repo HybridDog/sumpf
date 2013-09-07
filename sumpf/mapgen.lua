@@ -75,18 +75,18 @@ local c_stonebrick = minetest.get_content_id("default:stonebrick")
 local c_cloud = minetest.get_content_id("default:cloud")
 
 
+local env = minetest.env	--Should make things a bit faster.
 local smooth = sumpf.smooth
 local swampwater = sumpf.swampwater
 local plants_enabled = sumpf.enable_plants
-local env = minetest.env	--Should make things a bit faster.
 
---rarity in %
-local sumpf_rarity = 2
+local sumpf_rarity = sumpf.mapgen_rarity
+local sumpf_size = sumpf.mapgen_size
 
 local nosmooth_rarity = -(sumpf_rarity/50)+1
-local perlin_scale = 10000/sumpf_rarity
-local smooth_rarity_full = nosmooth_rarity+perlin_scale/2000
-local smooth_rarity_ran = nosmooth_rarity-perlin_scale/4000
+local perlin_scale = sumpf_size*100/sumpf_rarity
+local smooth_rarity_full = nosmooth_rarity+perlin_scale/(20*sumpf_size)
+local smooth_rarity_ran = nosmooth_rarity-perlin_scale/(40*sumpf_size)
 local smooth_rarity_dif = (smooth_rarity_full-smooth_rarity_ran)*100-1
 
 local EVSUMPFGROUND =	{"default:dirt_with_grass","default:dirt","default:sand","default:water_source","default:desert_sand"}
@@ -109,15 +109,15 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) then]]
 
 	if not sumpf.always_generate
-	and not ( perlin1:get2d( {x=x0, y=z0} ) > 0.53 ) 					--top left
-	and not ( perlin1:get2d( { x = x0 + ( (x1-x0)/2), y=z0 } ) > 0.53 )--top middle
-	and not (perlin1:get2d({x=x1, y=z1}) > 0.53) 						--bottom right
-	and not (perlin1:get2d({x=x1, y=z0+((z1-z0)/2)}) > 0.53) 			--right middle
-	and not (perlin1:get2d({x=x0, y=z1}) > 0.53)  						--bottom left
-	and not (perlin1:get2d({x=x1, y=z0}) > 0.53)						--top right
-	and not (perlin1:get2d({x=x0+((x1-x0)/2), y=z1}) > 0.53) 			--left middle
-	and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) 			--middle
-	and not (perlin1:get2d({x=x0, y=z1+((z1-z0)/2)}) > 0.53) then		--bottom middle
+	and not ( perlin1:get2d( {x=x0, y=z0} ) > nosmooth_rarity ) 					--top left
+	and not ( perlin1:get2d( { x = x0 + ( (x1-x0)/2), y=z0 } ) > nosmooth_rarity )--top middle
+	and not (perlin1:get2d({x=x1, y=z1}) > nosmooth_rarity) 						--bottom right
+	and not (perlin1:get2d({x=x1, y=z0+((z1-z0)/2)}) > nosmooth_rarity) 			--right middle
+	and not (perlin1:get2d({x=x0, y=z1}) > nosmooth_rarity)  						--bottom left
+	and not (perlin1:get2d({x=x1, y=z0}) > nosmooth_rarity)						--top right
+	and not (perlin1:get2d({x=x0+((x1-x0)/2), y=z1}) > nosmooth_rarity) 			--left middle
+	and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > nosmooth_rarity) 			--middle
+	and not (perlin1:get2d({x=x0, y=z1+((z1-z0)/2)}) > nosmooth_rarity) then		--bottom middle
 		return
 	end
 
@@ -163,9 +163,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			--smooth mapgen
 			if sumpf.always_generate then
 				in_biome = true
-			elseif smooth and (test > 0.73 or (test > 0.43 and pr:next(0,29) > (0.73 - test) * 100 )) then
+			elseif smooth and (test > smooth_rarity_full or (test > smooth_rarity_ran and pr:next(0,smooth_rarity_dif) > (smooth_rarity_full - test) * 100 )) then
 				in_biome = true
-			elseif (not smooth) and test > 0.53 then
+			elseif (not smooth) and test > nosmooth_rarity then
 				in_biome = true
 			end
 
