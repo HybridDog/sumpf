@@ -22,7 +22,7 @@ sumpf.swampwater = false
 
 
 --habitat stuff (no vm yet)
-sumpf.spawn_plants = false
+sumpf.spawn_plants = true
 
 --says some information.
 sumpf.info = true

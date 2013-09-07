@@ -6,4 +6,4 @@
 
 TODO:
 — fix swampwater
-— avoid generating it almost everywhere
+— test the rarity and size settings
