@@ -1,3 +1,5 @@
+local load_time_start = os.clock()
+
 minetest.register_craft({
 	output = "sumpf:junglestonebrick",
 	recipe = {
@@ -187,4 +189,4 @@ if sumpf.enable_mapgen then
 	dofile(minetest.get_modpath("sumpf") .. "/mapgen.lua")
 end
 
-print("[sumpf] Loaded!") 
+print(string.format("[sumpf] loaded after ca. %.2fs", os.clock() - load_time_start))

@@ -80,21 +80,34 @@ local swampwater = sumpf.swampwater
 local plants_enabled = sumpf.enable_plants
 local env = minetest.env	--Should make things a bit faster.
 
+--rarity in %
+local sumpf_rarity = 2
+
+local nosmooth_rarity = -(sumpf_rarity/50)+1
+local perlin_scale = 10000/sumpf_rarity
+local smooth_rarity_full = nosmooth_rarity+perlin_scale/2000
+local smooth_rarity_ran = nosmooth_rarity-perlin_scale/4000
+local smooth_rarity_dif = (smooth_rarity_full-smooth_rarity_ran)*100-1
+
 local EVSUMPFGROUND =	{"default:dirt_with_grass","default:dirt","default:sand","default:water_source","default:desert_sand"}
 local GROUND =	{c_gr, c_sand, c_dirt, c_desert_sand, c_water}
 --USUAL_STUFF =	{"default:leaves","default:apple","default:tree","default:dry_shrub","default:cactus","default:papyrus"}
 local USUAL_STUFF =	{c_dry_shrub, c_cactus, c_papyrus}
 minetest.register_on_generated(function(minp, maxp, seed)
+
+	--avoid calculating perlin noises for unneeded places
 	if maxp.y <= -2
-	or minp.y >= 150 then --avoid generation in the sky
+	or minp.y >= 150 then
 		return
 	end
+
 	local x0,z0,x1,z1 = minp.x,minp.z,maxp.x,maxp.z	-- Assume X and Z lengths are equal
 	local perlin1 = env:get_perlin(1123,3, 0.5, 200)	--Get map specific perlin
 
 	--[[if not (perlin1:get2d({x=x0, y=z0}) > 0.53) and not (perlin1:get2d({x=x1, y=z1}) > 0.53)
 	and not (perlin1:get2d({x=x0, y=z1}) > 0.53) and not (perlin1:get2d({x=x1, y=z0}) > 0.53)
 	and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) then]]
+
 	if not sumpf.always_generate
 	and not ( perlin1:get2d( {x=x0, y=z0} ) > 0.53 ) 					--top left
 	and not ( perlin1:get2d( { x = x0 + ( (x1-x0)/2), y=z0 } ) > 0.53 )--top middle
@@ -105,9 +118,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	and not (perlin1:get2d({x=x0+((x1-x0)/2), y=z1}) > 0.53) 			--left middle
 	and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) 			--middle
 	and not (perlin1:get2d({x=x0, y=z1+((z1-z0)/2)}) > 0.53) then		--bottom middle
-		print("[sumpf] abortsumpf")
 		return
 	end
+
 	local divs = (maxp.x-minp.x);
 	local pr = PseudoRandom(seed+68)
 
