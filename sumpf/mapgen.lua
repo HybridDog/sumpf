@@ -102,7 +102,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 
 	local x0,z0,x1,z1 = minp.x,minp.z,maxp.x,maxp.z	-- Assume X and Z lengths are equal
-	local perlin1 = env:get_perlin(1123,3, 0.5, 200)	--Get map specific perlin
+	local perlin1 = env:get_perlin(1123,3, 0.5, perlin_scale)	--Get map specific perlin
 
 	--[[if not (perlin1:get2d({x=x0, y=z0}) > 0.53) and not (perlin1:get2d({x=x1, y=z1}) > 0.53)
 	and not (perlin1:get2d({x=x0, y=z1}) > 0.53) and not (perlin1:get2d({x=x1, y=z0}) > 0.53)
