@@ -175,9 +175,17 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			--smooth mapgen
 			if sumpf.always_generate then
 				in_biome = true
-			elseif smooth and (test > smooth_rarity_full or (test > smooth_rarity_ran and pr:next(0,smooth_rarity_dif) > (smooth_rarity_full - test) * 100 )) then
+			elseif smooth
+			and (
+				test > smooth_rarity_full
+				or (
+					test > smooth_rarity_ran
+					and pr:next(0,smooth_rarity_dif) > (smooth_rarity_full - test) * 100
+				)
+			) then
 				in_biome = true
-			elseif (not smooth) and test > nosmooth_rarity then
+			elseif (not smooth)
+			and test > nosmooth_rarity then
 				in_biome = true
 			end
 
