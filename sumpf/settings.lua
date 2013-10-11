@@ -17,8 +17,10 @@ sumpf.mapgen_size = 50
 --Disable for testing
 sumpf.enable_plants = true
 
---Enables swampwater - be careful, it doesn't work right but it looks great.
+--Enables swampwater - it doesn't work correctly yet.
 sumpf.swampwater = false
+
+sumpf.wet_beaches = true
 
 
 --habitat stuff (no vm yet)

@@ -30,6 +30,18 @@ local function find_grond(a,list)
 	return false
 end
 
+local function water_allowed(data, area, x, y, z, nds)
+	for _,s in ipairs(nds) do
+		if data[area:index(x+1, y, z)] ~= s
+		and data[area:index(x-1, y, z)] ~= s
+		and data[area:index(x, y, z)+1] ~= s
+		and data[area:index(x, y, z)-1] ~= s then
+			return true
+		end
+	end
+	return false
+end
+
 --[[local function find_ground(pos, nodes)
 	for _, evground in ipairs(nodes) do
 		if minetest.env:get_node(pos).name == evground then
@@ -222,10 +234,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					else
 						if swampwater	--Sumpfwasser: doesn't work like cave detection
 						and pr:next(1,2) == 2
-						and data[area:index(x+1, ground_y, z)] ~= c_air
-						and data[area:index(x-1, ground_y, z)] ~= c_air
-						and data[area:index(x, ground_y, z)+1] ~= c_air
-						and data[area:index(x, ground_y, z)-1] ~= c_air
+						and water_allowed(data, area, x, ground_y, z, {c_air, nil, 0})
 						and d_p_boden == c_air then
 							for s=0,-10-pr:next(1,9),-1 do
 								local p_pos = area:index(x, ground_y+s, z)
@@ -236,11 +245,23 @@ minetest.register_on_generated(function(minp, maxp, seed)
 									break
 								end
 							end
-
-						else --Sumpfboden:
-							data[p_ground] = c_sumpfg
-							data[p_uground] = c_sumpfg
-							data[area:index(x, ground_y-2, z)] = c_sumpf2
+						else
+							local p_uuground = area:index(x, ground_y-2, z)
+							if sumpf.wet_beaches
+							and ground_y == 1
+							and pr:next(1,3) == 1 then
+								data[p_ground] = c_dirtywater
+								if pr:next(1,3) == 1 then
+									data[p_uground] = c_dirtywater
+								else
+									data[p_uground] = c_peat
+							end
+								data[p_uuground] = c_peat
+							else --Sumpfboden:
+								data[p_ground] = c_sumpfg
+								data[p_uground] = c_sumpfg
+								data[p_uuground] = c_sumpf2
+							end
 							for i=-3,-30,-1 do
 								local p_pos = area:index(x, ground_y+i, z)
 								local d_p_pos = data[p_pos]

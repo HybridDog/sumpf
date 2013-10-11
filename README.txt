@@ -6,4 +6,4 @@
 
 TODO:
 — fix swampwater
-— test the rarity and size settings
+— add CC0 16px textures for the birch
