@@ -182,20 +182,21 @@ function mache_birke(pos, generated)
 	manip:write_to_map()
 	if not generated then	--info
 		if sumpf_info_birch then
-			print(string.format("[sumpf] a birch grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") in: %.2fs", os.clock() - t1))
+			print(string.format("[sumpf] a birch grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") after: %.2fs", os.clock() - t1))
 			local t1 = os.clock()
 			manip:update_map()
-			print(string.format("[sumpf] map updated in: %.2fs", os.clock() - t1))
+			print(string.format("[sumpf] map updated after: %.2fs", os.clock() - t1))
 			t1 = os.clock()
 		else
 			manip:update_map()
 		end
 	end
+	t1 = os.clock()
 	for _,p in ipairs(tab) do
 		minetest.set_node(p, {name="sumpf:tree_horizontal", param2=1})
 	end
 	if sumpf_info_birch then
-		print(string.format("[sumpf] h1trees set after %.2fs", os.clock() - t1))
+		print(string.format("[sumpf] h1trees set after ca. %.2fs", os.clock() - t1))
 	end
 end
 

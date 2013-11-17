@@ -103,7 +103,7 @@ stairs.register_stair_and_slab("swampcobble", "sumpf:cobble",
 		default.node_sound_stone_defaults()
 )
 
-stairs.register_stair_and_slab("swampstonebrick", "sumpf:swampstonebrick",
+stairs.register_stair_and_slab("swampstonebrick", "sumpf:junglestonebrick",
 		{cracky=2, stone=1},
 		{"sumpf_swampstone_brick.png"},
 		"Swamp Stone Brick Stair",
