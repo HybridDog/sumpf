@@ -28,5 +28,9 @@ sumpf.spawn_plants = true
 
 --says some information.
 sumpf.info = true
-sumpf_info_jg = true
-sumpf_info_birch = true
+
+--informs the players, too
+sumpf.inform_all = true
+
+--1:<a bit of information> 2:<acceptable amount of information> 3:<lots of text>
+sumpf.max_spam = 2

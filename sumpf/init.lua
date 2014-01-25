@@ -15,11 +15,18 @@ minetest.register_craft({
 	}
 })
 
+minetest.register_craft({
+	type = "cooking",
+	output = "sumpf:junglestone",
+	recipe = "sumpf:cobble",
+})
+
 minetest.register_node("sumpf:junglestone", {
 	description = "Swamp Stone",
 	tiles = {"sumpf_swampstone.png"},
 	groups = {cracky=3},
 	legacy_mineral = true,
+	drop = "sumpf:cobble",
 	sounds = default.node_sound_stone_defaults(),
 })
 
@@ -27,7 +34,6 @@ minetest.register_node("sumpf:cobble", {
 	description = "Swamp Cobble Stone",
 	tiles = {"sumpf_cobble.png"},
 	groups = {cracky=3},
-	legacy_mineral = true,
 	sounds = default.node_sound_stone_defaults(),
 })
 
@@ -78,7 +84,7 @@ minetest.register_node("sumpf:sumpf", {
 minetest.register_node("sumpf:sumpf2", {
 	tiles = {"sumpf.png","sumpf_swampstone.png","sumpf_swampstone.png^sumpf2.png"},
 	groups = {cracky=3, soil=1},
-	drop = "sumpf:junglestone",
+	drop = "sumpf:cobble",
 	sounds = default.node_sound_stone_defaults({
 		footstep = {name="sumpf", gain=0.4},
 	}),
@@ -184,6 +190,7 @@ bucket.register_liquid(
 
 sumpf = {}
 dofile(minetest.get_modpath("sumpf").."/settings.lua")
+dofile(minetest.get_modpath("sumpf").."/functions.lua")
 dofile(minetest.get_modpath("sumpf") .. "/birke.lua")
 if sumpf.enable_mapgen then
 	dofile(minetest.get_modpath("sumpf") .. "/mapgen.lua")

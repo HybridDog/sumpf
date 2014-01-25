@@ -68,7 +68,6 @@ jungletree_ndtable = {jungletree_c_jungletree, jungletree_c_leaves_green, jungle
 	tiles = {"default_tree_top.png", 
 	"default_tree_top.png",
 	"jungletree_bark.png"},	
-	is_ground_content = true,	
 	groups = {tree=1,snappy=1,choppy=2,oddly_breakable_by_hand=1,flammable=2},
 }) --]]
 
@@ -189,17 +188,16 @@ function sumpf_make_jungletree(pos, generated)
 
 	manip:set_data(nodes)
 	manip:write_to_map()
-	if not generated then	--info
-		if sumpf_info_jg then
-			print(string.format("[sumpf] a jungletree grew at ("..pos.x.."|"..pos.y.."|"..pos.z..") in: %.2fs", os.clock() - t1))
-			local t1 = os.clock()
-			manip:update_map()
-			print(string.format("[sumpf] map updated in: %.2fs", os.clock() - t1))
-		else
-			manip:update_map()
-		end
+	local spam = 2
+	if generated then
+		spam = 3
 	end
---	area, nodes, jungletree_pr = nil
+	sumpf.inform("a jungletree grew at ("..pos.x.."|"..pos.y.."|"..pos.z..")", spam, t1)
+	if not generated then	--info
+		local t1 = os.clock()
+		manip:update_map()
+		sumpf.inform("map updated", spam, t1)
+	end
 end
 
 --[[
@@ -213,20 +211,20 @@ local function add_tree_branch(pos)
 		leave = "jungletree:leaves_"..leaves[math.random(1,3)]
 	end
 	
-	minetest.env:add_node(pos, {name="default:jungletree"})
+	minetest.add_node(pos, {name="default:jungletree"})
 	for i = math.random(2), -math.random(2), -1 do
 		for k =math.random(2), -math.random(2), -1 do
 			local p = {x=pos.x+i, y=pos.y, z=pos.z+k}
-			local n = minetest.env:get_node(p)
+			local n = minetest.get_node(p)
 			if (n.name=="air") then
-				minetest.env:add_node(p, {name=leave})
+				minetest.add_node(p, {name=leave})
 			end
 			local chance = math.abs(i+k)
 			if (chance < 1) then
 				p = {x=pos.x+i, y=pos.y+1, z=pos.z+k}
-				n = minetest.env:get_node(p)
+				n = minetest.get_node(p)
 				if (n.name=="air") then
-					minetest.env:add_node(p, {name=leave})
+					minetest.add_node(p, {name=leave})
 				end
 			end
 		end
@@ -239,7 +237,7 @@ function sumpf_make_jungletree(pos)
 		if height < 10 then
 			for i = height, -1, -1 do
 				local p = {x=pos.x, y=pos.y+i, z=pos.z}
-				minetest.env:add_node(p, {name="default:jungletree"})
+				minetest.add_node(p, {name="default:jungletree"})
 				if i == height then
 					add_tree_branch({x=pos.x, y=pos.y+height+math.random(0, 1), z=pos.z})
 					add_tree_branch({x=pos.x+1, y=pos.y+i-math.random(2), z=pos.z})
@@ -249,10 +247,10 @@ function sumpf_make_jungletree(pos)
 					add_tree_branch({x=pos.x, y=pos.y+i-math.random(2), z=pos.z-1})
 				end
 				if height <= 0 then
-					minetest.env:add_node({x=pos.x+1, y=pos.y+i-math.random(2), z=pos.z}, {name="default:jungletree"})
-					minetest.env:add_node({x=pos.x, y=pos.y+i-math.random(2), z=pos.z+1}, {name="default:jungletree"})
-					minetest.env:add_node({x=pos.x-1, y=pos.y+i-math.random(2), z=pos.z}, {name="default:jungletree"})
-					minetest.env:add_node({x=pos.x, y=pos.y+i-math.random(2), z=pos.z-1}, {name="default:jungletree"})
+					minetest.add_node({x=pos.x+1, y=pos.y+i-math.random(2), z=pos.z}, {name="default:jungletree"})
+					minetest.add_node({x=pos.x, y=pos.y+i-math.random(2), z=pos.z+1}, {name="default:jungletree"})
+					minetest.add_node({x=pos.x-1, y=pos.y+i-math.random(2), z=pos.z}, {name="default:jungletree"})
+					minetest.add_node({x=pos.x, y=pos.y+i-math.random(2), z=pos.z-1}, {name="default:jungletree"})
 				end
 				if (math.sin(i/height*i) < 0.2 and i > 3 and math.random(0,2) < 1.5) then
 					branch_pos = {x=pos.x+math.random(0,1), y=pos.y+i, z=pos.z-math.random(0,1)}
@@ -266,10 +264,10 @@ function sumpf_make_jungletree(pos)
 					add_tree_branch(branch_pos)
 				end
 				if i < math.random(0,1) then
-					minetest.env:add_node({x=pos.x+1, y=pos.y+i, z=pos.z+1}, {name="default:jungletree"})
-					minetest.env:add_node({x=pos.x+2, y=pos.y+i, z=pos.z-1}, {name="default:jungletree"})
-					minetest.env:add_node({x=pos.x, y=pos.y+i, z=pos.z-2}, {name="default:jungletree"})
-					minetest.env:add_node({x=pos.x-1, y=pos.y+i, z=pos.z}, {name="default:jungletree"})
+					minetest.add_node({x=pos.x+1, y=pos.y+i, z=pos.z+1}, {name="default:jungletree"})
+					minetest.add_node({x=pos.x+2, y=pos.y+i, z=pos.z-1}, {name="default:jungletree"})
+					minetest.add_node({x=pos.x, y=pos.y+i, z=pos.z-2}, {name="default:jungletree"})
+					minetest.add_node({x=pos.x-1, y=pos.y+i, z=pos.z}, {name="default:jungletree"})
 				end
 				if i == height then
 					add_tree_branch({x=pos.x+1, y=pos.y+i, z=pos.z+1})
@@ -285,10 +283,10 @@ function sumpf_make_jungletree(pos)
 					add_tree_branch({x=pos.x, y=pos.y+i, z=pos.z-1})
 					add_tree_branch({x=pos.x, y=pos.y+i, z=pos.z})
 				else
-					minetest.env:add_node({x=pos.x+1, y=pos.y+i, z=pos.z}, {name="default:jungletree"})
-					minetest.env:add_node({x=pos.x+1, y=pos.y+i, z=pos.z-1}, {name="default:jungletree"})
-					minetest.env:add_node({x=pos.x, y=pos.y+i, z=pos.z-1}, {name="default:jungletree"})
-					minetest.env:add_node({x=pos.x, y=pos.y+i, z=pos.z}, {name="default:jungletree"})
+					minetest.add_node({x=pos.x+1, y=pos.y+i, z=pos.z}, {name="default:jungletree"})
+					minetest.add_node({x=pos.x+1, y=pos.y+i, z=pos.z-1}, {name="default:jungletree"})
+					minetest.add_node({x=pos.x, y=pos.y+i, z=pos.z-1}, {name="default:jungletree"})
+					minetest.add_node({x=pos.x, y=pos.y+i, z=pos.z}, {name="default:jungletree"})
 				end
 			end
 		end
@@ -311,11 +309,7 @@ minetest.register_abm({
 	interval = 40,	
 	chance = 5,	
 	action = function(pos)	
-		if minetest.get_item_group(minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z}).name, "soil") ~= 1
-		or not minetest.get_node_light(pos) then
-			return
-		end
-		if minetest.env:get_node_light(pos, nil) > 6 then
+		if sumpf.tree_allowed(pos, 7) then
 			sumpf_make_jungletree(pos)
 		end
 	end

@@ -7,3 +7,4 @@
 TODO:
 — fix swampwater
 — add CC0 16px textures for the birch
+— maybe add some swamp huts

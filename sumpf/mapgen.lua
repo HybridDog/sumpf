@@ -1,10 +1,10 @@
 minetest.register_alias("sumpf:pilz", "riesenpilz:brown")
 
 --[[local function swampore(pos, env)
-	if env:get_node(pos).name == "default:stone_with_coal" then
+	if minetest.get_node(pos).name == "default:stone_with_coal" then
 		return "kohle"
 	end
-	if env:get_node(pos).name == "default:stone_with_iron" then
+	if minetest.get_node(pos).name == "default:stone_with_iron" then
 		return "eisen"
 	end
 	return "junglestone"
@@ -13,7 +13,7 @@ end]]
 local function avoid_nearby_node(pos, node)
 	for i = -1,1,2 do
 		for j = -1,1,2 do
-			if minetest.env:get_node({x=pos.x+i, y=pos.y, z=pos.z+j}).name == node then
+			if minetest.get_node({x=pos.x+i, y=pos.y, z=pos.z+j}).name == node then
 				return false
 			end
 		end
@@ -42,9 +42,20 @@ local function water_allowed(data, area, x, y, z, nds)
 	return false
 end
 
+local function fix_light(minp, maxp)
+	local manip = minetest.get_voxel_manip()
+	local emerged_pos1, emerged_pos2 = manip:read_from_map(minp, maxp)
+	area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
+	nodes = manip:get_data()
+
+	manip:set_data(nodes)
+	manip:write_to_map()
+	manip:update_map()
+end
+
 --[[local function find_ground(pos, nodes)
 	for _, evground in ipairs(nodes) do
-		if minetest.env:get_node(pos).name == evground then
+		if minetest.get_node(pos).name == evground then
 			return true
 		end
 	end
@@ -52,42 +63,39 @@ end
 end--]]
 
 
-local c_air = minetest.get_content_id("air")
-local c_stone = minetest.get_content_id("default:stone")
-local c_gr = minetest.get_content_id("default:dirt_with_grass")
-local c_dirt = minetest.get_content_id("default:dirt")
-local c_sand = minetest.get_content_id("default:sand")
-local c_desert_sand = minetest.get_content_id("default:desert_sand")
-local c_water = minetest.get_content_id("default:water_source")
-local c_dirtywater = minetest.get_content_id("sumpf:dirtywater_source")
-local c_coal = minetest.get_content_id("default:stone_with_coal")
-local c_iron = minetest.get_content_id("default:stone_with_iron")
+local c = {
+	air = minetest.get_content_id("air"),
+	stone = minetest.get_content_id("default:stone"),
+	gr = minetest.get_content_id("default:dirt_with_grass"),
+	dirt = minetest.get_content_id("default:dirt"),
+	sand = minetest.get_content_id("default:sand"),
+	desert_sand = minetest.get_content_id("default:desert_sand"),
+	water = minetest.get_content_id("default:water_source"),
+	dirtywater = minetest.get_content_id("sumpf:dirtywater_source"),
+	coal = minetest.get_content_id("default:stone_with_coal"),
+	iron = minetest.get_content_id("default:stone_with_iron"),
 
-local c_tree = minetest.get_content_id("default:tree")
-local c_leaves = minetest.get_content_id("default:leaves")
-local c_apple = minetest.get_content_id("default:apple")
-local c_dry_shrub = minetest.get_content_id("default:dry_shrub")
-local c_cactus = minetest.get_content_id("default:cactus")
-local c_papyrus = minetest.get_content_id("default:papyrus")
+	tree = minetest.get_content_id("default:tree"),
+	leaves = minetest.get_content_id("default:leaves"),
+	apple = minetest.get_content_id("default:apple"),
+	dry_shrub = minetest.get_content_id("default:dry_shrub"),
+	cactus = minetest.get_content_id("default:cactus"),
+	papyrus = minetest.get_content_id("default:papyrus"),
 
-local c_sumpfg = minetest.get_content_id("sumpf:sumpf")
-local c_sumpf2 = minetest.get_content_id("sumpf:sumpf2")
-local c_sumpfstone = minetest.get_content_id("sumpf:junglestone")
-local c_sumpfcoal = minetest.get_content_id("sumpf:kohle")
-local c_sumpfiron = minetest.get_content_id("sumpf:eisen")
-local c_peat = minetest.get_content_id("sumpf:peat")
+	sumpfg = minetest.get_content_id("sumpf:sumpf"),
+	sumpf2 = minetest.get_content_id("sumpf:sumpf2"),
+	sumpfstone = minetest.get_content_id("sumpf:junglestone"),
+	sumpfcoal = minetest.get_content_id("sumpf:kohle"),
+	sumpfiron = minetest.get_content_id("sumpf:eisen"),
+	peat = minetest.get_content_id("sumpf:peat"),
 
-local c_brown_shroom = minetest.get_content_id("riesenpilz:brown")
-local c_red_shroom = minetest.get_content_id("riesenpilz:red")
-local c_fly_agaric = minetest.get_content_id("riesenpilz:fly_agaric")
-local c_sumpfgrass = minetest.get_content_id("sumpf:gras")
-local c_junglegrass = minetest.get_content_id("default:junglegrass")
+	brown_shroom = minetest.get_content_id("riesenpilz:brown"),
+	red_shroom = minetest.get_content_id("riesenpilz:red"),
+	fly_agaric = minetest.get_content_id("riesenpilz:fly_agaric"),
+	sumpfgrass = minetest.get_content_id("sumpf:gras"),
+	junglegrass = minetest.get_content_id("default:junglegrass"),
+}
 
-local c_stonebrick = minetest.get_content_id("default:stonebrick")
-local c_cloud = minetest.get_content_id("default:cloud")
-
-
-local env = minetest.env	--Should make things a bit faster.
 local smooth = sumpf.smooth
 local swampwater = sumpf.swampwater
 local plants_enabled = sumpf.enable_plants
@@ -102,9 +110,9 @@ local smooth_rarity_ran = nosmooth_rarity-perlin_scale/(40*sumpf_size)
 local smooth_rarity_dif = (smooth_rarity_full-smooth_rarity_ran)*100-1
 
 local EVSUMPFGROUND =	{"default:dirt_with_grass","default:dirt","default:sand","default:water_source","default:desert_sand"}
-local GROUND =	{c_gr, c_sand, c_dirt, c_desert_sand, c_water}
+local GROUND =	{c.gr, c.sand, c.dirt, c.desert_sand, c.water}
 --USUAL_STUFF =	{"default:leaves","default:apple","default:tree","default:dry_shrub","default:cactus","default:papyrus"}
-local USUAL_STUFF =	{c_dry_shrub, c_cactus, c_papyrus}
+local USUAL_STUFF =	{c.dry_shrub, c.cactus, c.papyrus}
 minetest.register_on_generated(function(minp, maxp, seed)
 
 	--avoid calculating perlin noises for unneeded places
@@ -114,7 +122,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 
 	local x0,z0,x1,z1 = minp.x,minp.z,maxp.x,maxp.z	-- Assume X and Z lengths are equal
-	local perlin1 = env:get_perlin(1123,3, 0.5, perlin_scale)	--Get map specific perlin
+	local perlin1 = minetest.get_perlin(1123,3, 0.5, perlin_scale)	--Get map specific perlin
 
 	--[[if not (perlin1:get2d({x=x0, y=z0}) > 0.53) and not (perlin1:get2d({x=x1, y=z1}) > 0.53)
 	and not (perlin1:get2d({x=x0, y=z1}) > 0.53) and not (perlin1:get2d({x=x1, y=z0}) > 0.53)
@@ -133,20 +141,17 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		return
 	end
 
+	local t1 = os.clock()
+
 	local divs = (maxp.x-minp.x);
 	local pr = PseudoRandom(seed+68)
 
 		--Information:
-	if sumpf.info then
-		t1 = os.clock()
-		local geninfo = "[sumpf] tries to generate a swamp at: x=["..minp.x.."; "..maxp.x.."]; y=["..minp.y.."; "..maxp.y.."]; z=["..minp.z.."; "..maxp.z.."]"
-		print(geninfo)
-		minetest.chat_send_all(geninfo)
-	end
+	sumpf.inform("tries to generate a swamp at: x=["..minp.x.."; "..maxp.x.."]; y=["..minp.y.."; "..maxp.y.."]; z=["..minp.z.."; "..maxp.z.."]", 2)
 
-	--[[local trees = env:find_nodes_in_area(minp, maxp, USUAL_STUFF)
+	--[[local trees = minetest.find_nodes_in_area(minp, maxp, USUAL_STUFF)
 	for i,v in pairs(trees) do
-		env:remove_node(v)
+		minetest.remove_node(v)
 	end]]
 	local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
 	local data = vm:get_data()
@@ -154,9 +159,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 	for p_pos in area:iterp(minp, maxp) do	--remove tree stuff
 		local d_p_pos = data[p_pos]
-		for _,nam in ipairs({c_tree, c_leaves, c_apple}) do			
+		for _,nam in ipairs({c.tree, c.leaves, c.apple}) do			
 			if d_p_pos == nam then
-				data[p_pos] = c_air
+				data[p_pos] = c.air
 				break
 			end
 		end
@@ -196,7 +201,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					local d_p_pos = data[p_pos]
 					for _,nam in ipairs(USUAL_STUFF) do			
 						if d_p_pos == nam then
-							data[p_pos] = c_air
+							data[p_pos] = c.air
 							break
 						end
 					end
@@ -220,35 +225,35 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					local ground =	{x=x,y=ground_y,	z=z}
 					local boden =	{x=x,y=ground_y+1,	z=z}
 
-					if d_p_ground == c_water then	--Dreckseen:
+					if d_p_ground == c.water then	--Dreckseen:
 						if smooth then
 							h = pr:next(1,2)
 						else
 							h = 2 --untested
 						end
-						if env:find_node_near(ground, 3+h, "group:crumbly") then
-						--if data[area:index(x, ground_y-(3+pr:next(1,2)), z)] ~= c_water then
+						if minetest.find_node_near(ground, 3+h, "group:crumbly") then
+						--if data[area:index(x, ground_y-(3+pr:next(1,2)), z)] ~= c.water then
 							for y=0,-pr:next(26,30),-1 do
 								local p_pos = area:index(x, ground_y+y, z)
 								local d_p_pos = data[p_pos]
 								local pos = {x=x,y=ground_y+y,z=z}
-								if d_p_pos == c_water then
-									data[p_pos] = c_dirtywater
+								if d_p_pos == c.water then
+									data[p_pos] = c.dirtywater
 								else
-									data[p_pos] = c_peat
+									data[p_pos] = c.peat
 								end
 							end
 						end
 					else
 						if swampwater	--Sumpfwasser: doesn't work like cave detection
 						and pr:next(1,2) == 2
-						and water_allowed(data, area, x, ground_y, z, {c_air, nil, 0})
-						and d_p_boden == c_air then
+						and water_allowed(data, area, x, ground_y, z, {c.air, nil, 0})
+						and d_p_boden == c.air then
 							for s=0,-10-pr:next(1,9),-1 do
 								local p_pos = area:index(x, ground_y+s, z)
 								local d_p_pos = data[p_pos]
-								if d_p_pos ~= c_air then
-									data[p_pos] = c_dirtywater
+								if d_p_pos ~= c.air then
+									data[p_pos] = c.dirtywater
 								else
 									break
 								end
@@ -258,28 +263,28 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							if sumpf.wet_beaches
 							and ground_y == 1
 							and pr:next(1,3) == 1 then
-								data[p_ground] = c_dirtywater
+								data[p_ground] = c.dirtywater
 								if pr:next(1,3) == 1 then
-									data[p_uground] = c_dirtywater
+									data[p_uground] = c.dirtywater
 								else
-									data[p_uground] = c_peat
+									data[p_uground] = c.peat
 							end
-								data[p_uuground] = c_peat
+								data[p_uuground] = c.peat
 							else --Sumpfboden:
-								data[p_ground] = c_sumpfg
-								data[p_uground] = c_sumpfg
-								data[p_uuground] = c_sumpf2
+								data[p_ground] = c.sumpfg
+								data[p_uground] = c.sumpfg
+								data[p_uuground] = c.sumpf2
 							end
 							for i=-3,-30,-1 do
 								local p_pos = area:index(x, ground_y+i, z)
 								local d_p_pos = data[p_pos]
-								if d_p_pos ~= c_air then
-									if d_p_pos == c_coal then
-										data[p_pos] = c_sumpfcoal
-									elseif d_p_pos == c_iron then
-										data[p_pos] = c_sumpfiron
+								if d_p_pos ~= c.air then
+									if d_p_pos == c.coal then
+										data[p_pos] = c.sumpfcoal
+									elseif d_p_pos == c.iron then
+										data[p_pos] = c.sumpfiron
 									else
-										data[p_pos] = c_sumpfstone
+										data[p_pos] = c.sumpfstone
 									end
 								else
 									break
@@ -298,15 +303,15 @@ minetest.register_on_generated(function(minp, maxp, seed)
 								num = num+1
 --								sumpf_make_jungletree(boden)
 							elseif pr:next(1,50) == 1 then
-								data[p_boden] = c_brown_shroom
+								data[p_boden] = c.brown_shroom
 							elseif pr:next(1,100) == 1 then
-								data[p_boden] = c_red_shroom
+								data[p_boden] = c.red_shroom
 							elseif pr:next(1,200) == 1 then
-								data[p_boden] = c_fly_agaric
+								data[p_boden] = c.fly_agaric
 							elseif pr:next(1,4) == 1 then
-								data[p_boden] = c_sumpfgrass
+								data[p_boden] = c.sumpfgrass
 							elseif pr:next(1,6) == 1 then
-								data[p_boden] = c_junglegrass
+								data[p_boden] = c.junglegrass
 							end
 						end
 					end
@@ -316,27 +321,27 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 	vm:set_data(data)
 	--vm:set_lighting({day=0, night=0})
-	vm:calc_lighting(
-		{x=minp.x-16, y=minp.y, z=minp.z-16},
-		{x=maxp.x+16, y=maxp.y, z=maxp.z+16}
-	)
-	vm:update_liquids()
+	--vm:calc_lighting()
+	--vm:update_liquids()
 	vm:write_to_map()
+	sumpf.inform("ground finished", 2, t1)
 
+	local t2 = os.clock()
 	if plants_enabled then	--Trees:
 		for _,v in ipairs(tab) do
 			local p = v[2]
 			if v[1] == 1 then
-				mache_birke(p)
+				mache_birke(p, 1)
 			else
-				sumpf_make_jungletree(p)
+				sumpf_make_jungletree(p, 1)
 			end
 		end
 	end
+	sumpf.inform("trees made", 2, t2)
 
-	if sumpf.info then
-		local geninfo = string.format("[sumpf] done in: %.2fs", os.clock() - t1)
-		print(geninfo)
-		minetest.chat_send_all(geninfo)
-	end
+	local t2 = os.clock()
+	fix_light(minp, maxp)
+	sumpf.inform("shadows added", 2, t2)
+
+	sumpf.inform("done", 1, t1)
 end)
