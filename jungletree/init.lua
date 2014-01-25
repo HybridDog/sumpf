@@ -27,7 +27,77 @@ minetest.register_node("jungletree:sapling", {
 --else
 	--leavesimg = {"jungletree_leaves.png"}
 --end
+--[[
+local slvs = {
+	description = "Jungle Tree Leaves",
+	drawtype = "allfaces_optional",
+	paramtype = "light",
+	groups = {snappy=3, leafdecay=3, flammable=2, leaves=1},
+	drop = {
+		max_items = 1,
+		items = {
+			{
+				-- player will get sapling with 1/20 chance
+				items = {'jungletree:sapling'},
+				rarity = 20,
+			},
+		}
+	},
+	sounds = default.node_sound_leaves_defaults(),
+}
+if plantlike_leaves then
+	slvs.drawtype = "plantlike"
+	slvs.visual_scale = math.sqrt(math.sqrt(2))
+end
 
+for color = 1, 3 do
+	local leaf_name = "jungletree:leaves_"..leaves[color]
+	slvs.tiles = {"jungletree_leaves_"..leaves[color]..".png"}
+	slvs.drop["items"][2] = {
+		-- player will get leaves only if he get no saplings,
+		-- this is because max_items is 1
+		items = {leaf_name},
+	}
+	if plantlike_leaves then
+		slvs.inventory_image = minetest.inventorycube("jungletree_leaves_"..leaves[color]..".png")
+	end
+	minetest.register_node(leaf_name, slvs)
+end
+]]
+local plantlike_leaves = false
+if plantlike_leaves then
+for color = 1, 3 do
+	local leave_name = "jungletree:leaves_"..leaves[color]
+	minetest.register_node(leave_name, {
+		description = "Jungle Tree Leaves",
+		drawtype = "plantlike",
+		visual_scale = math.sqrt(math.sqrt(2)),
+		tiles = {"jungletree_leaves_"..leaves[color]..".png"},
+		inventory_image = minetest.inventorycube("jungletree_leaves_"..leaves[color]..".png"),
+		paramtype = "light",
+		groups = {snappy=3, leafdecay=3, flammable=2, leaves=1},
+		drop = {
+			max_items = 1,
+			items = {
+				{
+
+					-- player will get sapling with 1/20 chance
+					items = {'jungletree:sapling'},
+					rarity = 20,
+				},
+				{
+					-- player will get leaves only if he get no saplings,
+
+					-- this is because max_items is 1
+					items = {leave_name},
+				}
+			}
+		},
+
+		sounds = default.node_sound_leaves_defaults(),
+	})
+end
+else
 for color = 1, 3 do
 	local leave_name = "jungletree:leaves_"..leaves[color]
 	minetest.register_node(leave_name, {
@@ -40,19 +110,23 @@ for color = 1, 3 do
 			max_items = 1,
 			items = {
 				{
+
 					-- player will get sapling with 1/20 chance
 					items = {'jungletree:sapling'},
 					rarity = 20,
 				},
 				{
 					-- player will get leaves only if he get no saplings,
+
 					-- this is because max_items is 1
 					items = {leave_name},
 				}
 			}
 		},
+
 		sounds = default.node_sound_leaves_defaults(),
 	})
+end
 end
 
 jungletree_c_air = minetest.get_content_id("air")

@@ -22,7 +22,6 @@ sumpf.swampwater = false
 
 sumpf.wet_beaches = true
 
-
 --habitat stuff (no vm yet)
 sumpf.spawn_plants = true
 
