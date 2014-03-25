@@ -11,6 +11,7 @@ minetest.register_node("sumpf:sapling", {
 	inventory_image = "birke_sapling.png",	
 	wield_image = "birke_sapling.png",	
 	paramtype = "light",	
+	waving = 1,
 	walkable = false,	
 	groups = {snappy=2,dig_immediate=3,flammable=2,attached_node=1},
 	sounds = default.node_sound_leaves_defaults(),

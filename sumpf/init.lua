@@ -127,6 +127,7 @@ minetest.register_node("sumpf:gras", {
 	inventory_image = "sumpfgrass.png",
 	drawtype = "plantlike",
 	paramtype = "light",
+	waving = 1,
 	selection_box = {type = "fixed",fixed = {-1/3, -1/2, -1/3, 1/3, -1/5, 1/3},},
 	buildable_to = true,
 	walkable = false,

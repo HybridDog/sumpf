@@ -64,7 +64,7 @@ for color = 1, 3 do
 	minetest.register_node(leaf_name, slvs)
 end
 ]]
-local plantlike_leaves = false
+local plantlike_leaves = 1
 if plantlike_leaves then
 for color = 1, 3 do
 	local leave_name = "jungletree:leaves_"..leaves[color]
@@ -74,6 +74,7 @@ for color = 1, 3 do
 		visual_scale = math.sqrt(math.sqrt(2)),
 		tiles = {"jungletree_leaves_"..leaves[color]..".png"},
 		inventory_image = minetest.inventorycube("jungletree_leaves_"..leaves[color]..".png"),
+		waving = 1, --warum 1?
 		paramtype = "light",
 		groups = {snappy=3, leafdecay=3, flammable=2, leaves=1},
 		drop = {
@@ -235,27 +236,33 @@ function sumpf_make_jungletree(pos, generated)
 				nodes[area:index(pos.x-1, pos.y+i, pos.z)] = jungletree_c_jungletree
 			end
 			if i == height then
-				tree_branch({x=pos.x+1, y=pos.y+i, z=pos.z+1})
-				tree_branch({x=pos.x+2, y=pos.y+i, z=pos.z-1})
+				for _,p in ipairs({
+					{x=pos.x+1, y=pos.y+i, z=pos.z+1},
+					{x=pos.x+2, y=pos.y+i, z=pos.z-1},
 
-				tree_branch({x=pos.x, y=pos.y+i, z=pos.z-2})
-				tree_branch({x=pos.x-1, y=pos.y+i, z=pos.z})
-				tree_branch({x=pos.x+1, y=pos.y+i, z=pos.z+2})
-				tree_branch({x=pos.x+3, y=pos.y+i, z=pos.z-1})
-				tree_branch({x=pos.x, y=pos.y+i, z=pos.z-3})
+					{x=pos.x, y=pos.y+i, z=pos.z-2},
+					{x=pos.x-1, y=pos.y+i, z=pos.z},
+					{x=pos.x+1, y=pos.y+i, z=pos.z+2},
+					{x=pos.x+3, y=pos.y+i, z=pos.z-1},
+					{x=pos.x, y=pos.y+i, z=pos.z-3},
 
-				tree_branch({x=pos.x-2, y=pos.y+i, z=pos.z})
-				tree_branch({x=pos.x+1, y=pos.y+i, z=pos.z})
-				tree_branch({x=pos.x+1, y=pos.y+i, z=pos.z-1})
-				tree_branch({x=pos.x, y=pos.y+i, z=pos.z-1})
-				tree_branch({x=pos.x, y=pos.y+i, z=pos.z})
-
+					{x=pos.x-2, y=pos.y+i, z=pos.z},
+					{x=pos.x+1, y=pos.y+i, z=pos.z},
+					{x=pos.x+1, y=pos.y+i, z=pos.z-1},
+					{x=pos.x, y=pos.y+i, z=pos.z-1},
+					{x=pos.x, y=pos.y+i, z=pos.z},
+				}) do
+					tree_branch(p)
+				end
 			else
-				nodes[area:index(pos.x+1, pos.y+i, pos.z)] = jungletree_c_jungletree
-				nodes[area:index(pos.x+1, pos.y+i, pos.z-1)] = jungletree_c_jungletree
-				nodes[area:index(pos.x, pos.y+i, pos.z-1)] = jungletree_c_jungletree
-				nodes[area:index(pos.x, pos.y+i, pos.z)] = jungletree_c_jungletree
-
+				for _,p in ipairs({
+					{pos.x+1, pos.y+i, pos.z},
+					{pos.x+1, pos.y+i, pos.z-1},
+					{pos.x, pos.y+i, pos.z-1},
+					{pos.x, pos.y+i, pos.z},
+				}) do
+					nodes[area:index(p[1], p[2], p[3])] = jungletree_c_jungletree
+				end
 			end
 		end
 	end

@@ -9,10 +9,10 @@ sumpf.always_generate = false
 sumpf.smooth = true
 
 --rarity in %
-sumpf.mapgen_rarity = 2
+sumpf.mapgen_rarity = 4
 
 --size of the generated... (has an effect to the rarity, too)
-sumpf.mapgen_size = 50
+sumpf.mapgen_size = 100
 
 --Disable for testing
 sumpf.enable_plants = true
@@ -20,7 +20,7 @@ sumpf.enable_plants = true
 --Enables swampwater - it doesn't work correctly yet.
 sumpf.swampwater = false
 
-sumpf.wet_beaches = true
+sumpf.wet_beaches = false --currently the plants would be generated on this water
 
 --habitat stuff (no vm yet)
 sumpf.spawn_plants = true

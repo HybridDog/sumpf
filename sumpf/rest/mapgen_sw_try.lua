@@ -1,68 +1,6 @@
 minetest.register_alias("sumpf:pilz", "riesenpilz:brown")
 
---[[local function swampore(pos, env)
-	if minetest.get_node(pos).name == "default:stone_with_coal" then
-		return "kohle"
-	end
-	if minetest.get_node(pos).name == "default:stone_with_iron" then
-		return "eisen"
-	end
-	return "junglestone"
-end
-
-local function avoid_nearby_node(pos, node)
-	for i = -1,1,2 do
-		for j = -1,1,2 do
-			if minetest.get_node({x=pos.x+i, y=pos.y, z=pos.z+j}).name == node then
-				return false
-			end
-		end
-	end
-	return true
-end]]
-
-local function table_contains(v, t)
-	for _,i in ipairs(t) do			
-		if v == i then
-			return true
-		end
-	end
-	return false
-end
-
-local function water_allowed(data, area, x, y, z, nds)
-	for _,s in ipairs(nds) do
-		if data[area:index(x+1, y, z)] ~= s
-		and data[area:index(x-1, y, z)] ~= s
-		and data[area:index(x, y, z)+1] ~= s
-		and data[area:index(x, y, z)-1] ~= s then
-			return true
-		end
-	end
-	return false
-end
-
-local function fix_light(minp, maxp)
-	local manip = minetest.get_voxel_manip()
-	local emerged_pos1, emerged_pos2 = manip:read_from_map(minp, maxp)
-	area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
-	nodes = manip:get_data()
-
-	manip:set_data(nodes)
-	manip:write_to_map()
-	manip:update_map()
-end
-
---[[local function find_ground(pos, nodes)
-	for _, evground in ipairs(nodes) do
-		if minetest.get_node(pos).name == evground then
-			return true
-		end
-	end
-	return false
-end--]]
-
-
+--define contents
 local c = {
 	air = minetest.get_content_id("air"),
 	stone = minetest.get_content_id("default:stone"),
@@ -95,6 +33,88 @@ local c = {
 	sumpfgrass = minetest.get_content_id("sumpf:gras"),
 	junglegrass = minetest.get_content_id("default:junglegrass"),
 }
+
+--[[local function swampore(pos, env)
+	if minetest.get_node(pos).name == "default:stone_with_coal" then
+		return "kohle"
+	end
+	if minetest.get_node(pos).name == "default:stone_with_iron" then
+		return "eisen"
+	end
+	return "junglestone"
+end]]
+
+local function avoid_nearby_node(pos, node)
+	for i = -1,1,2 do
+		for j = -1,1,2 do
+			if minetest.get_node({x=pos.x+i, y=pos.y, z=pos.z+j}).name == node then
+				return false
+			end
+		end
+	end
+	return true
+end
+
+local function find_grond(a,list)
+	for _,nam in ipairs(list) do			
+		if a == nam then
+			return true
+		end
+	end
+	return false
+end
+
+local function water_allowed(data, area, x, y, z, nds)
+	for _,s in ipairs(nds) do
+		if data[area:index(x+1, y, z)] ~= s
+		and data[area:index(x-1, y, z)] ~= s
+		and data[area:index(x, y, z)+1] ~= s
+		and data[area:index(x, y, z)-1] ~= s then
+			return true
+		end
+	end
+	return false
+end
+
+local function fix_light(minp, maxp, swtab)
+	if swtab then
+		minp = vector.subtract(minp, 1)
+		maxp = vector.add(maxp, 1)
+	end
+	local manip = minetest.get_voxel_manip()
+	local emerged_pos1, emerged_pos2 = manip:read_from_map(minp, maxp)
+	area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
+	nodes = manip:get_data()
+
+	if swtab then
+		for _,i in ipairs(swtab) do
+			if water_allowed(nodes, area, i.x, i.y, i.z, {c.air, nil})
+			and nodes[area:index(i.x, i.y+1, i.z)] == c.air then
+				for s=0,-10-math.random(1,9),-1 do
+					local p_pos = area:index(i.x, i.y+s, i.z)
+					local d_p_pos = nodes[p_pos]
+					if d_p_pos ~= c.air then
+						nodes[p_pos] = c.dirtywater
+					else
+						break
+					end
+				end
+			end
+		end
+	end
+	manip:set_data(nodes)
+	manip:write_to_map()
+	manip:update_map()
+end
+
+--[[local function find_ground(pos, nodes)
+	for _, evground in ipairs(nodes) do
+		if minetest.get_node(pos).name == evground then
+			return true
+		end
+	end
+	return false
+end--]]
 
 local smooth = sumpf.smooth
 local swampwater = sumpf.swampwater
@@ -165,8 +185,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		end
 	end
 
-	local num = 1
-	local tab = {}
+	local tab, num = {}, 1
+	local swtab, swnum = {}, 1
 
 	for j=0,divs do
 		for i=0,divs do
@@ -206,9 +226,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				end
 
 				local ground_y = nil --Definition des Bodens:
---				for y=maxp.y,0,-1 do
-				for y=maxp.y,-5,-1 do	--because of the caves
-					if table_contains(data[area:index(x, y, z)], GROUND) then
+				for y=maxp.y,-5,-1 do	-- -5 because of the caves
+					if find_grond(data[area:index(x, y, z)], GROUND) then
 						ground_y = y
 						break
 					end
@@ -243,7 +262,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							end
 						end
 					else
-						if swampwater	--Sumpfwasser: doesn't work like cave detection
+						--[[if swampwater	--Sumpfwasser: doesn't work like cave detection
 						and pr:next(1,2) == 2
 						and water_allowed(data, area, x, ground_y, z, {c.air, nil, 0})
 						and d_p_boden == c.air then
@@ -256,37 +275,36 @@ minetest.register_on_generated(function(minp, maxp, seed)
 									break
 								end
 							end
-						else
-							local p_uuground = area:index(x, ground_y-2, z)
-							if sumpf.wet_beaches
-							and ground_y == 1
-							and pr:next(1,3) == 1 then
-								data[p_ground] = c.dirtywater
-								if pr:next(1,3) == 1 then
-									data[p_uground] = c.dirtywater
-								else
-									data[p_uground] = c.peat
+						else]]
+						local p_uuground = area:index(x, ground_y-2, z)
+						if sumpf.wet_beaches
+						and ground_y == 1
+						and pr:next(1,3) == 1 then
+							data[p_ground] = c.dirtywater
+							if pr:next(1,3) == 1 then
+								data[p_uground] = c.dirtywater
+							else
+								data[p_uground] = c.peat
 							end
-								data[p_uuground] = c.peat
-							else --Sumpfboden:
-								data[p_ground] = c.sumpfg
-								data[p_uground] = c.sumpfg
-								data[p_uuground] = c.sumpf2
-							end
-							for i=-3,-30,-1 do
-								local p_pos = area:index(x, ground_y+i, z)
-								local d_p_pos = data[p_pos]
-								if d_p_pos ~= c.air then
-									if d_p_pos == c.coal then
-										data[p_pos] = c.sumpfcoal
-									elseif d_p_pos == c.iron then
-										data[p_pos] = c.sumpfiron
-									else
-										data[p_pos] = c.sumpfstone
-									end
+							data[p_uuground] = c.peat
+						else --Sumpfboden:
+							data[p_ground] = c.sumpfg
+							data[p_uground] = c.sumpfg
+							data[p_uuground] = c.sumpf2
+						end
+						for i=-3,-30,-1 do
+							local p_pos = area:index(x, ground_y+i, z)
+							local d_p_pos = data[p_pos]
+							if d_p_pos ~= c.air then
+								if d_p_pos == c.coal then
+									data[p_pos] = c.sumpfcoal
+								elseif d_p_pos == c.iron then
+									data[p_pos] = c.sumpfiron
 								else
-									break
+									data[p_pos] = c.sumpfstone
 								end
+							else
+								break
 							end
 						end
 
@@ -300,6 +318,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 								tab[num] = {2, boden}
 								num = num+1
 --								sumpf_make_jungletree(boden)
+							elseif swampwater
+							and pr:next(1,2) == 2 then
+								swtab[swnum] = ground
+								swnum = swnum+1
 							elseif pr:next(1,50) == 1 then
 								data[p_boden] = c.brown_shroom
 							elseif pr:next(1,100) == 1 then
@@ -318,6 +340,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		end
 	end
 	vm:set_data(data)
+	--vm:set_lighting({day=0, night=0})
+	--vm:calc_lighting()
+	--vm:update_liquids()
 	vm:write_to_map()
 	sumpf.inform("ground finished", 2, t1)
 
@@ -334,33 +359,12 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 	sumpf.inform("trees made", 2, t2)
 
-	local t2 = os.clock()
-	fix_light(minp, maxp)
-	sumpf.inform("shadows added", 2, t2)
+	minetest.after(0, function(param)
+		local t2 = os.clock()
+		local minp, maxp, swtab = unpack(param)
+		fix_light(minp, maxp, swtab)
+		sumpf.inform("shadows added", 2, t2)
+	end, {minp, maxp, swtab})
 
 	sumpf.inform("done", 1, t1)
-
-	--[[local t3 = os.clock()
-	minetest.after(0, function(param)
-		local tab, minp, maxp, t1, t3 = unpack(param)
-		sumpf.inform("continuing", 2, t3)
-
-		local t2 = os.clock()
-		if plants_enabled then	--Trees:
-			for _,v in ipairs(tab) do
-				local p = v[2]
-				if v[1] == 1 then
-					mache_birke(p, 1)
-				else
-					sumpf_make_jungletree(p, 1)
-				end
-			end
-		end
-		sumpf.inform("trees made", 2, t2)
-
-		local t2 = os.clock()
-		fix_light(minp, maxp)
-		sumpf.inform("shadows added", 2, t2)
-		sumpf.inform("done", 1, t1)
-	end, {tab, minp, maxp, t1, t3})]]
 end)
