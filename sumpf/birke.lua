@@ -123,13 +123,14 @@ sumpf_c_leaves = minetest.get_content_id("sumpf:leaves")
 sumpf_ndtable = {sumpf_c_tree_horizontal, sumpf_c_leaves}
 
 
+local area, nodes, param2s, sumpf_birch_pr
+
 local function tree_branch(pos, dir)	
 
-	if dir == 0 then
-		nodes[area:index(pos.x, pos.y, pos.z)] = sumpf_c_tree_horizontal
-	else
-		tab[num] = pos
-		num = num+1
+	local p_pos = area:indexp(pos)
+	nodes[p_pos] = sumpf_c_tree_horizontal
+	if dir ~= 0 then
+		param2s[p_pos] = 1
 	end
 	for i = sumpf_birch_pr:next(1,2), -sumpf_birch_pr:next(1,2), -1 do		
 		for k = sumpf_birch_pr:next(1,2), -sumpf_birch_pr:next(1,2), -1 do
@@ -158,10 +159,9 @@ function mache_birke(pos, generated)
 		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
 	area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
 	nodes = manip:get_data()
+	param2s = manip:get_param2_data() 
 
 	sumpf_birch_pr = sumpf_birch_get_random(pos)
-	num = 1
-	tab = {}
 
 	nodes[area:index(pos.x, pos.y, pos.z)] = sumpf_c_mossytree
 	local height = 3 + sumpf_birch_pr:next(1,2)
@@ -180,21 +180,18 @@ function mache_birke(pos, generated)
 	tree_branch({x=pos.x, y=pos.y+height-sumpf_birch_pr:next(1,2), z=pos.z-1}, 0)
 
 	manip:set_data(nodes)
+	manip:set_param2_data(param2s)
 	manip:write_to_map()
-	local spam = 3
+	local spam = 2
+	if generated then
+		spam = 3
+	end
+	sumpf.inform("a birch grew at ("..pos.x.."|"..pos.y.."|"..pos.z..")", spam, t1)
 	if not generated then	--info
-		spam = 2
-		sumpf.inform("a birch grew at ("..pos.x.."|"..pos.y.."|"..pos.z..")", spam, t1)
-
 		local t1 = os.clock()
 		manip:update_map()
 		sumpf.inform("map updated", spam, t1)
 	end
-	t1 = os.clock()
-	for _,p in ipairs(tab) do
-		minetest.set_node(p, {name="sumpf:tree_horizontal", param2=1})
-	end
-	sumpf.inform("h1trees set", spam, t1)
 end
 
 --[[

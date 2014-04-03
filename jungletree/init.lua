@@ -149,6 +149,8 @@ jungletree_ndtable = {jungletree_c_jungletree, jungletree_c_leaves_green, jungle
 --minetest.register_alias("jungletree:tree", "default:jungletree")
 
 
+local area, nodes, jungletree_pr
+
 local function tree_branch(pos)
 
 	--choose random leave
