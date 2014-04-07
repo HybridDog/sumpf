@@ -102,11 +102,12 @@ local plants_enabled = sumpf.enable_plants
 
 local sumpf_rarity = sumpf.mapgen_rarity
 local sumpf_size = sumpf.mapgen_size
+local smooth_trans_size = sumpf.smooth_trans_size
 
-local nosmooth_rarity = -(sumpf_rarity/50)+1
+local nosmooth_rarity = 1-sumpf_rarity/50
 local perlin_scale = sumpf_size*100/sumpf_rarity
-local smooth_rarity_full = nosmooth_rarity+perlin_scale/(20*sumpf_size)
-local smooth_rarity_ran = nosmooth_rarity-perlin_scale/(40*sumpf_size)
+local smooth_rarity_full = nosmooth_rarity+smooth_trans_size*2/perlin_scale
+local smooth_rarity_ran = nosmooth_rarity-smooth_trans_size/perlin_scale
 local smooth_rarity_dif = (smooth_rarity_full-smooth_rarity_ran)*100-1
 
 local GROUND =	{c.gr, c.sand, c.dirt, c.desert_sand, c.water}

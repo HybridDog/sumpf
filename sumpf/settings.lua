@@ -14,6 +14,9 @@ sumpf.mapgen_rarity = 4
 --size of the generated... (has an effect to the rarity, too)
 sumpf.mapgen_size = 100
 
+--approximate size of the smooth transitions
+sumpf.smooth_trans_size = 4
+
 --Disable for testing
 sumpf.enable_plants = true
 
