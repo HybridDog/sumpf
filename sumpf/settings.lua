@@ -5,8 +5,8 @@ sumpf.enable_mapgen = true
 --Always generate swamps (causes some lag)
 sumpf.always_generate = false
 
---Enables smooth transition of biomes, which currently doesn't work correctly enough.
-sumpf.smooth = false
+--Enables smooth transition of biomes.
+sumpf.smooth = true
 
 --rarity in %
 sumpf.mapgen_rarity = 4

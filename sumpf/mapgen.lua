@@ -106,9 +106,9 @@ local smooth_trans_size = sumpf.smooth_trans_size
 
 local nosmooth_rarity = 1-sumpf_rarity/50
 local perlin_scale = sumpf_size*100/sumpf_rarity
-local smooth_rarity_full = nosmooth_rarity+smooth_trans_size*2/perlin_scale
-local smooth_rarity_ran = nosmooth_rarity-smooth_trans_size/perlin_scale
-local smooth_rarity_dif = (smooth_rarity_full-smooth_rarity_ran)*100-1
+local smooth_rarity_max = nosmooth_rarity+smooth_trans_size*2/perlin_scale
+local smooth_rarity_min = nosmooth_rarity-smooth_trans_size/perlin_scale
+local smooth_rarity_dif = smooth_rarity_max-smooth_rarity_min
 
 local GROUND =	{c.gr, c.sand, c.dirt, c.desert_sand, c.water}
 local USUAL_STUFF =	{c.dry_shrub, c.cactus, c.papyrus}
@@ -179,16 +179,15 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			--smooth mapgen
 			if sumpf.always_generate then
 				in_biome = true
-			elseif smooth
-			and (
-				test > smooth_rarity_full
+			elseif smooth then
+				if test >= smooth_rarity_max
 				or (
-					test > smooth_rarity_ran
-					and pr:next(0,smooth_rarity_dif) > (smooth_rarity_full - test) * 100
-				)
-			) then
-				in_biome = true
-			elseif (not smooth)
+					test > smooth_rarity_min
+					and pr:next(1, 1000) <= ((test-smooth_rarity_min)/smooth_rarity_dif)*1000
+				) then
+					in_biome = true
+				end
+			elseif not smooth
 			and test > nosmooth_rarity then
 				in_biome = true
 			end
@@ -322,8 +321,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	vm:write_to_map()
 	sumpf.inform("ground finished", 2, t1)
 
-	local t2 = os.clock()
 	if plants_enabled then	--Trees:
+		local t2 = os.clock()
 		for _,v in ipairs(tab) do
 			local p = v[2]
 			if v[1] == 1 then
@@ -332,12 +331,13 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				sumpf_make_jungletree(p, 1)
 			end
 		end
-	end
-	sumpf.inform("trees made", 2, t2)
+		sumpf.inform("trees made", 2, t2)
 
-	local t2 = os.clock()
-	fix_light(minp, maxp)
-	sumpf.inform("shadows added", 2, t2)
+		t2 = os.clock()
+		fix_light(minp, maxp)
+		sumpf.inform("shadows added", 2, t2)
+	end
+
 
 	sumpf.inform("done", 1, t1)
 
