@@ -22,7 +22,7 @@ local function avoid_nearby_node(pos, node)
 end]]
 
 local function table_contains(v, t)
-	for _,i in ipairs(t) do			
+	for _,i in pairs(t) do			
 		if v == i then
 			return true
 		end
@@ -31,7 +31,7 @@ local function table_contains(v, t)
 end
 
 local function water_allowed(data, area, x, y, z, nds)
-	for _,s in ipairs(nds) do
+	for _,s in pairs(nds) do
 		if data[area:index(x+1, y, z)] ~= s
 		and data[area:index(x-1, y, z)] ~= s
 		and data[area:index(x, y, z)+1] ~= s
@@ -158,7 +158,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 	for p_pos in area:iterp(minp, maxp) do	--remove tree stuff
 		local d_p_pos = data[p_pos]
-		for _,nam in ipairs({c.tree, c.leaves, c.apple}) do			
+		for _,nam in pairs({c.tree, c.leaves, c.apple}) do			
 			if d_p_pos == nam then
 				data[p_pos] = c.air
 				break
@@ -197,7 +197,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				for b = minp.y,maxp.y,1 do	--remove usual stuff
 					local p_pos = area:index(x, b, z)
 					local d_p_pos = data[p_pos]
-					for _,nam in ipairs(USUAL_STUFF) do			
+					for _,nam in pairs(USUAL_STUFF) do			
 						if d_p_pos == nam then
 							data[p_pos] = c.air
 							break
@@ -323,7 +323,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 	if plants_enabled then	--Trees:
 		local t2 = os.clock()
-		for _,v in ipairs(tab) do
+		for _,v in pairs(tab) do
 			local p = v[2]
 			if v[1] == 1 then
 				mache_birke(p, 1)
