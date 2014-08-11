@@ -63,38 +63,51 @@ end
 end--]]
 
 
-local c = {
-	air = minetest.get_content_id("air"),
-	stone = minetest.get_content_id("default:stone"),
-	gr = minetest.get_content_id("default:dirt_with_grass"),
-	dirt = minetest.get_content_id("default:dirt"),
-	sand = minetest.get_content_id("default:sand"),
-	desert_sand = minetest.get_content_id("default:desert_sand"),
-	water = minetest.get_content_id("default:water_source"),
-	dirtywater = minetest.get_content_id("sumpf:dirtywater_source"),
-	coal = minetest.get_content_id("default:stone_with_coal"),
-	iron = minetest.get_content_id("default:stone_with_iron"),
+local c
+local function define_contents()
+	c = {
+		air = minetest.get_content_id("air"),
+		stone = minetest.get_content_id("default:stone"),
+		water = minetest.get_content_id("default:water_source"),
+		dirtywater = minetest.get_content_id("sumpf:dirtywater_source"),
+		coal = minetest.get_content_id("default:stone_with_coal"),
+		iron = minetest.get_content_id("default:stone_with_iron"),
 
-	tree = minetest.get_content_id("default:tree"),
-	leaves = minetest.get_content_id("default:leaves"),
-	apple = minetest.get_content_id("default:apple"),
-	dry_shrub = minetest.get_content_id("default:dry_shrub"),
-	cactus = minetest.get_content_id("default:cactus"),
-	papyrus = minetest.get_content_id("default:papyrus"),
+		sumpfg = minetest.get_content_id("sumpf:sumpf"),
+		sumpf2 = minetest.get_content_id("sumpf:sumpf2"),
+		sumpfstone = minetest.get_content_id("sumpf:junglestone"),
+		sumpfcoal = minetest.get_content_id("sumpf:kohle"),
+		sumpfiron = minetest.get_content_id("sumpf:eisen"),
+		peat = minetest.get_content_id("sumpf:peat"),
 
-	sumpfg = minetest.get_content_id("sumpf:sumpf"),
-	sumpf2 = minetest.get_content_id("sumpf:sumpf2"),
-	sumpfstone = minetest.get_content_id("sumpf:junglestone"),
-	sumpfcoal = minetest.get_content_id("sumpf:kohle"),
-	sumpfiron = minetest.get_content_id("sumpf:eisen"),
-	peat = minetest.get_content_id("sumpf:peat"),
+		brown_shroom = minetest.get_content_id("riesenpilz:brown"),
+		red_shroom = minetest.get_content_id("riesenpilz:red"),
+		fly_agaric = minetest.get_content_id("riesenpilz:fly_agaric"),
+		sumpfgrass = minetest.get_content_id("sumpf:gras"),
+		junglegrass = minetest.get_content_id("default:junglegrass"),
 
-	brown_shroom = minetest.get_content_id("riesenpilz:brown"),
-	red_shroom = minetest.get_content_id("riesenpilz:red"),
-	fly_agaric = minetest.get_content_id("riesenpilz:fly_agaric"),
-	sumpfgrass = minetest.get_content_id("sumpf:gras"),
-	junglegrass = minetest.get_content_id("default:junglegrass"),
-}
+		USUAL_STUFF = {
+			minetest.get_content_id("default:dry_shrub"),
+			minetest.get_content_id("default:cactus"),
+			minetest.get_content_id("default:papyrus")
+		},
+		TREE_STUFF = {
+			minetest.get_content_id("default:tree"),
+			minetest.get_content_id("default:leaves"),
+			minetest.get_content_id("default:apple"),
+		},
+	}
+	c.GROUND = {c.water}
+	for name,data in pairs(minetest.registered_nodes) do
+		local groups = data.groups
+		if groups then
+			if groups.crumbly == 3
+			or groups.soil == 1 then
+				table.insert(c.GROUND, minetest.get_content_id(name))
+			end
+		end
+	end
+end
 
 local smooth = sumpf.smooth
 local swampwater = sumpf.swampwater
@@ -110,14 +123,18 @@ local smooth_rarity_max = nosmooth_rarity+smooth_trans_size*2/perlin_scale
 local smooth_rarity_min = nosmooth_rarity-smooth_trans_size/perlin_scale
 local smooth_rarity_dif = smooth_rarity_max-smooth_rarity_min
 
-local GROUND =	{c.gr, c.sand, c.dirt, c.desert_sand, c.water}
-local USUAL_STUFF =	{c.dry_shrub, c.cactus, c.papyrus}
+local contents_defined
 minetest.register_on_generated(function(minp, maxp, seed)
 
 	--avoid calculating perlin noises for unneeded places
 	if maxp.y <= -2
 	or minp.y >= 150 then
 		return
+	end
+
+	if not contents_defined then
+		define_contents()
+		contents_defined = true
 	end
 
 	local x0,z0,x1,z1 = minp.x,minp.z,maxp.x,maxp.z	-- Assume X and Z lengths are equal
@@ -158,7 +175,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 	for p_pos in area:iterp(minp, maxp) do	--remove tree stuff
 		local d_p_pos = data[p_pos]
-		for _,nam in pairs({c.tree, c.leaves, c.apple}) do			
+		for _,nam in pairs(c.TREE_STUFF) do			
 			if d_p_pos == nam then
 				data[p_pos] = c.air
 				break
@@ -197,7 +214,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				for b = minp.y,maxp.y,1 do	--remove usual stuff
 					local p_pos = area:index(x, b, z)
 					local d_p_pos = data[p_pos]
-					for _,nam in pairs(USUAL_STUFF) do			
+					for _,nam in pairs(c.USUAL_STUFF) do			
 						if d_p_pos == nam then
 							data[p_pos] = c.air
 							break
@@ -208,7 +225,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				local ground_y = nil --Definition des Bodens:
 --				for y=maxp.y,0,-1 do
 				for y=maxp.y,-5,-1 do	--because of the caves
-					if table_contains(data[area:index(x, y, z)], GROUND) then
+					if table_contains(data[area:index(x, y, z)], c.GROUND) then
 						ground_y = y
 						break
 					end
