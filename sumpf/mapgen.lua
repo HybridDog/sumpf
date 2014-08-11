@@ -132,11 +132,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		return
 	end
 
-	if not contents_defined then
-		define_contents()
-		contents_defined = true
-	end
-
 	local x0,z0,x1,z1 = minp.x,minp.z,maxp.x,maxp.z	-- Assume X and Z lengths are equal
 	local perlin1 = minetest.get_perlin(1123,3, 0.5, perlin_scale)	--Get map specific perlin
 
@@ -159,11 +154,16 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 	local t1 = os.clock()
 
+		--Information:
+	sumpf.inform("tries to generate a swamp at: x=["..minp.x.."; "..maxp.x.."]; y=["..minp.y.."; "..maxp.y.."]; z=["..minp.z.."; "..maxp.z.."]", 2)
+
 	local divs = (maxp.x-minp.x);
 	local pr = PseudoRandom(seed+68)
 
-		--Information:
-	sumpf.inform("tries to generate a swamp at: x=["..minp.x.."; "..maxp.x.."]; y=["..minp.y.."; "..maxp.y.."]; z=["..minp.z.."; "..maxp.z.."]", 2)
+	if not contents_defined then
+		define_contents()
+		contents_defined = true
+	end
 
 	--[[local trees = minetest.find_nodes_in_area(minp, maxp, USUAL_STUFF)
 	for i,v in pairs(trees) do

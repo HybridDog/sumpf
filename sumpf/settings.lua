@@ -2,7 +2,7 @@
 
 sumpf.enable_mapgen = true
 
---Always generate swamps (causes some lag)
+--Generate swamps everywhere
 sumpf.always_generate = false
 
 --Enables smooth transition of biomes.
@@ -31,7 +31,7 @@ sumpf.spawn_plants = true
 --says some information.
 sumpf.info = true
 
---informs the players, too
+--informs the players too
 sumpf.inform_all = minetest.is_singleplayer()
 
 --1:<a bit of information> 2:<acceptable amount of information> 3:<lots of text>
