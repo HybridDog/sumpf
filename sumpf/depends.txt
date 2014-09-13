@@ -1,6 +1,6 @@
 default
 riesenpilz
 jungletree
-habitat
-bucket
-stairs
+bucket?
+habitat?
+stairs?

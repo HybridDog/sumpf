@@ -93,29 +93,31 @@ minetest.register_node("sumpf:sumpf2", {
 
 ----------------------stairs and slabs------------------
 
-stairs.register_stair_and_slab("swampstone", "sumpf:junglestone",
-		{cracky=3},
-		{"sumpf_swampstone.png"},
-		"Swamp Stone Stair",
-		"Swamp Stone Slab",
-		default.node_sound_stone_defaults()
-)
+if stairs then
+	stairs.register_stair_and_slab("swampstone", "sumpf:junglestone",
+			{cracky=3},
+			{"sumpf_swampstone.png"},
+			"Swamp Stone Stair",
+			"Swamp Stone Slab",
+			default.node_sound_stone_defaults()
+	)
 
-stairs.register_stair_and_slab("swampcobble", "sumpf:cobble",
-		{cracky=3},
-		{"sumpf_cobble.png"},
-		"Swamp Cobble Stone Stair",
-		"Swamp Cobble Stone Slab",
-		default.node_sound_stone_defaults()
-)
+	stairs.register_stair_and_slab("swampcobble", "sumpf:cobble",
+			{cracky=3},
+			{"sumpf_cobble.png"},
+			"Swamp Cobble Stone Stair",
+			"Swamp Cobble Stone Slab",
+			default.node_sound_stone_defaults()
+	)
 
-stairs.register_stair_and_slab("swampstonebrick", "sumpf:junglestonebrick",
-		{cracky=2, stone=1},
-		{"sumpf_swampstone_brick.png"},
-		"Swamp Stone Brick Stair",
-		"Swamp Stone Brick Slab",
-		default.node_sound_stone_defaults()
-)
+	stairs.register_stair_and_slab("swampstonebrick", "sumpf:junglestonebrick",
+			{cracky=2, stone=1},
+			{"sumpf_swampstone_brick.png"},
+			"Swamp Stone Brick Stair",
+			"Swamp Stone Brick Slab",
+			default.node_sound_stone_defaults()
+	)
+end
 
 ---------------------------------------------------------
 
@@ -180,13 +182,15 @@ minetest.register_node("sumpf:dirtywater_source", {
 	groups = {water=3, liquid=3, puts_out_fire=1},
 })
 
-bucket.register_liquid(
-	"sumpf:dirtywater_source",
-	"sumpf:dirtywater_flowing",
-	"sumpf:bucket_dirtywater",
-	"bucket.png^sumpf_bucket_dirtywater.png",
-	"Swampwater Bucket"
-)
+if bucket then
+	bucket.register_liquid(
+		"sumpf:dirtywater_source",
+		"sumpf:dirtywater_flowing",
+		"sumpf:bucket_dirtywater",
+		"bucket.png^sumpf_bucket_dirtywater.png",
+		"Swampwater Bucket"
+	)
+end
 
 
 sumpf = {}

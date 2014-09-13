@@ -207,7 +207,7 @@ minetest.register_abm({
 })
 
 if sumpf.spawn_plants
-and minetest.get_modpath("habitat") then
+and habitat then
 	habitat:generate("sumpf:sapling", {"default:dirt_with_grass"},
 		minp, maxp, 20, 25, 100, 500, {"default:water_source"},30,{"default:desert_sand"})
 	habitat:generate("sumpf:gras", {"default:dirt_with_grass"},
