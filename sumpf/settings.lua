@@ -20,8 +20,8 @@ sumpf.smooth_trans_size = 4
 --Disable for testing
 sumpf.enable_plants = true
 
---Enables swampwater - it doesn't work correctly yet.
-sumpf.swampwater = false
+--Enables swampwater - it might be a bit buggy with mapgen v6.
+sumpf.swampwater = true
 
 sumpf.wet_beaches = false --currently the plants would be generated on this water
 

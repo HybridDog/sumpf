@@ -30,18 +30,6 @@ local function table_contains(v, t)
 	return false
 end
 
-local function water_allowed(data, area, x, y, z, nds)
-	for _,s in pairs(nds) do
-		if data[area:index(x+1, y, z)] ~= s
-		and data[area:index(x-1, y, z)] ~= s
-		and data[area:index(x, y, z)+1] ~= s
-		and data[area:index(x, y, z)-1] ~= s then
-			return true
-		end
-	end
-	return false
-end
-
 local function fix_light(minp, maxp)
 	local manip = minetest.get_voxel_manip()
 	local emerged_pos1, emerged_pos2 = manip:read_from_map(minp, maxp)
@@ -63,7 +51,7 @@ end
 end--]]
 
 
-local c
+local c, water_allowed, swampwater
 local function define_contents()
 	c = {
 		air = minetest.get_content_id("air"),
@@ -107,10 +95,56 @@ local function define_contents()
 			end
 		end
 	end
+
+	swampwater = sumpf.swampwater
+	if not swampwater then
+		return
+	end
+
+	local hard_nodes = {}
+	local function hard_node(id)
+		if not id then
+			return false
+		end
+		local hard = hard_nodes[id]
+		if hard ~= nil then
+			return hard
+		end
+		local name = minetest.get_name_from_content_id(id)
+		sumpf.inform("<swampwater> testing if "..name.."is a hard node", 3)
+		local node = minetest.registered_nodes[name]
+		if not node then
+			hard_nodes[id] = false
+			return false
+		end
+		local drawtype = node.drawtype
+		if not drawtype
+		or drawtype == "normal" then
+			hard_nodes[id] = true
+			return true
+		end
+		hard_nodes[id] = false
+		return false
+	end
+
+	function water_allowed(data, area, x, y, z)
+		for _,p in pairs({
+			{0,-1},
+			{0,1},
+			{-1,0},
+			{1,0},
+		}) do
+			local id = data[area:index(x+p[1], y, z+p[2])]
+			if id ~= c.dirtywater
+			and not hard_node(id) then
+				return false
+			end
+		end
+		return true
+	end
 end
 
 local smooth = sumpf.smooth
-local swampwater = sumpf.swampwater
 local plants_enabled = sumpf.enable_plants
 
 local sumpf_rarity = sumpf.mapgen_rarity
@@ -260,10 +294,12 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							end
 						end
 					else
+						local plant_allowed = plants_enabled
 						if swampwater	--Sumpfwasser: doesn't work like cave detection
 						and pr:next(1,2) == 2
-						and water_allowed(data, area, x, ground_y, z, {c.air, nil, 0})
+						and water_allowed(data, area, x, ground_y, z)
 						and d_p_boden == c.air then
+							plant_allowed = false
 							for s=0,-10-pr:next(1,9),-1 do
 								local p_pos = area:index(x, ground_y+s, z)
 								local d_p_pos = data[p_pos]
@@ -307,7 +343,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							end
 						end
 
-						if plants_enabled then	--Pflanzen (und Pilz):
+						if plant_allowed then	--Pflanzen (und Pilz):
 
 							if pr:next(1,80) == 1 then
 --								mache_birke(boden)	this didn't work, so...
