@@ -23,7 +23,8 @@ sumpf.enable_plants = true
 --Enables swampwater - it might be a bit buggy with mapgen v6.
 sumpf.swampwater = true
 
-sumpf.wet_beaches = false --currently the plants would be generated on this water
+--adds swampwater near sea (different behaviour)
+sumpf.wet_beaches = sumpf.swampwater
 
 --habitat stuff (no vm yet)
 sumpf.spawn_plants = true

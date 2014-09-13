@@ -98,10 +98,10 @@ local function define_contents()
 
 	swampwater = sumpf.swampwater
 	if not swampwater then
-		return
+		return	--abort if swampwater is disabled
 	end
 
-	local hard_nodes = {}
+	local hard_nodes = {}	--in time makes a table of nodes which are allowed to be next to swampwater
 	local function hard_node(id)
 		if not id then
 			return false
@@ -127,6 +127,7 @@ local function define_contents()
 		return false
 	end
 
+	--tests if swampwater is allowed to generate at this position
 	function water_allowed(data, area, x, y, z)
 		for _,p in pairs({
 			{0,-1},
@@ -295,15 +296,15 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						end
 					else
 						local plant_allowed = plants_enabled
-						if swampwater	--Sumpfwasser: doesn't work like cave detection
+						if swampwater
+						and ground_y ~= 1
+						and d_p_boden == c.air
 						and pr:next(1,2) == 2
-						and water_allowed(data, area, x, ground_y, z)
-						and d_p_boden == c.air then
-							plant_allowed = false
+						and water_allowed(data, area, x, ground_y, z) then
+							plant_allowed = false	--disable plants on swampwater
 							for s=0,-10-pr:next(1,9),-1 do
 								local p_pos = area:index(x, ground_y+s, z)
-								local d_p_pos = data[p_pos]
-								if d_p_pos ~= c.air then
+								if data[p_pos] ~= c.air then
 									data[p_pos] = c.dirtywater
 								else
 									break
@@ -313,13 +314,15 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							local p_uuground = area:index(x, ground_y-2, z)
 							if sumpf.wet_beaches
 							and ground_y == 1
+							and d_p_boden == c.air
 							and pr:next(1,3) == 1 then
+								plant_allowed = false	--disable plants on swampwater
 								data[p_ground] = c.dirtywater
 								if pr:next(1,3) == 1 then
 									data[p_uground] = c.dirtywater
 								else
 									data[p_uground] = c.peat
-							end
+								end
 								data[p_uuground] = c.peat
 							else --Sumpfboden:
 								data[p_ground] = c.sumpfg
