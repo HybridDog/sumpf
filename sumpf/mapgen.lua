@@ -33,8 +33,8 @@ end
 local function fix_light(minp, maxp)
 	local manip = minetest.get_voxel_manip()
 	local emerged_pos1, emerged_pos2 = manip:read_from_map(minp, maxp)
-	area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
-	nodes = manip:get_data()
+	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
+	local nodes = manip:get_data()
 
 	manip:set_data(nodes)
 	manip:write_to_map()
@@ -174,7 +174,22 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	and not (perlin1:get2d({x=x0, y=z1}) > 0.53) and not (perlin1:get2d({x=x1, y=z0}) > 0.53)
 	and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) then]]
 
-	if not sumpf.always_generate
+	if not sumpf.always_generate then
+		local swamp_allowed
+		for x = x0, x1, 16 do
+			for z = z0, z1, 16 do
+				if perlin1:get2d({x=x, y=z}) > nosmooth_rarity then
+					swamp_allowed = true
+					break
+				end
+			end
+		end
+		if not swamp_allowed then
+			return
+		end
+	end
+
+	--[[if not sumpf.always_generate
 	and not ( perlin1:get2d( {x=x0, y=z0} ) > nosmooth_rarity ) 					--top left
 	and not ( perlin1:get2d( { x = x0 + ( (x1-x0)/2), y=z0 } ) > nosmooth_rarity )--top middle
 	and not (perlin1:get2d({x=x1, y=z1}) > nosmooth_rarity) 						--bottom right
@@ -185,14 +200,14 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > nosmooth_rarity) 			--middle
 	and not (perlin1:get2d({x=x0, y=z1+((z1-z0)/2)}) > nosmooth_rarity) then		--bottom middle
 		return
-	end
+	end]]
 
 	local t1 = os.clock()
 
 		--Information:
-	sumpf.inform("tries to generate a swamp at: x=["..minp.x.."; "..maxp.x.."]; y=["..minp.y.."; "..maxp.y.."]; z=["..minp.z.."; "..maxp.z.."]", 2)
+	sumpf.inform("tries to generate a swamp at: x=["..x0.."; "..x1.."]; y=["..minp.y.."; "..maxp.y.."]; z=["..z0.."; "..z1.."]", 2)
 
-	local divs = (maxp.x-minp.x);
+	local divs = (x1-x0);
 	local pr = PseudoRandom(seed+68)
 
 	if not contents_defined then
@@ -276,6 +291,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					local boden =	{x=x,y=ground_y+1,	z=z}
 
 					if d_p_ground == c.water then	--Dreckseen:
+						local h
 						if smooth then
 							h = pr:next(1,2)
 						else

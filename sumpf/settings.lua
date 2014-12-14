@@ -1,4 +1,4 @@
---This file contains configuration options for swamp mod.
+--This file contains configuration options for the swamp mod.
 
 sumpf.enable_mapgen = true
 

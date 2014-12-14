@@ -169,8 +169,10 @@ function mache_birke(pos, generated)
 		local p = {x=pos.x, y=pos.y+i, z=pos.z}
 		nodes[area:index(p.x, p.y, p.z)] = sumpf_c_tree
 		if (math.sin(i/height*i) < 0.2 and i > 3 and sumpf_birch_pr:next(0,2) < 1.5) then
-			branch_pos = {x=pos.x+sumpf_birch_pr:next(0,1), y=pos.y+i, z=pos.z-sumpf_birch_pr:next(0,1)}
-			tree_branch(branch_pos, sumpf_birch_pr:next(0,1))
+			tree_branch(
+				{x=pos.x+sumpf_birch_pr:next(0,1), y=pos.y+i, z=pos.z-sumpf_birch_pr:next(0,1)},
+				sumpf_birch_pr:next(0,1)
+			)
 		end
 	end
 	tree_branch({x=pos.x, y=pos.y+height+sumpf_birch_pr:next(0,1),z=pos.z}, sumpf_birch_pr:next(0,1))
@@ -194,7 +196,7 @@ function mache_birke(pos, generated)
 	end
 end
 
-minetest.register_abm({	
+minetest.register_abm({
 	nodenames = {"sumpf:sapling"},	
 	neighbors = {"group:soil"},
 	interval = 20,	
