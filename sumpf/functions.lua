@@ -7,7 +7,7 @@ if sumpf.info then
 			else
 				info = "[sumpf] "..msg
 			end
-			print(info)
+			minetest.log("info", info)
 			if sumpf.inform_all then
 				minetest.chat_send_all(info)
 			end

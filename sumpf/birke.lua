@@ -19,8 +19,8 @@ minetest.register_node("sumpf:sapling", {
 })
 
 minetest.register_node("sumpf:birk", {
-	tiles = {"birke_mossytree.png"},	
-	inventory_image = "birke_mossytree.png^birke_sapling.png",	
+	tiles = {"birke_tree_top.png"},	
+	inventory_image = "birke_tree_top.png^birke_sapling.png",	
 	paramtype = "light",	
 	stack_max = 1024,
 	groups = {snappy=2,dig_immediate=3},
@@ -74,7 +74,7 @@ minetest.register_node("sumpf:tree_horizontal", {
 
 minetest.register_node("sumpf:mossytree", {
 	description = "Mossy Birch Trunk",	
-	tiles = {"birke_tree_top.png",	"sumpf.png",	"birke_mossytree.png"},	
+	tiles = {"birke_tree_top.png",	"sumpf.png", "birke_tree.png^(sumpf_transition.png^[transformR180)"},	
 	groups = {tree=1,snappy=1,choppy=2,oddly_breakable_by_hand=1,flammable=2},
 	sounds = default.node_sound_wood_defaults(),
 })
