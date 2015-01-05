@@ -137,12 +137,13 @@ minetest.register_node("sumpf:gras", {
 	sounds = default.node_sound_leaves_defaults(),
 })
 
+local ani = {type="vertical_frames", aspect_w=16, aspect_h=16, length=1.5}--17
 minetest.register_node("sumpf:dirtywater_flowing", {
 	drawtype = "flowingliquid",
 	tiles = {"default_water.png"},
 	special_tiles = {
-		{name="sumpfwasser2.png", backface_culling=false,	animation={type="vertical_frames", aspect_w=32, aspect_h=32, length=1}},
-		{name="sumpfwasser2.png", backface_culling=true,	animation={type="vertical_frames", aspect_w=32, aspect_h=32, length=1}}
+		{name="sumpf_water_flowing.png", backface_culling=false,	animation=ani},
+		{name="sumpf_water_flowing.png", backface_culling=true,	animation=ani}
 	},
 	alpha = WATER_ALPHA,
 	paramtype = "light",
@@ -163,11 +164,11 @@ minetest.register_node("sumpf:dirtywater_source", {
 	description = "Swampwater",
 	drawtype = "liquid",
 	tiles = {
-		{name="sumpfwasser.png", animation={type="vertical_frames", aspect_w=32, aspect_h=32, length=1.0}},
-		{name="sumpfwasser.png", animation={type="vertical_frames", aspect_w=32, aspect_h=32, length=1.0}},
-		{name="sumpfwasser2.png", animation={type="vertical_frames", aspect_w=32, aspect_h=32, length=1.0}}
+		{name="sumpf_water_source.png", animation=ani},
+		{name="sumpf_water_source.png", animation=ani},
+		{name="sumpf_water_flowing.png", animation=ani}
 	},
-	special_tiles = {{name="sumpfwasser.png", animation={type="vertical_frames", aspect_w=32, aspect_h=32, length=1.0}, backface_culling=false},},
+	special_tiles = {{name="sumpf_water_source.png", animation=ani, backface_culling=false},},
 	alpha = WATER_ALPHA,
 	paramtype = "light",
 	walkable = false,
