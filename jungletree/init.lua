@@ -6,14 +6,13 @@ function jungletree_get_random(pos)
 end
 
 minetest.register_node("jungletree:sapling", {
-	description = "Jungle Tree Sapling",	
-	drawtype = "plantlike",	
-	visual_scale = 1.0,	
-	tiles = {"jungletree_sapling.png"},	
-	inventory_image = "jungletree_sapling.png",	
-	wield_image = "default_sapling.png",	
-	paramtype = "light",	
-	walkable = false,	
+	description = "Jungle Tree Sapling",
+	drawtype = "plantlike",
+	tiles = {"jungletree_sapling.png"},
+	inventory_image = "jungletree_sapling.png",
+	wield_image = "jungletree_sapling.png",
+	paramtype = "light",
+	walkable = false,
 	groups = {snappy=2,dig_immediate=3,flammable=2,attached_node=1},
 	on_construct = function(pos)
 		if minetest.setting_getbool("creative_mode") then
@@ -85,7 +84,7 @@ local function tree_branch(pos)
 	if (chance < 2) then
 		leaf = jungletree_pr:next(2,4)
 	end
-	
+
 	nodes[area:index(pos.x, pos.y, pos.z)] = jungletree_c_jungletree
 	for i = jungletree_pr:next(1,2), -jungletree_pr:next(1,2), -1 do
 		for k =jungletree_pr:next(1,2), -jungletree_pr:next(1,2), -1 do
@@ -208,12 +207,12 @@ function sumpf_make_jungletree(pos, generated)
 	end
 end
 
-minetest.register_abm({	
-	nodenames = {"jungletree:sapling"},	
+minetest.register_abm({
+	nodenames = {"jungletree:sapling"},
 	neighbors = {"group:soil"},
-	interval = 40,	
-	chance = 5,	
-	action = function(pos)	
+	interval = 40,
+	chance = 5,
+	action = function(pos)
 		if sumpf.tree_allowed(pos, 7) then
 			sumpf_make_jungletree(pos)
 		end
