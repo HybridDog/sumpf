@@ -25,7 +25,6 @@ minetest.register_node("sumpf:junglestone", {
 	description = "Swamp Stone",
 	tiles = {"sumpf_swampstone.png"},
 	groups = {cracky=3},
-	legacy_mineral = true,
 	drop = "sumpf:cobble",
 	sounds = default.node_sound_stone_defaults(),
 })
