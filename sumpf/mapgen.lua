@@ -1,5 +1,3 @@
-minetest.register_alias("sumpf:pilz", "riesenpilz:brown")
-
 --[[local function swampore(pos, env)
 	if minetest.get_node(pos).name == "default:stone_with_coal" then
 		return "kohle"

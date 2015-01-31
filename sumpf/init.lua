@@ -201,4 +201,10 @@ if sumpf.enable_mapgen then
 	dofile(minetest.get_modpath("sumpf") .. "/mapgen.lua")
 end
 
+
+-- legacy
+
+minetest.register_alias("sumpf:pilz", "riesenpilz:brown")
+
+
 print(string.format("[sumpf] loaded after ca. %.2fs", os.clock() - load_time_start))
