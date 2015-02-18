@@ -94,27 +94,27 @@ minetest.register_node("sumpf:sumpf2", {
 
 if stairs then
 	stairs.register_stair_and_slab("swampstone", "sumpf:junglestone",
-			{cracky=3},
-			{"sumpf_swampstone.png"},
-			"Swamp Stone Stair",
-			"Swamp Stone Slab",
-			default.node_sound_stone_defaults()
+		{cracky=3},
+		{"sumpf_swampstone.png"},
+		"Swamp Stone Stair",
+		"Swamp Stone Slab",
+		default.node_sound_stone_defaults()
 	)
 
 	stairs.register_stair_and_slab("swampcobble", "sumpf:cobble",
-			{cracky=3},
-			{"sumpf_cobble.png"},
-			"Swamp Cobble Stone Stair",
-			"Swamp Cobble Stone Slab",
-			default.node_sound_stone_defaults()
+		{cracky=3},
+		{"sumpf_cobble.png"},
+		"Swamp Cobble Stone Stair",
+		"Swamp Cobble Stone Slab",
+		default.node_sound_stone_defaults()
 	)
 
 	stairs.register_stair_and_slab("swampstonebrick", "sumpf:junglestonebrick",
-			{cracky=2, stone=1},
-			{"sumpf_swampstone_brick.png"},
-			"Swamp Stone Brick Stair",
-			"Swamp Stone Brick Slab",
-			default.node_sound_stone_defaults()
+		{cracky=2, stone=1},
+		{"sumpf_swampstone_brick.png"},
+		"Swamp Stone Brick Stair",
+		"Swamp Stone Brick Slab",
+		default.node_sound_stone_defaults()
 	)
 end
 
@@ -207,4 +207,4 @@ end
 minetest.register_alias("sumpf:pilz", "riesenpilz:brown")
 
 
-print(string.format("[sumpf] loaded after ca. %.2fs", os.clock() - load_time_start))
+minetest.log("info", string.format("[sumpf] loaded after ca. %.2fs", os.clock() - load_time_start))
