@@ -26,7 +26,7 @@ local rt2 = math.sqrt(2)
 local tex_sc = (1-(1/rt2))*100-4 --doesn't seem to work right
 local tab = {
 	description = "Jungle Tree Leaves",
-	--is_ground_content = false,
+	is_ground_content = false,
 	waving = 1, --warum 1?
 	paramtype = "light",
 	groups = {snappy=3, leafdecay=3, flammable=2, leaves=1},
