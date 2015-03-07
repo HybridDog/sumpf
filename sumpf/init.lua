@@ -22,7 +22,7 @@ minetest.register_craft({
 })
 
 minetest.register_node("sumpf:junglestone", {
-	description = "Swamp Stone",
+	description = "swamp stone",
 	tiles = {"sumpf_swampstone.png"},
 	groups = {cracky=3},
 	drop = "sumpf:cobble",
@@ -30,21 +30,21 @@ minetest.register_node("sumpf:junglestone", {
 })
 
 minetest.register_node("sumpf:cobble", {
-	description = "Swamp Cobble Stone",
+	description = "swamp cobble stone",
 	tiles = {"sumpf_cobble.png"},
 	groups = {cracky=3},
 	sounds = default.node_sound_stone_defaults(),
 })
 
 minetest.register_node("sumpf:junglestonebrick", {
-	description = "Swamp Stone Brick",
+	description = "swamp stone brick",
 	tiles = {"sumpf_swampstone_brick.png"},
 	groups = {cracky=2, stone=1},
 	sounds = default.node_sound_stone_defaults(),
 })
 
 minetest.register_node("sumpf:peat", {
-	description = "Peat",
+	description = "peat",
 	tiles = {"sumpf_peat.png"},
 	groups = {crumbly=3, falling_node=1, sand=1, soil=1},
 	sounds = default.node_sound_sand_defaults({
@@ -56,7 +56,7 @@ minetest.register_node("sumpf:peat", {
 })
 
 minetest.register_node("sumpf:kohle", {
-	description = "Coal Ore",
+	description = "coal ore",
 	tiles = {"sumpf_swampstone.png^default_mineral_coal.png"},
 	groups = {cracky=3},
 	drop = 'default:coal_lump',
@@ -64,7 +64,7 @@ minetest.register_node("sumpf:kohle", {
 })
 
 minetest.register_node("sumpf:eisen", {
-	description = "Iron Ore",
+	description = "iron ore",
 	tiles = {"sumpf_swampstone.png^default_mineral_iron.png"},
 	groups = {cracky=3},
 	drop = 'default:iron_lump',
@@ -72,7 +72,7 @@ minetest.register_node("sumpf:eisen", {
 })
 
 minetest.register_node("sumpf:sumpf", {
-	description = "Swamp",
+	description = "swamp",
 	tiles = {"sumpf.png"},
 	groups = {crumbly=3, soil=1},
 	sounds = default.node_sound_dirt_defaults({
@@ -96,24 +96,24 @@ if stairs then
 	stairs.register_stair_and_slab("swampstone", "sumpf:junglestone",
 		{cracky=3},
 		{"sumpf_swampstone.png"},
-		"Swamp Stone Stair",
-		"Swamp Stone Slab",
+		"swamp stone stair",
+		"swamp stone slab",
 		default.node_sound_stone_defaults()
 	)
 
 	stairs.register_stair_and_slab("swampcobble", "sumpf:cobble",
 		{cracky=3},
 		{"sumpf_cobble.png"},
-		"Swamp Cobble Stone Stair",
-		"Swamp Cobble Stone Slab",
+		"swamp cobble stone stair",
+		"swamp cobble stone slab",
 		default.node_sound_stone_defaults()
 	)
 
 	stairs.register_stair_and_slab("swampstonebrick", "sumpf:junglestonebrick",
 		{cracky=2, stone=1},
 		{"sumpf_swampstone_brick.png"},
-		"Swamp Stone Brick Stair",
-		"Swamp Stone Brick Slab",
+		"swamp stone brick stair",
+		"swamp stone brick slab",
 		default.node_sound_stone_defaults()
 	)
 end
@@ -123,7 +123,7 @@ end
 
 
 minetest.register_node("sumpf:gras", {
-	description = "Swamp Grass",
+	description = "swamp grass",
 	tiles = {"sumpfgrass.png"},
 	inventory_image = "sumpfgrass.png",
 	drawtype = "plantlike",
@@ -144,7 +144,7 @@ minetest.register_node("sumpf:dirtywater_flowing", {
 		{name="sumpf_water_flowing.png", backface_culling=false,	animation=ani},
 		{name="sumpf_water_flowing.png", backface_culling=true,	animation=ani}
 	},
-	alpha = WATER_ALPHA,
+	alpha = WATER_ALpHA,
 	paramtype = "light",
 	walkable = false,
 	pointable = false,
@@ -160,7 +160,7 @@ minetest.register_node("sumpf:dirtywater_flowing", {
 })
 
 minetest.register_node("sumpf:dirtywater_source", {
-	description = "Swampwater",
+	description = "swampwater",
 	drawtype = "liquid",
 	tiles = {
 		{name="sumpf_water_source.png", animation=ani},
@@ -168,7 +168,7 @@ minetest.register_node("sumpf:dirtywater_source", {
 		{name="sumpf_water_flowing.png", animation=ani}
 	},
 	special_tiles = {{name="sumpf_water_source.png", animation=ani, backface_culling=false},},
-	alpha = WATER_ALPHA,
+	alpha = WATER_ALpHA,
 	paramtype = "light",
 	walkable = false,
 	pointable = false,
@@ -188,7 +188,7 @@ if bucket then
 		"sumpf:dirtywater_flowing",
 		"sumpf:bucket_dirtywater",
 		"bucket.png^sumpf_bucket_dirtywater.png",
-		"Swampwater Bucket"
+		"swampwater bucket"
 	)
 end
 

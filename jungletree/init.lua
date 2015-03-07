@@ -6,7 +6,7 @@ function jungletree_get_random(pos)
 end
 
 minetest.register_node("jungletree:sapling", {
-	description = "Jungle Tree Sapling",
+	description = "jungle tree sapling",
 	drawtype = "plantlike",
 	tiles = {"jungletree_sapling.png"},
 	inventory_image = "jungletree_sapling.png",
@@ -25,7 +25,7 @@ local plantlike_leaves = not minetest.setting_getbool("new_style_leaves")
 local rt2 = math.sqrt(2)
 local tex_sc = (1-(1/rt2))*100-4 --doesn't seem to work right
 local tab = {
-	description = "Jungle Tree Leaves",
+	description = "jungle tree leaves",
 	is_ground_content = false,
 	waving = 1, --warum 1?
 	paramtype = "light",
@@ -222,4 +222,4 @@ minetest.register_abm({
 --very old mod compatible
 --minetest.register_alias("jungletree:leaves", "jungletree:leaves_green")
 
-minetest.log("info", "[Jungletree] Loaded!")
+minetest.log("info", "[jungletree] loaded!")

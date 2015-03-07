@@ -5,7 +5,7 @@ function sumpf_birch_get_random(pos)
 end
 
 minetest.register_node("sumpf:sapling", {
-	description = "Birch",
+	description = "birch",
 	drawtype = "plantlike",
 	tiles = {"birke_sapling.png"},
 	inventory_image = "birke_sapling.png",
@@ -31,7 +31,7 @@ minetest.register_node("sumpf:birk", {
 })
 
 minetest.register_node("sumpf:leaves", {
-	description = "Birch Leaves",
+	description = "birch leaves",
 	drawtype = "glasslike",
 	tiles = {"birke_leaves.png"},
 	paramtype = "light",
@@ -53,7 +53,7 @@ minetest.register_node("sumpf:leaves", {
 })
 
 minetest.register_node("sumpf:tree", {
-	description = "Birch Trunk",
+	description = "birch trunk",
 	tiles = {"birke_tree_top.png",	"birke_tree_top.png",	"birke_tree.png"},
 	paramtype2 = "facedir",
 	on_place = minetest.rotate_node,
@@ -62,7 +62,7 @@ minetest.register_node("sumpf:tree", {
 })
 
 minetest.register_node("sumpf:mossytree", {
-	description = "Mossy Birch Trunk",
+	description = "mossy birch trunk",
 	tiles = {"birke_tree_top.png",	"sumpf.png", "birke_tree.png^(sumpf_transition.png^[transformR180)"},
 	groups = {tree=1,snappy=1,choppy=2,oddly_breakable_by_hand=1,flammable=2},
 	sounds = default.node_sound_wood_defaults(),
@@ -190,7 +190,7 @@ end
 -- legacy
 
 minetest.register_node("sumpf:tree_horizontal", {
-	description = "Horizontal Birch Trunk",
+	description = "horizontal birch trunk",
 	tiles = {"birke_tree.png",	"birke_tree.png",	"birke_tree.png^[transformR90",
 			"birke_tree.png^[transformR90", "birke_tree_top.png"},
 	paramtype2 = "facedir",
