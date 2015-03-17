@@ -178,6 +178,16 @@ minetest.register_abm({
 	end
 })
 
+-- treecapitator support
+if rawget(_G, "treecapitator") then
+	treecapitator.register_tree({
+		trees = {"sumpf:tree", "sumpf:mossytree"},
+		leaves = {"sumpf:leaves"},
+		range = 3,
+		fruits = {"sumpf:tree"}
+	})
+end
+
 if sumpf.spawn_plants
 and habitat then
 	habitat:generate("sumpf:sapling", {"default:dirt_with_grass"},

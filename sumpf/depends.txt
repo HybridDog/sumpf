@@ -4,3 +4,4 @@ jungletree
 bucket?
 habitat?
 stairs?
+treecapitator?
