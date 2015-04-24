@@ -26,6 +26,10 @@ sumpf.swampwater = true
 --adds swampwater near sea (different behaviour)
 sumpf.wet_beaches = sumpf.swampwater
 
+--delays the shadow calculation if it's lagging or the waited time > post_calc_delay_max
+--depends on my function_delayer mod and is disabled if post_calc_delay_max <= 0
+sumpf.post_calc_delay_max = 300
+
 --habitat stuff (no vm yet)
 sumpf.spawn_plants = true
 

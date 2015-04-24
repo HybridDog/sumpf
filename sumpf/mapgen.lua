@@ -1,3 +1,6 @@
+-- might decrease lag a bit
+local minetest = minetest
+
 --[[local function swampore(pos, env)
 	if minetest.get_node(pos).name == "default:stone_with_coal" then
 		return "kohle"
@@ -28,17 +31,6 @@ local function table_contains(v, t)
 	return false
 end
 
-local function fix_light(minp, maxp)
-	local manip = minetest.get_voxel_manip()
-	local emerged_pos1, emerged_pos2 = manip:read_from_map(minp, maxp)
-	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
-	local nodes = manip:get_data()
-
-	manip:set_data(nodes)
-	manip:write_to_map()
-	manip:update_map()
-end
-
 --[[local function find_ground(pos, nodes)
 	for _, evground in ipairs(nodes) do
 		if minetest.get_node(pos).name == evground then
@@ -48,8 +40,9 @@ end
 	return false
 end--]]
 
+local plants_enabled = sumpf.enable_plants
 
-local c, water_allowed, swampwater
+local c, water_allowed, swampwater, make_trees
 local function define_contents()
 	c = {
 		air = minetest.get_content_id("air"),
@@ -141,10 +134,61 @@ local function define_contents()
 		end
 		return true
 	end
+
+	if plants_enabled then
+		-- spawns trees
+		local function spawn_trees(tab, minp, maxp)
+			local t2 = os.clock()
+			for _,v in pairs(tab) do
+				local p = v[2]
+				if v[1] == 1 then
+					mache_birke(p, 1)
+				else
+					sumpf_make_jungletree(p, 1)
+				end
+			end
+			sumpf.inform("trees made", 2, t2)
+		end
+
+		-- fixes shadows
+		local function fix_light(minp, maxp)
+			local t = os.clock()
+
+			local manip = minetest.get_voxel_manip()
+			local emerged_pos1, emerged_pos2 = manip:read_from_map(minp, maxp)
+			local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
+			local nodes = manip:get_data()
+
+			manip:set_data(nodes)
+			manip:write_to_map()
+			manip:update_map()
+
+			sumpf.inform("shadows added", 2, t)
+		end
+
+		local pcdm = sumpf.post_calc_delay_max
+		if type(pcdm) == "number"
+		and pcdm > 0
+		and minetest.delay_function then
+			function make_trees(tab, minp, maxp)
+				spawn_trees(tab, minp, maxp)
+				minetest.delay_function(pcdm, function(minp, maxp)
+					fix_light(minp, maxp)
+				end, minp, maxp)
+			end
+		else
+			function make_trees(tab, minp, maxp)
+				spawn_trees(tab, minp, maxp)
+				fix_light(minp, maxp)
+			end
+		end
+	else
+		function make_trees()
+		end
+	end
 end
 
 local smooth = sumpf.smooth
-local plants_enabled = sumpf.enable_plants
 
 local sumpf_rarity = sumpf.mapgen_rarity
 local sumpf_size = sumpf.mapgen_size
@@ -391,23 +435,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	vm:write_to_map()
 	sumpf.inform("ground finished", 2, t1)
 
-	if plants_enabled then	--Trees:
-		local t2 = os.clock()
-		for _,v in pairs(tab) do
-			local p = v[2]
-			if v[1] == 1 then
-				mache_birke(p, 1)
-			else
-				sumpf_make_jungletree(p, 1)
-			end
-		end
-		sumpf.inform("trees made", 2, t2)
-
-		t2 = os.clock()
-		fix_light(minp, maxp)
-		sumpf.inform("shadows added", 2, t2)
-	end
-
+	-- spawns trees
+	make_trees(tab, minp, maxp)
 
 	sumpf.inform("done", 1, t1)
 
