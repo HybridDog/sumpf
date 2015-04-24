@@ -82,10 +82,19 @@ function sumpf_get_volume(pos1, pos2)
 	return (pos2.x - pos1.x + 1) * (pos2.y - pos1.y + 1) * (pos2.z - pos1.z + 1)
 end
 
-local sumpf_c_air = minetest.get_content_id("air")
 local sumpf_c_mossytree = minetest.get_content_id("sumpf:mossytree")
 local sumpf_c_tree = minetest.get_content_id("sumpf:tree")
 local sumpf_c_leaves = minetest.get_content_id("sumpf:leaves")
+
+local airlike_cs = {minetest.get_content_id("air"), minetest.get_content_id("ignore")}
+local function soft_node(id)
+	for i = 1,#airlike_cs do
+		if airlike_cs[i] == id then
+			return true
+		end
+	end
+	return false
+end
 
 
 local area, nodes, param2s, sumpf_birch_pr
@@ -103,13 +112,13 @@ local function tree_branch(pos, dir)
 	for i = sumpf_birch_pr:next(1,2), -sumpf_birch_pr:next(1,2), -1 do
 		for k = sumpf_birch_pr:next(1,2), -sumpf_birch_pr:next(1,2), -1 do
 			local p_p = area:index(pos.x+i, pos.y, pos.z+k)
-			if nodes[p_p] == sumpf_c_air then
+			if soft_node(nodes[p_p]) then
 				nodes[p_p] = sumpf_c_leaves
 			end
 			local chance = math.abs(i+k)
 			if (chance < 1) then
 				local p_p = area:index(pos.x+i, pos.y+1, pos.z+k)
-				if nodes[p_p] == sumpf_c_air then
+				if soft_node(nodes[p_p]) then
 					nodes[p_p] = sumpf_c_leaves
 				end
 			end

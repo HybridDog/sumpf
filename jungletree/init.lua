@@ -65,13 +65,21 @@ else
 	end
 end
 
-jungletree_c_air = minetest.get_content_id("air")
-jungletree_c_leaves_green = minetest.get_content_id("jungletree:leaves_green")
-jungletree_c_leaves_red = minetest.get_content_id("jungletree:leaves_red")
-jungletree_c_leaves_yellow = minetest.get_content_id("jungletree:leaves_yellow")
-jungletree_c_jungletree = minetest.get_content_id("default:jungletree")
-jungletree_ndtable = {jungletree_c_jungletree, jungletree_c_leaves_green, jungletree_c_leaves_red, jungletree_c_leaves_yellow}
+local c_leaves_green = minetest.get_content_id("jungletree:leaves_green")
+local c_leaves_red = minetest.get_content_id("jungletree:leaves_red")
+local c_leaves_yellow = minetest.get_content_id("jungletree:leaves_yellow")
+local c_jungletree = minetest.get_content_id("default:jungletree")
+local ndtable = {c_jungletree, c_leaves_green, c_leaves_red, c_leaves_yellow}
 
+local airlike_cs = {minetest.get_content_id("air"), minetest.get_content_id("ignore")}
+local function soft_node(id)
+	for i = 1,#airlike_cs do
+		if airlike_cs[i] == id then
+			return true
+		end
+	end
+	return false
+end
 
 local area, nodes, jungletree_pr
 
@@ -85,18 +93,18 @@ local function tree_branch(pos)
 		leaf = jungletree_pr:next(2,4)
 	end
 
-	nodes[area:index(pos.x, pos.y, pos.z)] = jungletree_c_jungletree
+	nodes[area:index(pos.x, pos.y, pos.z)] = c_jungletree
 	for i = jungletree_pr:next(1,2), -jungletree_pr:next(1,2), -1 do
 		for k =jungletree_pr:next(1,2), -jungletree_pr:next(1,2), -1 do
 			local p_p = area:index(pos.x+i, pos.y, pos.z+k)
-			if nodes[p_p] == jungletree_c_air then
-				nodes[p_p] = jungletree_ndtable[leaf]
+			if soft_node(nodes[p_p]) then
+				nodes[p_p] = ndtable[leaf]
 			end
 			local chance = math.abs(i+k)
 			if (chance < 1) then
 				local p_p = area:index(pos.x+i, pos.y+1, pos.z+k)
-				if nodes[p_p] == jungletree_c_air then
-					nodes[p_p] = jungletree_ndtable[leaf]
+				if soft_node(nodes[p_p]) then
+					nodes[p_p] = ndtable[leaf]
 				end
 			end
 		end
@@ -120,7 +128,7 @@ function sumpf_make_jungletree(pos, generated)
 	if height < 10 then
 		for i = height, -1, -1 do
 			local p = {x=pos.x, y=pos.y+i, z=pos.z}
-			nodes[area:index(pos.x, pos.y+i, pos.z)] = jungletree_c_jungletree
+			nodes[area:index(pos.x, pos.y+i, pos.z)] = c_jungletree
 			if i == height then
 				tree_branch({x=pos.x, y=pos.y+height+jungletree_pr:next(0,1), z=pos.z})
 				tree_branch({x=pos.x, y=pos.y+height+jungletree_pr:next(0,1), z=pos.z})
@@ -133,10 +141,10 @@ function sumpf_make_jungletree(pos, generated)
 			end
 			if height <= 0 then
 
-				nodes[area:index(pos.x+1, pos.y+i-jungletree_pr:next(1,2), pos.z)] = jungletree_c_jungletree
-				nodes[area:index(pos.x, pos.y+i-jungletree_pr:next(1,2), pos.z+1)] = jungletree_c_jungletree
-				nodes[area:index(pos.x-1, pos.y+i-jungletree_pr:next(1,2), pos.z)] = jungletree_c_jungletree
-				nodes[area:index(pos.x, pos.y+i-jungletree_pr:next(1,2), pos.z-1)] = jungletree_c_jungletree
+				nodes[area:index(pos.x+1, pos.y+i-jungletree_pr:next(1,2), pos.z)] = c_jungletree
+				nodes[area:index(pos.x, pos.y+i-jungletree_pr:next(1,2), pos.z+1)] = c_jungletree
+				nodes[area:index(pos.x-1, pos.y+i-jungletree_pr:next(1,2), pos.z)] = c_jungletree
+				nodes[area:index(pos.x, pos.y+i-jungletree_pr:next(1,2), pos.z-1)] = c_jungletree
 			end
 
 			if (math.sin(i/height*i) < 0.2
@@ -155,11 +163,11 @@ function sumpf_make_jungletree(pos, generated)
 
 			end
 			if i < jungletree_pr:next(0,1) then
-				nodes[area:index(pos.x+1, pos.y+i, pos.z+1)] = jungletree_c_jungletree
-				nodes[area:index(pos.x+2, pos.y+i, pos.z-1)] = jungletree_c_jungletree
-				nodes[area:index(pos.x, pos.y+i, pos.z-2)] = jungletree_c_jungletree
+				nodes[area:index(pos.x+1, pos.y+i, pos.z+1)] = c_jungletree
+				nodes[area:index(pos.x+2, pos.y+i, pos.z-1)] = c_jungletree
+				nodes[area:index(pos.x, pos.y+i, pos.z-2)] = c_jungletree
 
-				nodes[area:index(pos.x-1, pos.y+i, pos.z)] = jungletree_c_jungletree
+				nodes[area:index(pos.x-1, pos.y+i, pos.z)] = c_jungletree
 			end
 			if i == height then
 				for _,p in ipairs({
@@ -187,7 +195,7 @@ function sumpf_make_jungletree(pos, generated)
 					{pos.x, pos.y+i, pos.z-1},
 					{pos.x, pos.y+i, pos.z},
 				}) do
-					nodes[area:index(p[1], p[2], p[3])] = jungletree_c_jungletree
+					nodes[area:index(p[1], p[2], p[3])] = c_jungletree
 				end
 			end
 		end
