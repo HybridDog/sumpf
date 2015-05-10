@@ -52,7 +52,7 @@ if plantlike_leaves then
 		tab.tiles = {"jungletree_leaves_"..leaves[color]..".png^[lowpart:"..tex_sc..":jungletree_invmat.png^[makealpha:255,126,126"}
 		tab.inventory_image = minetest.inventorycube("jungletree_leaves_"..leaves[color]..".png")
 		tab.drop.items[2].items[1] = leaf_name
-		minetest.register_node(leaf_name, tab)
+		minetest.register_node(leaf_name, table.copy(tab))
 	end
 else
 	for color = 1, 3 do
@@ -61,7 +61,7 @@ else
 		tab.drawtype = "allfaces_optional"
 		tab.tiles = {"jungletree_leaves_"..leaves[color]..".png"}
 		tab.drop.items[2].items[1] = leaf_name
-		minetest.register_node(leaf_name, tab)
+		minetest.register_node(leaf_name, table.copy(tab))
 	end
 end
 
@@ -81,21 +81,21 @@ local function soft_node(id)
 	return false
 end
 
-local area, nodes, jungletree_pr
+local area, nodes
 
-local function tree_branch(pos)
+local function tree_branch(pos, area, nodes, pr)
 
 	--choose random leave
 	--green leaves are more common
-	local chance = jungletree_pr:next(1,5)
+	local chance = pr:next(1,5)
 	local leaf = 2
 	if (chance < 2) then
-		leaf = jungletree_pr:next(2,4)
+		leaf = pr:next(2,4)
 	end
 
 	nodes[area:index(pos.x, pos.y, pos.z)] = c_jungletree
-	for i = jungletree_pr:next(1,2), -jungletree_pr:next(1,2), -1 do
-		for k =jungletree_pr:next(1,2), -jungletree_pr:next(1,2), -1 do
+	for i = pr:next(1,2), -pr:next(1,2), -1 do
+		for k = pr:next(1,2), -pr:next(1,2), -1 do
 			local p_p = area:index(pos.x+i, pos.y, pos.z+k)
 			if soft_node(nodes[p_p]) then
 				nodes[p_p] = ndtable[leaf]
@@ -112,93 +112,104 @@ local function tree_branch(pos)
 end
 
 
+local function small_jungletree(pos, height, area, nodes, pr)
+	for _,p in ipairs({
+		{x=pos.x, y=pos.y+height+pr:next(0,1), z=pos.z},
+		{x=pos.x, y=pos.y+height+pr:next(0,1), z=pos.z},
+
+		{x=pos.x+1, y=pos.y+height-pr:next(1,2), z=pos.z},
+		{x=pos.x-1, y=pos.y+height-pr:next(1,2), z=pos.z},
+		{x=pos.x, y=pos.y+height-pr:next(1,2), z=pos.z+1},
+		{x=pos.x, y=pos.y+height-pr:next(1,2), z=pos.z-1},
+	}) do
+		tree_branch(p, area, nodes, pr)
+	end
+
+	for i = -1, height do
+		nodes[area:index(pos.x, pos.y+i, pos.z)] = c_jungletree
+	end
+
+	for i = height, 4, -1 do
+		if math.sin(i*i/height) < 0.2
+		and pr:next(0,2) < 1.5 then
+			tree_branch({x=pos.x+pr:next(0,1), y=pos.y+i, z=pos.z-pr:next(0,1)}, area, nodes, pr)
+		end
+	end
+end
+
+local function big_jungletree(pos, height, area, nodes, pr)
+	local h_root = pr:next(0,1)-1
+	for i = -2, h_root do
+		nodes[area:index(pos.x+1, pos.y+i, pos.z+1)] = c_jungletree
+		nodes[area:index(pos.x+2, pos.y+i, pos.z-1)] = c_jungletree
+		nodes[area:index(pos.x, pos.y+i, pos.z-2)] = c_jungletree
+
+		nodes[area:index(pos.x-1, pos.y+i, pos.z)] = c_jungletree
+	end
+	for i = height, -2, -1 do
+		if i > 3
+		and math.sin(i*i/height) < 0.2
+		and pr:next(0,2) < 1.5 then
+			tree_branch({x=pos.x+pr:next(0,1), y=pos.y+i, z=pos.z-pr:next(0,1)}, area, nodes, pr)
+		end
+
+		if i == height then
+			for _,p in ipairs({
+				{x=pos.x+1, y=pos.y+i, z=pos.z+1},
+				{x=pos.x+2, y=pos.y+i, z=pos.z-1},
+
+				{x=pos.x, y=pos.y+i, z=pos.z-2},
+				{x=pos.x-1, y=pos.y+i, z=pos.z},
+				{x=pos.x+1, y=pos.y+i, z=pos.z+2},
+				{x=pos.x+3, y=pos.y+i, z=pos.z-1},
+				{x=pos.x, y=pos.y+i, z=pos.z-3},
+
+				{x=pos.x-2, y=pos.y+i, z=pos.z},
+				{x=pos.x+1, y=pos.y+i, z=pos.z},
+				{x=pos.x+1, y=pos.y+i, z=pos.z-1},
+				{x=pos.x, y=pos.y+i, z=pos.z-1},
+				{x=pos.x, y=pos.y+i, z=pos.z},
+			}) do
+				tree_branch(p, area, nodes, pr)
+			end
+		else
+			for _,p in pairs({
+				{pos.x+1, pos.y+i, pos.z},
+				{pos.x+1, pos.y+i, pos.z-1},
+				{pos.x, pos.y+i, pos.z-1},
+				{pos.x, pos.y+i, pos.z},
+			}) do
+				nodes[area:index(p[1], p[2], p[3])] = c_jungletree
+			end
+		end
+	end
+end
+
 function sumpf_make_jungletree(pos, generated)
 
 	local t1 = os.clock()
+
+	local pr = jungletree_get_random(pos)
+	local height = 5 + pr:next(1,15)
+	local small = height < 10
+
 	local manip = minetest.get_voxel_manip()
 	local vwidth = 7
-	local vheight = 25
+	local vheight = height+5
+
+	if small then
+		vheight = vheight+1
+	end
+
 	local emerged_pos1, emerged_pos2 = manip:read_from_map({x=pos.x-vwidth, y=pos.y-3, z=pos.z-vwidth},
 		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
-	area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
-	nodes = manip:get_data()
+	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
+	local nodes = manip:get_data()
 
-	jungletree_pr = jungletree_get_random(pos)
-	local height = 5 + jungletree_pr:next(1,15)
-	if height < 10 then
-		for i = height, -1, -1 do
-			local p = {x=pos.x, y=pos.y+i, z=pos.z}
-			nodes[area:index(pos.x, pos.y+i, pos.z)] = c_jungletree
-			if i == height then
-				tree_branch({x=pos.x, y=pos.y+height+jungletree_pr:next(0,1), z=pos.z})
-				tree_branch({x=pos.x, y=pos.y+height+jungletree_pr:next(0,1), z=pos.z})
-				tree_branch({x=pos.x+1, y=pos.y+i-jungletree_pr:next(1,2), z=pos.z})
-				tree_branch({x=pos.x-1, y=pos.y+i-jungletree_pr:next(1,2), z=pos.z})
-
-				tree_branch({x=pos.x, y=pos.y+i-jungletree_pr:next(1,2), z=pos.z+1})
-				tree_branch({x=pos.x, y=pos.y+i-jungletree_pr:next(1,2), z=pos.z-1})
-
-			end
-			if height <= 0 then
-
-				nodes[area:index(pos.x+1, pos.y+i-jungletree_pr:next(1,2), pos.z)] = c_jungletree
-				nodes[area:index(pos.x, pos.y+i-jungletree_pr:next(1,2), pos.z+1)] = c_jungletree
-				nodes[area:index(pos.x-1, pos.y+i-jungletree_pr:next(1,2), pos.z)] = c_jungletree
-				nodes[area:index(pos.x, pos.y+i-jungletree_pr:next(1,2), pos.z-1)] = c_jungletree
-			end
-
-			if (math.sin(i/height*i) < 0.2
-			and i > 3
-			and jungletree_pr:next(0,2) < 1.5) then
-				tree_branch({x=pos.x+jungletree_pr:next(0,1), y=pos.y+i, z=pos.z-jungletree_pr:next(0,1)})
-			end
-		end
-
+	if small then
+		small_jungletree(pos, height, area, nodes, pr)
 	else
-		for i = height, -2, -1 do
-			if (math.sin(i/height*i) < 0.2
-			and i > 3
-			and jungletree_pr:next(0,2) < 1.5) then
-				tree_branch({x=pos.x+jungletree_pr:next(0,1), y=pos.y+i, z=pos.z-jungletree_pr:next(0,1)})
-
-			end
-			if i < jungletree_pr:next(0,1) then
-				nodes[area:index(pos.x+1, pos.y+i, pos.z+1)] = c_jungletree
-				nodes[area:index(pos.x+2, pos.y+i, pos.z-1)] = c_jungletree
-				nodes[area:index(pos.x, pos.y+i, pos.z-2)] = c_jungletree
-
-				nodes[area:index(pos.x-1, pos.y+i, pos.z)] = c_jungletree
-			end
-			if i == height then
-				for _,p in ipairs({
-					{x=pos.x+1, y=pos.y+i, z=pos.z+1},
-					{x=pos.x+2, y=pos.y+i, z=pos.z-1},
-
-					{x=pos.x, y=pos.y+i, z=pos.z-2},
-					{x=pos.x-1, y=pos.y+i, z=pos.z},
-					{x=pos.x+1, y=pos.y+i, z=pos.z+2},
-					{x=pos.x+3, y=pos.y+i, z=pos.z-1},
-					{x=pos.x, y=pos.y+i, z=pos.z-3},
-
-					{x=pos.x-2, y=pos.y+i, z=pos.z},
-					{x=pos.x+1, y=pos.y+i, z=pos.z},
-					{x=pos.x+1, y=pos.y+i, z=pos.z-1},
-					{x=pos.x, y=pos.y+i, z=pos.z-1},
-					{x=pos.x, y=pos.y+i, z=pos.z},
-				}) do
-					tree_branch(p)
-				end
-			else
-				for _,p in ipairs({
-					{pos.x+1, pos.y+i, pos.z},
-					{pos.x+1, pos.y+i, pos.z-1},
-					{pos.x, pos.y+i, pos.z-1},
-					{pos.x, pos.y+i, pos.z},
-				}) do
-					nodes[area:index(p[1], p[2], p[3])] = c_jungletree
-				end
-			end
-		end
+		big_jungletree(pos, height, area, nodes, pr)
 	end
 
 	manip:set_data(nodes)
