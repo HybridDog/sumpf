@@ -1,12 +1,16 @@
 sumpf = rawget(_G, "sumpf") or {}
 
-local leaves = {"green","yellow","red"}
 local jungletree_seed = 112
 
 function jungletree_get_random(pos)
 	return PseudoRandom(math.abs(pos.x+pos.y*3+pos.z*5)+jungletree_seed)
 end
 
+
+-- Nodes
+
+local leaves = {"green","yellow","red"}
+local spawn_jungletree
 minetest.register_node("jungletree:sapling", {
 	description = "jungle tree sapling",
 	drawtype = "plantlike",
@@ -18,7 +22,7 @@ minetest.register_node("jungletree:sapling", {
 	groups = {snappy=2,dig_immediate=3,flammable=2,attached_node=1},
 	on_construct = function(pos)
 		if minetest.setting_getbool("creative_mode") then
-			sumpf_make_jungletree(pos)
+			spawn_jungletree(pos)
 		end
 	end
 })
@@ -67,11 +71,14 @@ else
 	end
 end
 
+
+-- tree functions and abm
+
 local c_leaves_green = minetest.get_content_id("jungletree:leaves_green")
 local c_leaves_red = minetest.get_content_id("jungletree:leaves_red")
 local c_leaves_yellow = minetest.get_content_id("jungletree:leaves_yellow")
 local c_jungletree = minetest.get_content_id("default:jungletree")
-local ndtable = {c_jungletree, c_leaves_green, c_leaves_red, c_leaves_yellow}
+local ndtable = {c_leaves_green, c_leaves_red, c_leaves_yellow}
 
 local airlike_cs = {minetest.get_content_id("air"), minetest.get_content_id("ignore")}
 local function soft_node(id)
@@ -83,16 +90,13 @@ local function soft_node(id)
 	return false
 end
 
-local area, nodes
-
 local function tree_branch(pos, area, nodes, pr)
 
-	--choose random leave
+	--choose random leaves
 	--green leaves are more common
-	local chance = pr:next(1,5)
-	local leaf = 2
-	if (chance < 2) then
-		leaf = pr:next(2,4)
+	local leaf = 1
+	if pr:next(1,5) < 2 then
+		leaf = pr:next(1,3)
 	end
 
 	nodes[area:index(pos.x, pos.y, pos.z)] = c_jungletree
@@ -186,50 +190,6 @@ local function big_jungletree(pos, height, area, nodes, pr)
 	end
 end
 
-function sumpf_make_jungletree(pos, generated)
-
-	local t1 = os.clock()
-
-	local pr = jungletree_get_random(pos)
-	local height = 5 + pr:next(1,15)
-	local small = height < 10
-
-	local vwidth = 5
-	local vheight = height+1
-	local vdepth = -2
-
-	if small then
-		vheight = vheight+1
-		vdepth = -1	-- vdepth+1
-		vwidth = 3
-	end
-
-	local manip = minetest.get_voxel_manip()
-	local emerged_pos1, emerged_pos2 = manip:read_from_map({x=pos.x-vwidth, y=pos.y+vdepth, z=pos.z-vwidth},
-		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
-	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
-	local nodes = manip:get_data()
-
-	if small then
-		small_jungletree(pos, height, area, nodes, pr)
-	else
-		big_jungletree(pos, height, area, nodes, pr)
-	end
-
-	manip:set_data(nodes)
-	manip:write_to_map()
-	local spam = 2
-	if generated then
-		spam = 3
-	end
-	sumpf.inform("a jungletree grew at ("..pos.x.."|"..pos.y.."|"..pos.z..")", spam, t1)
-	if not generated then	--info
-		local t1 = os.clock()
-		manip:update_map()
-		sumpf.inform("map updated", spam, t1)
-	end
-end
-
 function sumpf.generate_jungletree(pos, area, nodes, pr)
 	local h_max = 15
 	-- fix trees on upper chunk corners
@@ -247,6 +207,45 @@ function sumpf.generate_jungletree(pos, area, nodes, pr)
 	end
 end
 
+function spawn_jungletree(pos)
+	local t1 = os.clock()
+
+	local pr = jungletree_get_random(pos)
+	local height = 5 + pr:next(1,15)
+	local small = height < 10
+
+	local vwidth, vheight, vdepth
+	if small then
+		vheight = 2
+		vdepth = -1
+		vwidth = 3
+	else
+		vheight = 1
+		vdepth = -2
+		vwidth = 5
+	end
+	vheight = height+vheight
+
+	local manip = minetest.get_voxel_manip()
+	local emerged_pos1, emerged_pos2 = manip:read_from_map({x=pos.x-vwidth, y=pos.y+vdepth, z=pos.z-vwidth},
+		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
+	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
+	local nodes = manip:get_data()
+
+	if small then
+		small_jungletree(pos, height, area, nodes, pr)
+	else
+		big_jungletree(pos, height, area, nodes, pr)
+	end
+
+	manip:set_data(nodes)
+	manip:write_to_map()
+	sumpf.inform("a jungletree grew at ("..pos.x.."|"..pos.y.."|"..pos.z..")", 2, t1)
+	t1 = os.clock()
+	manip:update_map()
+	sumpf.inform("map updated", 2, t1)
+end
+
 minetest.register_abm({
 	nodenames = {"jungletree:sapling"},
 	neighbors = {"group:soil"},
@@ -254,7 +253,7 @@ minetest.register_abm({
 	chance = 5,
 	action = function(pos)
 		if sumpf.tree_allowed(pos, 7) then
-			sumpf_make_jungletree(pos)
+			spawn_jungletree(pos)
 		end
 	end
 })

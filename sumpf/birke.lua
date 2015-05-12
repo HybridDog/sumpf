@@ -1,8 +1,11 @@
 local sumpf_birch_seed = 113
 
-function sumpf_birch_get_random(pos)
+local function get_random(pos)
 	return PseudoRandom(math.abs(pos.x+pos.y*3+pos.z*5)+sumpf_birch_seed)
 end
+
+
+-- Nodes and crafting
 
 minetest.register_node("sumpf:sapling", {
 	description = "birch",
@@ -18,6 +21,7 @@ minetest.register_node("sumpf:sapling", {
 	furnace_burntime = 9,
 })
 
+local spawn_birch
 minetest.register_node("sumpf:birk", {
 	tiles = {"birke_tree_top.png"},
 	inventory_image = "birke_tree_top.png^birke_sapling.png",
@@ -26,7 +30,7 @@ minetest.register_node("sumpf:birk", {
 	groups = {snappy=2,dig_immediate=3},
 	sounds = default.node_sound_leaves_defaults(),
 	on_construct = function(pos)
-		mache_birke(pos)
+		spawn_birch(pos)
 	end,
 })
 
@@ -78,9 +82,8 @@ minetest.register_craft({
 	recipe = {{"sumpf:mossytree"}}
 })
 
-function sumpf_get_volume(pos1, pos2)
-	return (pos2.x - pos1.x + 1) * (pos2.y - pos1.y + 1) * (pos2.z - pos1.z + 1)
-end
+
+-- tree functions and abm
 
 local sumpf_c_mossytree = minetest.get_content_id("sumpf:mossytree")
 local sumpf_c_tree = minetest.get_content_id("sumpf:tree")
@@ -154,11 +157,14 @@ local function birch(pos, height, area, nodes, pr, param2s)
 	end
 end
 
-function mache_birke(pos, generated)
+function sumpf.generate_birch(pos, area, nodes, pr, param2s)
+	birch(pos, 3+pr:next(1,2), area, nodes, pr, param2s)
+end
 
+function spawn_birch(pos)
 	local t1 = os.clock()
 
-	local pr = sumpf_birch_get_random(pos)
+	local pr = get_random(pos)
 	local height = 3 + pr:next(1,2)
 
 	local vwidth = 3
@@ -171,26 +177,15 @@ function mache_birke(pos, generated)
 	local nodes = manip:get_data()
 	local param2s = manip:get_param2_data() 
 
-
 	birch(pos, height, area, nodes, pr, param2s)
 
 	manip:set_data(nodes)
 	manip:set_param2_data(param2s)
 	manip:write_to_map()
-	local spam = 2
-	if generated then
-		spam = 3
-	end
-	sumpf.inform("a birch grew at ("..pos.x.."|"..pos.y.."|"..pos.z..")", spam, t1)
-	if not generated then	--info
-		local t1 = os.clock()
-		manip:update_map()
-		sumpf.inform("map updated", spam, t1)
-	end
-end
-
-function sumpf.generate_birch(pos, area, nodes, pr, param2s)
-	birch(pos, 3+pr:next(1,2), area, nodes, pr, param2s)
+	sumpf.inform("a birch grew at ("..pos.x.."|"..pos.y.."|"..pos.z..")", 2, t1)
+	t1 = os.clock()
+	manip:update_map()
+	sumpf.inform("map updated", 2, t1)
 end
 
 minetest.register_abm({
@@ -200,12 +195,14 @@ minetest.register_abm({
 	chance = 8,
 	action = function(pos)
 		if sumpf.tree_allowed(pos, 8) then
-			mache_birke(pos)
+			spawn_birch(pos)
 		end
 	end
 })
 
+
 -- treecapitator support
+
 if rawget(_G, "treecapitator") then
 	treecapitator.register_tree({
 		trees = {"sumpf:tree", "sumpf:mossytree"},
@@ -214,6 +211,9 @@ if rawget(_G, "treecapitator") then
 		fruits = {"sumpf:tree"}
 	})
 end
+
+
+-- habitat support
 
 if sumpf.spawn_plants
 and rawget(_G, "habitat") then
