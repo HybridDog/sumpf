@@ -1,3 +1,5 @@
+sumpf = rawget(_G, "sumpf") or {}
+
 local leaves = {"green","yellow","red"}
 local jungletree_seed = 112
 
@@ -100,8 +102,7 @@ local function tree_branch(pos, area, nodes, pr)
 			if soft_node(nodes[p_p]) then
 				nodes[p_p] = ndtable[leaf]
 			end
-			local chance = math.abs(i+k)
-			if (chance < 1) then
+			if math.abs(i+k) < 1 then
 				local p_p = area:index(pos.x+i, pos.y+1, pos.z+k)
 				if soft_node(nodes[p_p]) then
 					nodes[p_p] = ndtable[leaf]
@@ -193,15 +194,18 @@ function sumpf_make_jungletree(pos, generated)
 	local height = 5 + pr:next(1,15)
 	local small = height < 10
 
-	local manip = minetest.get_voxel_manip()
-	local vwidth = 7
-	local vheight = height+5
+	local vwidth = 5
+	local vheight = height+1
+	local vdepth = -2
 
 	if small then
 		vheight = vheight+1
+		vdepth = -1	-- vdepth+1
+		vwidth = 3
 	end
 
-	local emerged_pos1, emerged_pos2 = manip:read_from_map({x=pos.x-vwidth, y=pos.y-3, z=pos.z-vwidth},
+	local manip = minetest.get_voxel_manip()
+	local emerged_pos1, emerged_pos2 = manip:read_from_map({x=pos.x-vwidth, y=pos.y+vdepth, z=pos.z-vwidth},
 		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
 	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
 	local nodes = manip:get_data()
@@ -223,6 +227,23 @@ function sumpf_make_jungletree(pos, generated)
 		local t1 = os.clock()
 		manip:update_map()
 		sumpf.inform("map updated", spam, t1)
+	end
+end
+
+function sumpf.generate_jungletree(pos, area, nodes, pr)
+	local h_max = 15
+	-- fix trees on upper chunk corners
+	local h_corner = pos.y % 80
+	if h_corner > 74 then	-- 79+16-h_max-5-1
+		h_max = 89-h_corner	-- 95-h_corner-5-1
+	end
+
+	local height = 5 + pr:next(1,h_max)
+
+	if height < 10 then
+		small_jungletree(pos, height, area, nodes, pr)
+	else
+		big_jungletree(pos, height, area, nodes, pr)
 	end
 end
 

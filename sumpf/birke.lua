@@ -97,9 +97,7 @@ local function soft_node(id)
 end
 
 
-local area, nodes, param2s, sumpf_birch_pr
-
-local function tree_branch(pos, dir)
+local function tree_branch(pos, dir, area, nodes, pr, param2s)
 
 	local p_pos = area:indexp(pos)
 	nodes[p_pos] = sumpf_c_tree
@@ -109,8 +107,8 @@ local function tree_branch(pos, dir)
 		param2s[p_pos] = 12
 	end
 
-	for i = sumpf_birch_pr:next(1,2), -sumpf_birch_pr:next(1,2), -1 do
-		for k = sumpf_birch_pr:next(1,2), -sumpf_birch_pr:next(1,2), -1 do
+	for i = pr:next(1,2), -pr:next(1,2), -1 do
+		for k = pr:next(1,2), -pr:next(1,2), -1 do
 			local p_p = area:index(pos.x+i, pos.y, pos.z+k)
 			if soft_node(nodes[p_p]) then
 				nodes[p_p] = sumpf_c_leaves
@@ -126,39 +124,55 @@ local function tree_branch(pos, dir)
 	end
 end
 
-function mache_birke(pos, generated)
-
-	local t1 = os.clock()
-	local manip = minetest.get_voxel_manip()
-	local vwidth = 7
-	local vheight = 13
-	local emerged_pos1, emerged_pos2 = manip:read_from_map({x=pos.x-vwidth, y=pos.y-3, z=pos.z-vwidth},
-		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
-	area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
-	nodes = manip:get_data()
-	param2s = manip:get_param2_data() 
-
-	sumpf_birch_pr = sumpf_birch_get_random(pos)
-
+local function birch(pos, height, area, nodes, pr, param2s)
 	nodes[area:index(pos.x, pos.y, pos.z)] = sumpf_c_mossytree
-	local height = 3 + sumpf_birch_pr:next(1,2)
-	for i = height, 1, -1 do
-		local p = {x=pos.x, y=pos.y+i, z=pos.z}
+	for i = 1, height do
 		local p_p = area:index(pos.x, pos.y+i, pos.z)
 		nodes[p_p] = sumpf_c_tree
 		param2s[p_p] = 0	-- < this is maybe missing in the default mod
-		if (math.sin(i/height*i) < 0.2 and i > 3 and sumpf_birch_pr:next(0,2) < 1.5) then
+	end
+
+	for i = height, 4, -1 do
+		if math.sin(i*i/height) < 0.2
+		and pr:next(0,2) < 1.5 then
 			tree_branch(
-				{x=pos.x+sumpf_birch_pr:next(0,1), y=pos.y+i, z=pos.z-sumpf_birch_pr:next(0,1)},
-				sumpf_birch_pr:next(0,1)
-			)
+				{x=pos.x+pr:next(0,1), y=pos.y+i, z=pos.z-pr:next(0,1)},
+				pr:next(0,1),
+			area, nodes, pr, param2s)
 		end
 	end
-	tree_branch({x=pos.x, y=pos.y+height+sumpf_birch_pr:next(0,1),z=pos.z}, sumpf_birch_pr:next(0,1))
-	tree_branch({x=pos.x+1, y=pos.y+height-sumpf_birch_pr:next(1,2), z=pos.z,}, 1)
-	tree_branch({x=pos.x-1, y=pos.y+height-sumpf_birch_pr:next(1,2), z=pos.z}, 1)
-	tree_branch({x=pos.x, y=pos.y+height-sumpf_birch_pr:next(1,2), z=pos.z+1}, 0)
-	tree_branch({x=pos.x, y=pos.y+height-sumpf_birch_pr:next(1,2), z=pos.z-1}, 0)
+
+	for _,i in ipairs({
+		{{x=pos.x, y=pos.y+height+pr:next(0,1), z=pos.z}, pr:next(0,1)},
+
+		{{x=pos.x+1, y=pos.y+height-pr:next(1,2), z=pos.z,}, 1},
+		{{x=pos.x-1, y=pos.y+height-pr:next(1,2), z=pos.z}, 1},
+		{{x=pos.x, y=pos.y+height-pr:next(1,2), z=pos.z+1}, 0},
+		{{x=pos.x, y=pos.y+height-pr:next(1,2), z=pos.z-1}, 0},
+	}) do
+		tree_branch(i[1], i[2], area, nodes, pr, param2s)
+	end
+end
+
+function mache_birke(pos, generated)
+
+	local t1 = os.clock()
+
+	local pr = sumpf_birch_get_random(pos)
+	local height = 3 + pr:next(1,2)
+
+	local vwidth = 3
+	local vheight = height+2
+
+	local manip = minetest.get_voxel_manip()
+	local emerged_pos1, emerged_pos2 = manip:read_from_map({x=pos.x-vwidth, y=pos.y, z=pos.z-vwidth},
+		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
+	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
+	local nodes = manip:get_data()
+	local param2s = manip:get_param2_data() 
+
+
+	birch(pos, height, area, nodes, pr, param2s)
 
 	manip:set_data(nodes)
 	manip:set_param2_data(param2s)
@@ -173,6 +187,10 @@ function mache_birke(pos, generated)
 		manip:update_map()
 		sumpf.inform("map updated", spam, t1)
 	end
+end
+
+function sumpf.generate_birch(pos, area, nodes, pr, param2s)
+	birch(pos, 3+pr:next(1,2), area, nodes, pr, param2s)
 end
 
 minetest.register_abm({

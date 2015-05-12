@@ -193,7 +193,7 @@ if bucket then
 end
 
 
-sumpf = {}
+--sumpf = rawget(_G, "sumpf") or {}
 dofile(minetest.get_modpath("sumpf").."/settings.lua")
 dofile(minetest.get_modpath("sumpf").."/functions.lua")
 dofile(minetest.get_modpath("sumpf") .. "/birke.lua")

@@ -42,7 +42,7 @@ end--]]
 
 local plants_enabled = sumpf.enable_plants
 
-local c, water_allowed, swampwater, make_trees
+local c
 local function define_contents()
 	c = {
 		air = minetest.get_content_id("air"),
@@ -86,12 +86,11 @@ local function define_contents()
 			end
 		end
 	end
+end
 
-	swampwater = sumpf.swampwater
-	if not swampwater then
-		return	--abort if swampwater is disabled
-	end
-
+local swampwater = sumpf.swampwater
+local water_allowed
+if swampwater then
 	local hard_nodes = {}	--in time makes a table of nodes which are allowed to be next to swampwater
 	local function hard_node(id)
 		if not id then
@@ -133,58 +132,6 @@ local function define_contents()
 			end
 		end
 		return true
-	end
-
-	if plants_enabled then
-		-- spawns trees
-		local function spawn_trees(tab, minp, maxp)
-			local t2 = os.clock()
-			for _,v in pairs(tab) do
-				local p = v[2]
-				if v[1] == 1 then
-					mache_birke(p, 1)
-				else
-					sumpf_make_jungletree(p, 1)
-				end
-			end
-			sumpf.inform("trees made", 2, t2)
-		end
-
-		-- fixes shadows
-		local function fix_light(minp, maxp)
-			local t = os.clock()
-
-			local manip = minetest.get_voxel_manip()
-			local emerged_pos1, emerged_pos2 = manip:read_from_map(minp, maxp)
-			local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
-			local nodes = manip:get_data()
-
-			manip:set_data(nodes)
-			manip:write_to_map()
-			manip:update_map()
-
-			sumpf.inform("shadows added", 2, t)
-		end
-
-		local pcdm = sumpf.post_calc_delay_max
-		if type(pcdm) == "number"
-		and pcdm > 0
-		and minetest.delay_function then
-			function make_trees(tab, minp, maxp)
-				spawn_trees(tab, minp, maxp)
-				minetest.delay_function(pcdm, function(minp, maxp)
-					fix_light(minp, maxp)
-				end, minp, maxp)
-			end
-		else
-			function make_trees(tab, minp, maxp)
-				spawn_trees(tab, minp, maxp)
-				fix_light(minp, maxp)
-			end
-		end
-	else
-		function make_trees()
-		end
 	end
 end
 
@@ -303,8 +250,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 			if in_biome then
 
-				for b = minp.y,maxp.y,1 do	--remove usual stuff
-					local p_pos = area:index(x, b, z)
+				for p_pos in area:iter(x, minp.y, z, x, maxp.y, z) do	--remove usual stuff
 					local d_p_pos = data[p_pos]
 					for _,nam in pairs(c.USUAL_STUFF) do			
 						if d_p_pos == nam then
@@ -314,9 +260,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					end
 				end
 
-				local ground_y = nil --Definition des Bodens:
+				local ground_y --Definition des Bodens:
 --				for y=maxp.y,0,-1 do
-				for y=maxp.y,-5,-1 do	--because of the caves
+				for y=maxp.y,minp.y-5,-1 do	--because of the caves
 					if table_contains(data[area:index(x, y, z)], c.GROUND) then
 						ground_y = y
 						break
@@ -324,28 +270,20 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				end
 				if ground_y then
 					local p_ground = area:index(x, ground_y, z)
-					local p_boden = area:index(x, ground_y+1, z)
-					local p_uground = area:index(x, ground_y-1, z)
-					local d_p_ground = data[p_ground]
-					local d_p_boden = data[p_boden]
-					local d_p_uground = data[p_uground]
-					local ground =	{x=x,y=ground_y,	z=z}
-					local boden =	{x=x,y=ground_y+1,	z=z}
 
-					if d_p_ground == c.water then	--Dreckseen:
+					if data[p_ground] == c.water then	--Dreckseen:
 						local h
 						if smooth then
 							h = pr:next(1,2)
 						else
-							h = 2 --untested
+							h = 2
 						end
-						if minetest.find_node_near(ground, 3+h, "group:crumbly") then
+						if minetest.find_node_near({x=x, y=ground_y, z=z}, 3+h, "group:crumbly") then
 						--if data[area:index(x, ground_y-(3+pr:next(1,2)), z)] ~= c.water then
-							for y=0,-pr:next(26,30),-1 do
-								local p_pos = area:index(x, ground_y+y, z)
-								local d_p_pos = data[p_pos]
-								local pos = {x=x,y=ground_y+y,z=z}
-								if d_p_pos == c.water then
+							local min = math.max(-pr:next(16,20), minp.y-16-ground_y)
+							for y = min,0 do
+								local p_pos = area:index(x, y+ground_y, z)
+								if data[p_pos] == c.water then
 									data[p_pos] = c.dirtywater
 								else
 									data[p_pos] = c.peat
@@ -353,6 +291,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							end
 						end
 					else
+						local p_boden = area:index(x, ground_y+1, z)
+						local d_p_boden = data[p_boden]
 						local plant_allowed = plants_enabled
 						if swampwater
 						and ground_y ~= 1
@@ -360,15 +300,16 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						and pr:next(1,2) == 2
 						and water_allowed(data, area, x, ground_y, z) then
 							plant_allowed = false	--disable plants on swampwater
-							for s=0,-10-pr:next(1,9),-1 do
+							local min = math.max(-pr:next(1,9)-10, minp.y-16-ground_y)
+							for s=0,min,-1 do
 								local p_pos = area:index(x, ground_y+s, z)
-								if data[p_pos] ~= c.air then
-									data[p_pos] = c.dirtywater
-								else
+								if data[p_pos] == c.air then
 									break
 								end
+								data[p_pos] = c.dirtywater
 							end
 						else
+							local p_uground = area:index(x, ground_y-1, z)
 							local p_uuground = area:index(x, ground_y-2, z)
 							if sumpf.wet_beaches
 							and ground_y == 1
@@ -387,7 +328,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 								data[p_uground] = c.sumpfg
 								data[p_uuground] = c.sumpf2
 							end
-							for i=-3,-30,-1 do
+							local min = math.max(-30, minp.y-16-ground_y)
+							for i=-3,min,-1 do
 								local p_pos = area:index(x, ground_y+i, z)
 								local d_p_pos = data[p_pos]
 								if d_p_pos ~= c.air then
@@ -406,14 +348,12 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 						if plant_allowed then	--Pflanzen (und Pilz):
 
-							if pr:next(1,80) == 1 then
---								mache_birke(boden)	this didn't work, so...
-								tab[num] = {1, boden}
+							if pr:next(1,80) == 1 then	-- Birke
+								tab[num] = {1, {x=x, y=ground_y+1, z=z}}
 								num = num+1
-							elseif pr:next(1,20) == 1 then
-								tab[num] = {2, boden}
+							elseif pr:next(1,20) == 1 then	-- jungletree
+								tab[num] = {2, {x=x, y=ground_y+1, z=z}}
 								num = num+1
---								sumpf_make_jungletree(boden)
 							elseif pr:next(1,50) == 1 then
 								data[p_boden] = c.brown_shroom
 							elseif pr:next(1,100) == 1 then
@@ -431,12 +371,34 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			end
 		end
 	end
-	vm:set_data(data)
-	vm:write_to_map()
 	sumpf.inform("ground finished", 2, t1)
 
-	-- spawns trees
-	make_trees(tab, minp, maxp)
+	local param2s
+	if num ~= 1 then
+		-- spawn trees
+		local t2 = os.clock()
+		for _,v in pairs(tab) do
+			if v[1] == 1 then
+				if not param2s then
+					param2s = vm:get_param2_data()
+				end
+				sumpf.generate_birch(v[2], area, data, pr, param2s)
+			else
+				sumpf.generate_jungletree(v[2], area, data, pr)
+			end
+		end
+		sumpf.inform("trees made", 2, t2)
+	end
+
+	local t2 = os.clock()
+	vm:set_data(data)
+	if param2s then
+		vm:set_param2_data(param2s)
+	end
+	vm:set_lighting({day=0, night=0})
+	vm:calc_lighting()
+	vm:write_to_map()
+	sumpf.inform("data set", 2, t2)
 
 	sumpf.inform("done", 1, t1)
 
