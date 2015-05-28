@@ -164,16 +164,19 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) then]]
 
 	if not sumpf.always_generate then
-		local swamp_allowed
+		local biome_allowed
 		for x = x0, x1, 16 do
 			for z = z0, z1, 16 do
 				if perlin1:get2d({x=x, y=z}) > nosmooth_rarity then
-					swamp_allowed = true
+					biome_allowed = true
 					break
 				end
 			end
+			if biome_allowed then
+				break
+			end
 		end
-		if not swamp_allowed then
+		if not biome_allowed then
 			return
 		end
 	end
@@ -255,14 +258,14 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				for y=maxp.y,minp.y-5,-1 do	--because of the caves
 					local p_pos = area:index(x, y, z)
 					local d_p_pos = data[p_pos]
-					for _,nam in pairs(c.USUAL_STUFF) do			
+					for _,nam in pairs(c.USUAL_STUFF) do --remove usual stuff
 						if d_p_pos == nam then
 							data[p_pos] = c.air
 							p_pos = nil
 							break
 						end
 					end
-					if p_pos
+					if p_pos --else search ground_y
 					and table_contains(d_p_pos, c.GROUND) then
 						ground_y = y
 						break
