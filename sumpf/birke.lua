@@ -175,7 +175,7 @@ function spawn_birch(pos)
 		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
 	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
 	local nodes = manip:get_data()
-	local param2s = manip:get_param2_data() 
+	local param2s = manip:get_param2_data()
 
 	birch(pos, height, area, nodes, pr, param2s)
 
