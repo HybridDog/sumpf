@@ -250,20 +250,20 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 			if in_biome then
 
-				for p_pos in area:iter(x, minp.y, z, x, maxp.y, z) do	--remove usual stuff
+				local ground_y --Definition des Bodens:
+--				for y=maxp.y,0,-1 do
+				for y=maxp.y,minp.y-5,-1 do	--because of the caves
+					local p_pos = area:index(x, y, z)
 					local d_p_pos = data[p_pos]
 					for _,nam in pairs(c.USUAL_STUFF) do			
 						if d_p_pos == nam then
 							data[p_pos] = c.air
+							p_pos = nil
 							break
 						end
 					end
-				end
-
-				local ground_y --Definition des Bodens:
---				for y=maxp.y,0,-1 do
-				for y=maxp.y,minp.y-5,-1 do	--because of the caves
-					if table_contains(data[area:index(x, y, z)], c.GROUND) then
+					if p_pos
+					and table_contains(d_p_pos, c.GROUND) then
 						ground_y = y
 						break
 					end
