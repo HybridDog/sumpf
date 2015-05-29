@@ -23,7 +23,7 @@ local function avoid_nearby_node(pos, node)
 end]]
 
 local function table_contains(v, t)
-	for _,i in pairs(t) do			
+	for _,i in pairs(t) do
 		if v == i then
 			return true
 		end
@@ -217,7 +217,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 	for p_pos in area:iterp(minp, maxp) do	--remove tree stuff
 		local d_p_pos = data[p_pos]
-		for _,nam in pairs(c.TREE_STUFF) do			
+		for _,nam in pairs(c.TREE_STUFF) do
 			if d_p_pos == nam then
 				data[p_pos] = c.air
 				break

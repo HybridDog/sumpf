@@ -56,7 +56,7 @@ local function avoid_nearby_node(pos, node)
 end
 
 local function find_grond(a,list)
-	for _,nam in ipairs(list) do			
+	for _,nam in ipairs(list) do
 		if a == nam then
 			return true
 		end
@@ -177,7 +177,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 	for p_pos in area:iterp(minp, maxp) do	--remove tree stuff
 		local d_p_pos = data[p_pos]
-		for _,nam in ipairs({c.tree, c.leaves, c.apple}) do			
+		for _,nam in ipairs({c.tree, c.leaves, c.apple}) do
 			if d_p_pos == nam then
 				data[p_pos] = c.air
 				break
@@ -217,7 +217,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				for b = minp.y,maxp.y,1 do	--remove usual stuff
 					local p_pos = area:index(x, b, z)
 					local d_p_pos = data[p_pos]
-					for _,nam in ipairs(USUAL_STUFF) do			
+					for _,nam in ipairs(USUAL_STUFF) do
 						if d_p_pos == nam then
 							data[p_pos] = c.air
 							break
