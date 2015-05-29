@@ -13,7 +13,7 @@ end
 local function avoid_nearby_node(pos, node)
 	for i = -1,1,2 do
 		for j = -1,1,2 do
-			if minetest.env:get_node({x=pos.x+i, y=pos.y, z=pos.z+j}).name == node then
+			if minetest.get_node({x=pos.x+i, y=pos.y, z=pos.z+j}).name == node then
 				return false
 			end
 		end
@@ -23,7 +23,7 @@ end
 
 local function find_ground(pos, nodes)
 	for _, evground in ipairs(nodes) do
-		if minetest.env:get_node(pos).name == evground then
+		if minetest.get_node(pos).name == evground then
 			return true
 		end
 	end

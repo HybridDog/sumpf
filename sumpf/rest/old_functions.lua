@@ -148,20 +148,20 @@ end
 
 --[[
 local function add_tree_branch(pos, dir)
-	minetest.env:set_node(pos, {name="sumpf:tree_horizontal", param2=dir})
+	minetest.set_node(pos, {name="sumpf:tree_horizontal", param2=dir})
 	for i = math.random(2), -math.random(2), -1 do
 		for k = math.random(2), -math.random(2), -1 do
 			local p = {x=pos.x+i, y=pos.y, z=pos.z+k}
-			local n = minetest.env:get_node(p)
+			local n = minetest.get_node(p)
 			if (n.name=="air") then
-				minetest.env:add_node(p, {name="sumpf:leaves"})
+				minetest.add_node(p, {name="sumpf:leaves"})
 			end
 			local chance = math.abs(i+k)
 			if (chance < 1) then
 				p = {x=pos.x+i, y=pos.y+1, z=pos.z+k}
-				n = minetest.env:get_node(p)
+				n = minetest.get_node(p)
 				if (n.name=="air") then
-					minetest.env:add_node(p, {name="sumpf:leaves"})
+					minetest.add_node(p, {name="sumpf:leaves"})
 				end
 			end
 		end
@@ -170,11 +170,11 @@ end
 
 function mache_birke(pos)
 	local t1 = os.clock()
-	minetest.env:add_node(pos, {name="sumpf:mossytree"})
+	minetest.add_node(pos, {name="sumpf:mossytree"})
 	local height = 3 + math.random(2)
 	for i = height, 1, -1 do
 		local p = {x=pos.x, y=pos.y+i, z=pos.z}
-		minetest.env:add_node(p, {name="sumpf:tree"})
+		minetest.add_node(p, {name="sumpf:tree"})
 		if (math.sin(i/height*i) < 0.2 and i > 3 and math.random(0,2) < 1.5) then
 			branch_pos = {x=pos.x+math.random(0,1), y=pos.y+i, z=pos.z-math.random(0,1)}
 			add_tree_branch(branch_pos, math.random(1,2))
