@@ -216,11 +216,13 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
 
 	for p_pos in area:iterp(minp, maxp) do	--remove tree stuff
-		local d_p_pos = data[p_pos]
-		for _,nam in pairs(c.TREE_STUFF) do
-			if d_p_pos == nam then
-				data[p_pos] = c.air
-				break
+		if data[p_pos] ~= c.air then
+			local d_p_pos = data[p_pos]
+			for _,nam in pairs(c.TREE_STUFF) do
+				if d_p_pos == nam then
+					data[p_pos] = c.air
+					break
+				end
 			end
 		end
 	end
@@ -258,17 +260,19 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				for y=maxp.y,minp.y-5,-1 do	--because of the caves
 					local p_pos = area:index(x, y, z)
 					local d_p_pos = data[p_pos]
-					for _,nam in pairs(c.USUAL_STUFF) do --remove usual stuff
-						if d_p_pos == nam then
-							data[p_pos] = c.air
-							p_pos = nil
+					if d_p_pos ~= c.air then
+						for _,nam in pairs(c.USUAL_STUFF) do --remove usual stuff
+							if d_p_pos == nam then
+								data[p_pos] = c.air
+								p_pos = nil
+								break
+							end
+						end
+						if p_pos --else search ground_y
+						and table_contains(d_p_pos, c.GROUND) then
+							ground_y = y
 							break
 						end
-					end
-					if p_pos --else search ground_y
-					and table_contains(d_p_pos, c.GROUND) then
-						ground_y = y
-						break
 					end
 				end
 				if ground_y then
@@ -277,11 +281,11 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					if data[p_ground] == c.water then	--Dreckseen:
 						local h
 						if smooth then
-							h = pr:next(1,2)
+							h = pr:next(4,5)
 						else
-							h = 2
-						end
-						if minetest.find_node_near({x=x, y=ground_y, z=z}, 3+h, "group:crumbly") then
+							h = 5
+						end	--find_node_near may be a laggy function here
+						if minetest.find_node_near({x=x, y=ground_y, z=z}, h, "group:crumbly") then
 						--if data[area:index(x, ground_y-(3+pr:next(1,2)), z)] ~= c.water then
 							local min = math.max(-pr:next(16,20), minp.y-16-ground_y)
 							for y = min,0 do
