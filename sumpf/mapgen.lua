@@ -135,17 +135,25 @@ if swampwater then
 	end
 end
 
-local smooth = sumpf.smooth
+-- perlin noise "hills" are not peaks but looking like sinus curve
+local function upper_rarity(rarity)
+	return math.sign(rarity)*math.sin(math.abs(rarity)*math.pi/2)
+end
 
-local sumpf_rarity = sumpf.mapgen_rarity
+local rarity = sumpf.mapgen_rarity
 local sumpf_size = sumpf.mapgen_size
-local smooth_trans_size = sumpf.smooth_trans_size
 
-local nosmooth_rarity = 1-sumpf_rarity/50
-local perlin_scale = sumpf_size*100/sumpf_rarity
-local smooth_rarity_max = nosmooth_rarity+smooth_trans_size*2/perlin_scale
-local smooth_rarity_min = nosmooth_rarity-smooth_trans_size/perlin_scale
-local smooth_rarity_dif = smooth_rarity_max-smooth_rarity_min
+local nosmooth_rarity = 1-rarity/50
+local perlin_scale = sumpf_size*100/rarity
+local smooth_rarity_max, smooth_rarity_min, smooth_rarity_dif
+local smooth = sumpf.smooth
+if smooth then
+	local smooth_trans_size = sumpf.smooth_trans_size
+	smooth_rarity_max = upper_rarity(nosmooth_rarity+smooth_trans_size*2/perlin_scale)
+	smooth_rarity_min = upper_rarity(nosmooth_rarity-smooth_trans_size/perlin_scale)
+	smooth_rarity_dif = smooth_rarity_max-smooth_rarity_min
+end
+nosmooth_rarity = upper_rarity(nosmooth_rarity)
 
 local contents_defined
 minetest.register_on_generated(function(minp, maxp, seed)
@@ -237,10 +245,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			--Check if we are in a "Swamp biome"
 			local in_biome = false
 			local test = perlin1:get2d({x=x, y=z})
-			--smooth mapgen
 			if sumpf.always_generate then
 				in_biome = true
 			elseif smooth then
+				--smooth transitions, sinus not used yet
 				if test >= smooth_rarity_max
 				or (
 					test > smooth_rarity_min
@@ -248,8 +256,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				) then
 					in_biome = true
 				end
-			elseif not smooth
-			and test > nosmooth_rarity then
+			elseif test > nosmooth_rarity then
 				in_biome = true
 			end
 
