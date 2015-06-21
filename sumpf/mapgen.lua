@@ -159,7 +159,7 @@ local contents_defined
 minetest.register_on_generated(function(minp, maxp, seed)
 
 	--avoid calculating perlin noises for unneeded places
-	if maxp.y <= -2
+	if maxp.y <= -6
 	or minp.y >= 150 then
 		return
 	end
@@ -262,12 +262,22 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 			if in_biome then
 
-				local ground_y --Definition des Bodens:
---				for y=maxp.y,0,-1 do
-				for y=maxp.y,minp.y-5,-1 do	--because of the caves
-					local p_pos = area:index(x, y, z)
-					local d_p_pos = data[p_pos]
-					if d_p_pos ~= c.air then
+				local ymin = math.max(-5, minp.y) -- -5 because of caves
+
+				-- skip the air part
+				local ground
+				for y = maxp.y,ymin,-1 do
+					if data[area:index(x, y, z)] ~= c.air then
+						ground = y
+						break
+					end
+				end
+
+				local ground_y
+				if ground then
+					for y = ground,ymin,-1 do
+						local p_pos = area:index(x, y, z)
+						local d_p_pos = data[p_pos]
 						for _,nam in pairs(c.USUAL_STUFF) do --remove usual stuff
 							if d_p_pos == nam then
 								data[p_pos] = c.air
@@ -282,6 +292,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						end
 					end
 				end
+
 				if ground_y then
 					local p_ground = area:index(x, ground_y, z)
 
