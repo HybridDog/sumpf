@@ -81,7 +81,9 @@ minetest.register_node("sumpf:sumpf", {
 })
 
 minetest.register_node("sumpf:sumpf2", {
-	tiles = {"sumpf.png","sumpf_swampstone.png","sumpf_swampstone.png^sumpf_transition.png"},
+	tiles = {"sumpf.png", "sumpf_swampstone.png",
+		{name="sumpf_swampstone.png^sumpf_transition.png", tileable_vertical = false}
+	},
 	groups = {cracky=3, soil=1},
 	drop = "sumpf:cobble",
 	sounds = default.node_sound_stone_defaults({

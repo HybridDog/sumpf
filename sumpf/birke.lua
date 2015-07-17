@@ -67,7 +67,9 @@ minetest.register_node("sumpf:tree", {
 
 minetest.register_node("sumpf:mossytree", {
 	description = "mossy birch trunk",
-	tiles = {"birke_tree_top.png",	"sumpf.png", "birke_tree.png^(sumpf_transition.png^[transformR180)"},
+	tiles = {"birke_tree_top.png",	"sumpf.png",
+		{name="birke_tree.png^(sumpf_transition.png^[transformR180)", tileable_vertical = false}
+	},
 	groups = {tree=1,snappy=1,choppy=2,oddly_breakable_by_hand=1,flammable=2},
 	sounds = default.node_sound_wood_defaults(),
 })
