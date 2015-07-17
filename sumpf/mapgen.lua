@@ -238,6 +238,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local num = 1
 	local tab = {}
 
+	local heightmap = minetest.get_mapgen_object("heightmap")
+	local hmi = 1
+
 	for j=0,divs do
 		for i=0,divs do
 			local x,z = x0+i,z0+j
@@ -262,11 +265,11 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 			if in_biome then
 
-				local ymin = math.max(-5, minp.y) -- -5 because of caves
+				local ymin = math.max(heightmap[hmi]-5, minp.y) -- -5 because of caves
 
 				-- skip the air part
 				local ground
-				for y = maxp.y,ymin,-1 do
+				for y = math.min(heightmap[hmi]+20, maxp.y),ymin,-1 do
 					if data[area:index(x, y, z)] ~= c.air then
 						ground = y
 						break
@@ -394,6 +397,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					end
 				end
 			end
+			hmi = hmi+1
 		end
 	end
 	sumpf.inform("ground finished", 2, t1)
