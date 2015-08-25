@@ -33,7 +33,7 @@ sumpf.spawn_plants = true
 sumpf.info = true
 
 --informs the players too
-sumpf.inform_all = minetest.is_singleplayer()
+sumpf.inform_all = false--minetest.is_singleplayer()
 
 --1:<a bit of information> 2:<acceptable amount of information> 3:<lots of text>
 sumpf.max_spam = 2
