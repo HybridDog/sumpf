@@ -1,27 +1,6 @@
 -- might decrease lag a bit
 local minetest = minetest
 
---[[local function swampore(pos, env)
-	if minetest.get_node(pos).name == "default:stone_with_coal" then
-		return "kohle"
-	end
-	if minetest.get_node(pos).name == "default:stone_with_iron" then
-		return "eisen"
-	end
-	return "junglestone"
-end
-
-local function avoid_nearby_node(pos, node)
-	for i = -1,1,2 do
-		for j = -1,1,2 do
-			if minetest.get_node({x=pos.x+i, y=pos.y, z=pos.z+j}).name == node then
-				return false
-			end
-		end
-	end
-	return true
-end]]
-
 local function table_contains(v, t)
 	for _,i in pairs(t) do
 		if v == i then
@@ -31,17 +10,15 @@ local function table_contains(v, t)
 	return false
 end
 
---[[local function find_ground(pos, nodes)
-	for _, evground in ipairs(nodes) do
-		if minetest.get_node(pos).name == evground then
-			return true
-		end
-	end
-	return false
-end--]]
-
+local hut_allowed, generate_hut
 if sumpf.hut_chance > 0 then
 	dofile(minetest.get_modpath("sumpf") .. "/huts.lua")
+	hut_allowed = sumpf.hut_allowed
+	generate_hut = sumpf.generate_hut
+else
+	function hut_allowed()
+		return false
+	end
 end
 
 local plants_enabled = sumpf.enable_plants
@@ -239,6 +216,17 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		end
 	end
 
+	local hut
+	if hut_allowed(minp) then
+		hut = {
+			rmin = pr:next(4,6),
+			rmax = pr:next(10,20)
+		}
+		local plen = math.max(maxp.x-minp.x-hut.rmax-hut.rmax-2, 0)
+		hut.x = minp.x+plen+pr:next(0,plen)
+		hut.z = minp.z+plen+pr:next(0,plen)
+	end
+
 	local num = 1
 	local tab = {}
 
@@ -301,6 +289,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				end
 
 				if ground_y then
+					if hut then
+						hut.y = math.max(2, ground_y)
+					end
+
 					local p_ground = area:index(x, ground_y, z)
 
 					if data[p_ground] == c.water then	--Dreckseen:
@@ -364,16 +356,15 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							for i=-3,min,-1 do
 								local p_pos = area:index(x, ground_y+i, z)
 								local d_p_pos = data[p_pos]
-								if d_p_pos ~= c.air then
-									if d_p_pos == c.coal then
-										data[p_pos] = c.sumpfcoal
-									elseif d_p_pos == c.iron then
-										data[p_pos] = c.sumpfiron
-									else
-										data[p_pos] = c.sumpfstone
-									end
-								else
+								if d_p_pos == c.air then
 									break
+								end
+								if d_p_pos == c.coal then
+									data[p_pos] = c.sumpfcoal
+								elseif d_p_pos == c.iron then
+									data[p_pos] = c.sumpfiron
+								else
+									data[p_pos] = c.sumpfstone
 								end
 							end
 						end
@@ -421,6 +412,13 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			end
 		end
 		sumpf.inform("trees made", 2, t2)
+	end
+
+	if hut
+	and hut.y then
+		local t2 = os.clock()
+		generate_hut({x=hut.x, y=hut.y, z=hut.z}, area, data, hut.rmin, hut.rmax)
+		sumpf.inform("hut made", 2, t2)
 	end
 
 	local t2 = os.clock()
