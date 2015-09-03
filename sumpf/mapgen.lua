@@ -40,6 +40,10 @@ end
 	return false
 end--]]
 
+if sumpf.hut_chance > 0 then
+	dofile(minetest.get_modpath("sumpf") .. "/huts.lua")
+end
+
 local plants_enabled = sumpf.enable_plants
 
 local c

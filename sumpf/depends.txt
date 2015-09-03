@@ -1,8 +1,8 @@
 default
 riesenpilz
 jungletree
+stairs
 bucket?
 function_delayer?
 habitat?
-stairs?
 treecapitator?

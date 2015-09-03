@@ -16,6 +16,15 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+	output = "sumpf:roofing",
+	recipe = {
+		{"sumpf:gras", "default:junglegrass", "sumpf:gras"},
+		{"default:junglegrass", "sumpf:gras", "default:junglegrass"},
+		{"sumpf:gras", "default:junglegrass", "sumpf:gras"},
+	}
+})
+
+minetest.register_craft({
 	type = "cooking",
 	output = "sumpf:junglestone",
 	recipe = "sumpf:cobble",
@@ -91,10 +100,18 @@ minetest.register_node("sumpf:sumpf2", {
 	}),
 })
 
+minetest.register_node("sumpf:roofing", {
+	description = "swamp grass roofing",
+	tiles = {"sumpf_roofing.png"},
+	is_ground_content = false,
+	groups = {snappy = 3, flammable = 1, level = 2},
+	sounds = default.node_sound_leaves_defaults(),
+	furnace_burntime = 13,
+})
 
 ----------------------stairs and slabs------------------
 
-if stairs then
+if rawget(_G, "stairs") then
 	stairs.register_stair_and_slab("swampstone", "sumpf:junglestone",
 		{cracky=3},
 		{"sumpf_swampstone.png"},
@@ -118,6 +135,14 @@ if stairs then
 		"swamp stone brick slab",
 		default.node_sound_stone_defaults()
 	)
+
+	stairs.register_stair_and_slab("sumpf_roofing", "sumpf:roofing",
+		{snappy = 3, flammable = 1, level = 2},
+		{"sumpf_roofing.png"},
+		"swamp grass roofing stair",
+		"swamp grass roofing slab",
+		default.node_sound_leaves_defaults()
+	)
 end
 
 ---------------------------------------------------------
@@ -136,6 +161,7 @@ minetest.register_node("sumpf:gras", {
 	walkable = false,
 	groups = {snappy=3,flammable=3,flora=1,attached_node=1},
 	sounds = default.node_sound_leaves_defaults(),
+	furnace_burntime = 1,
 })
 
 local ani = {type="vertical_frames", aspect_w=16, aspect_h=16, length=1.5}--17

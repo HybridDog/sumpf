@@ -26,7 +26,10 @@ sumpf.swampwater = true
 --adds swampwater near sea (different behaviour)
 sumpf.wet_beaches = sumpf.swampwater
 
---habitat stuff (no vm yet)
+--chance of spawning a hut in a mapchunk, set to 0 to disable it
+sumpf.hut_chance = 50
+
+--habitat stuff
 sumpf.spawn_plants = true
 
 --says some information.
