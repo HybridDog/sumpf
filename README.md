@@ -10,4 +10,4 @@ If you got ideas or found bugs, please tell them to me.
 
 
 TODO:
-— maybe add some swamp huts
+— maybe add some not ruined swamp huts

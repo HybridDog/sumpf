@@ -289,8 +289,12 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				end
 
 				if ground_y then
-					if hut then
-						hut.y = math.max(2, ground_y)
+					if hut
+					and not hut.y
+					and x == hut.x
+					and z == hut.z then
+						hut.y = math.max(1, ground_y)
+						hut.y = hut.y + 1
 					end
 
 					local p_ground = area:index(x, ground_y, z)
