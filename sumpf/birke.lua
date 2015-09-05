@@ -58,7 +58,9 @@ minetest.register_node("sumpf:leaves", {
 
 minetest.register_node("sumpf:tree", {
 	description = "birch trunk",
-	tiles = {"birke_tree_top.png",	"birke_tree_top.png",	"birke_tree.png"},
+	tiles = {"birke_tree_top.png",	"birke_tree_top.png",
+		{name="birke_tree.png", tileable_vertical = false}
+	},
 	paramtype2 = "facedir",
 	on_place = minetest.rotate_node,
 	groups = {tree=1,snappy=1,choppy=2,oddly_breakable_by_hand=1,flammable=2},

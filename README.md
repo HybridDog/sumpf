@@ -9,5 +9,6 @@
 If you got ideas or found bugs, please tell them to me.
 
 
-TODO:
-— maybe add some not ruined swamp huts
+TODO:  
+— maybe add some not ruined swamp huts  
+— fix wall position list order (maybe)
