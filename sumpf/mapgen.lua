@@ -220,11 +220,16 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	if hut_allowed(minp) then
 		hut = {
 			rmin = pr:next(4,6),
-			rmax = pr:next(10,20)
+			rmax = pr:next(10,20),
+			ruin = pr:next(1,2) == 1
 		}
-		local plen = math.max(maxp.x-minp.x-hut.rmax-hut.rmax-2, 0)
-		hut.x = minp.x+plen+pr:next(0,plen)
-		hut.z = minp.z+plen+pr:next(0,plen)
+		-- sidelen-2*radius_max-2*roof_outside
+		local sidelen = maxp.x-minp.x+1
+		local hsidelen = math.floor(sidelen/2)
+		local diff = math.max(hsidelen-hut.rmax-1, 0)
+
+		hut.x = minp.x+hsidelen+pr:next(-diff,diff)
+		hut.z = minp.z+hsidelen+pr:next(-diff,diff)
 	end
 
 	local num = 1
@@ -421,7 +426,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	if hut
 	and hut.y then
 		local t2 = os.clock()
-		generate_hut({x=hut.x, y=hut.y, z=hut.z}, area, data, hut.rmin, hut.rmax)
+		generate_hut({x=hut.x, y=hut.y, z=hut.z}, area, data, hut.rmin, hut.rmax, hut.ruin)
 		sumpf.inform("hut made", 2, t2)
 	end
 

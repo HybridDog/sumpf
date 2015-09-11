@@ -319,10 +319,37 @@ local function make_floor_and_roof(ps,ps_list, wall_ps, wall_ps_list, y, tab)
 	end
 end
 
+-- reiht die wandpositionen auf
+local function arrange_wall_ps_list(pos, wall_ps)
+	local ps_list,n = {},1
+	local dones = {}
+	local current = {pos.z,pos.x}
+	while current do
+		local y,x = unpack(current)
+		current = false
+		for y = y-1,y+1 do
+			for x = x-1,x+1 do
+				if get(wall_ps, y,x)
+				and not get(dones, y,x) then
+					set(dones, y,x, true)
+					ps_list[n] = {y,x}
+					n = n+1
+					current = {y,x}
+					break
+				end
+			end
+			if current then
+				break
+			end
+		end
+	end
+	return ps_list
+end
+
 -- erstellt die Wände
-local function make_walls(ps_list, y, tab)
-	for _,p in pairs(ps_list) do
-		make_wall(tab, p.z,y,p.x)
+local function make_walls(pos, ps, y, tab)
+	for _,p in ipairs(arrange_wall_ps_list(pos, ps)) do
+		make_wall(tab, p[1],y,p[2])
 	end
 	glass_count = -1
 end
@@ -334,7 +361,8 @@ local function get_hut_node_ps(wall_ps, wall_ps_list, y)
 	or #wall_ps_list < 2 then
 		return node_ps
 	end
-	make_walls(wall_ps_list, y, node_ps)
+
+	make_walls(wall_ps_list[1], wall_ps, y, node_ps)
 	make_floor_and_roof(ps,ps_list, wall_ps, wall_ps_list, y, node_ps)
 	return node_ps
 end
@@ -493,7 +521,8 @@ local function hard_node(id)
 	if hard ~= nil then
 		return hard
 	end
-	hard = minetest.get_item_group(minetest.get_name_from_content_id(id), "cracky") > 0
+	local name = minetest.get_name_from_content_id(id)
+	hard = name == "ignore" or minetest.get_item_group(name, "cracky") > 0
 	hard_nodes[id] = hard
 	return hard
 end
@@ -524,18 +553,25 @@ local function usual_node(id)
 	return false
 end
 
+
 local c_air = minetest.get_content_id("air")
+local c_birch = minetest.get_content_id("sumpf:tree")
+local c_jungletree = minetest.get_content_id("default:jungletree")
 local c_primfloor = minetest.get_content_id("sumpf:cobble")
 local c_secofloor = minetest.get_content_id("sumpf:junglestonebrick")
-local c_wall = minetest.get_content_id("sumpf:tree")
-local c_glass = minetest.get_content_id("default:obsidian_glass")
+local c_wall = c_birch
+local c_glass
+if minetest.registered_nodes["moreblocks:super_glow_glass"] then
+	c_glass = minetest.get_content_id("moreblocks:super_glow_glass")
+else
+	c_glass = minetest.get_content_id("default:glass")
+end
 local c_primroof = minetest.get_content_id("sumpf:roofing")
 local c_secoroof = minetest.get_content_id("stairs:slab_sumpf_roofing") --slab
+local c_glass_ruin = minetest.get_content_id("default:obsidian_glass")
 
 -- should be a ruin with somehow fresh grass roofing (todo: how???)
-function sumpf.generate_hut(pos, area, nodes, rmin, rmax)
-	local tab = get_hut_nodes(pos, rmin, rmax)
-
+local function generate_ruin_hut(area, nodes, tab, floor_y)
 	-- the primary floor is a fairly stable bottom plate
 	for _,p in pairs(tab[1]) do
 		local z,y,x = unpack(p)
@@ -545,7 +581,10 @@ function sumpf.generate_hut(pos, area, nodes, rmin, rmax)
 	-- the secondary floor means decoration in the plate
 	for _,p in pairs(tab[2]) do
 		local z,y,x = unpack(p)
-		nodes[area:index(x,y,z)] = c_secofloor
+		p = area:index(x,y,z)
+		if not usual_node(nodes[p]) then
+			nodes[p] = c_secofloor
+		end
 	end
 
 	-- the wall is made of birch wood, the builders didn't know it doesn't last long
@@ -554,8 +593,8 @@ function sumpf.generate_hut(pos, area, nodes, rmin, rmax)
 		p = area:index(x,y,z)
 		if not hard_node(nodes[p]) then
 			nodes[p] = c_wall
-			if y == pos.y+1 then
-				for y = pos.y-2, pos.y-16, -1 do
+			if y == floor_y+1 then
+				for y = floor_y-2, floor_y-100, -1 do
 					local p = area:index(x,y,z)
 					if hard_node(nodes[p]) then
 						break
@@ -571,7 +610,7 @@ function sumpf.generate_hut(pos, area, nodes, rmin, rmax)
 		local z,y,x = unpack(p)
 		p = area:index(x,y,z)
 		if not usual_node(nodes[p]) then
-			nodes[p] = c_glass
+			nodes[p] = c_glass_ruin
 		end
 	end
 
@@ -579,7 +618,7 @@ function sumpf.generate_hut(pos, area, nodes, rmin, rmax)
 	for _,p in pairs(tab[5]) do
 		local z,y,x = unpack(p)
 		p = area:index(x,y,z)
-		if not usual_node(nodes[p]) then
+		if nodes[p] == c_air then
 			nodes[p] = c_primroof
 		end
 	end
@@ -588,12 +627,122 @@ function sumpf.generate_hut(pos, area, nodes, rmin, rmax)
 	for _,p in pairs(tab[6]) do
 		local z,y,x = unpack(p)
 		p = area:index(x,y,z)
-		if not usual_node(nodes[p]) then
+		if nodes[p] == c_air then
 			if nodes[area:index(x,y+1,z)] == c_air then
 				nodes[p] = c_secoroof
 			else
 				nodes[p] = c_primroof
 			end
 		end
+	end
+end
+
+-- this one shouldn't be a ruin
+local function generate_fresh_hut(area, nodes, tab, floor_y)
+	-- the primary floor is a fairly stable bottom plate
+	for _,p in pairs(tab[1]) do
+		local z,y,x = unpack(p)
+		nodes[area:index(x,y,z)] = c_primfloor
+	end
+
+	-- the secondary floor means decoration in the plate
+	for _,p in pairs(tab[2]) do
+		local z,y,x = unpack(p)
+		nodes[area:index(x,y,z)] = c_secofloor
+	end
+
+	-- the wall is made of birch wood
+	for _,p in pairs(tab[3]) do
+		local z,y,x = unpack(p)
+		nodes[area:index(x,y,z)] = c_wall
+		if y == floor_y+1 then
+			for y = floor_y-2, floor_y-100, -1 do
+				local p = area:index(x,y,z)
+				if hard_node(nodes[p]) then
+					break
+				end
+				nodes[p] = c_wall
+			end
+		end
+	end
+
+	-- glass needs to glow for lighting
+	for _,p in pairs(tab[4]) do
+		local z,y,x = unpack(p)
+		p = area:index(x,y,z)
+		if (not usual_node(nodes[p])
+			and y == floor_y+1)
+		or not usual_node(nodes[area:index(x,floor_y+1,z)]) then
+			nodes[p] = c_glass
+		else
+			nodes[p] = c_wall
+		end
+	end
+
+	-- the primary roofing
+	for _,p in pairs(tab[5]) do
+		local z,y,x = unpack(p)
+		p = area:index(x,y,z)
+		-- [[ jungletree pillars for stability
+		if y >= floor_y+8
+		and nodes[p] == c_jungletree then
+			for y = floor_y,y-1 do
+				local p = area:index(x,y,z)
+				if nodes[p] == c_jungletree then
+					break
+				end
+				nodes[p] = c_jungletree
+			end
+		else--]]
+			if y ~= floor_y+4 then
+				for y = floor_y,y-1 do
+					nodes[area:index(x,y,z)] = c_air
+				end
+			end
+			nodes[p] = c_primroof
+		end
+	end
+
+	-- increasing stability a bit the secondary roofing becomes primary if a not air is above it (e.g. leaves)
+	for _,p in pairs(tab[6]) do
+		local z,y,x = unpack(p)
+		p = area:index(x,y,z)
+		-- [[ jungletree pillars also here
+		if y >= floor_y+8
+		and nodes[p] == c_jungletree then
+			for y = floor_y,y-1 do
+				local p = area:index(x,y,z)
+				if nodes[p] == c_jungletree then
+					break
+				end
+				nodes[p] = c_jungletree
+			end
+		else--]]
+			local free_above = nodes[area:index(x,y+1,z)] == c_air
+			if y == floor_y+4 then
+				if free_above
+				and not usual_node(nodes[p]) then
+					nodes[p] = c_secoroof
+				end
+			else
+				for y = floor_y,y-1 do
+					nodes[area:index(x,y,z)] = c_air
+				end
+				if free_above then
+					nodes[p] = c_secoroof
+				else
+					nodes[p] = c_primroof
+				end
+			end
+		end
+	end
+end
+
+function sumpf.generate_hut(pos, area, nodes, rmin, rmax, ruin)
+	local tab = get_hut_nodes(pos, rmin, rmax)
+	if ruin then
+		generate_ruin_hut(area, nodes, tab, pos.y)
+	else
+		generate_fresh_hut(area, nodes, tab, pos.y)
 	end
 end

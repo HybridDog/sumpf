@@ -10,5 +10,5 @@ If you got ideas or found bugs, please tell them to me.
 
 
 TODO:  
-— maybe add some not ruined swamp huts  
-— fix wall position list order (maybe)
+— find out fitting values for ruined and hut chance  
+— add dried, rotten grass roofing nodes for the ruined hut
