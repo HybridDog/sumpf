@@ -10,11 +10,10 @@ local function table_contains(v, t)
 	return false
 end
 
-local hut_allowed, generate_hut
+local hut_allowed
 if sumpf.hut_chance > 0 then
 	dofile(minetest.get_modpath("sumpf") .. "/huts.lua")
 	hut_allowed = sumpf.hut_allowed
-	generate_hut = sumpf.generate_hut
 else
 	function hut_allowed()
 		return false
@@ -426,7 +425,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	if hut
 	and hut.y then
 		local t2 = os.clock()
-		generate_hut({x=hut.x, y=hut.y, z=hut.z}, area, data, hut.rmin, hut.rmax, hut.ruin)
+		sumpf.generate_hut({x=hut.x, y=hut.y, z=hut.z}, area, data, hut.rmin, hut.rmax, hut.ruin)
 		sumpf.inform("hut made", 2, t2)
 	end
 
