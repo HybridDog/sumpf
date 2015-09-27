@@ -187,7 +187,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		--Information:
 	sumpf.inform("tries to generate a swamp at: x=["..x0.."; "..x1.."]; y=["..minp.y.."; "..maxp.y.."]; z=["..z0.."; "..z1.."]", 2)
 
-	local divs = (x1-x0);
+	local divs = (x1-x0)
 	local pr = PseudoRandom(seed+68)
 
 	if not contents_defined then

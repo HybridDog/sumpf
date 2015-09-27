@@ -238,7 +238,7 @@ local function get_roof_ps(wall_ps_list, ps, ps_list)
 	end
 end
 
--- gibt die Distanz zur naechsten Wandsaeule
+-- gibt die Distanz zur naechsten Wandsaeule, Manhattan-Metrik
 local function get_wall_dist(pos, wall_ps)
 	if pos.h then
 		return -1
