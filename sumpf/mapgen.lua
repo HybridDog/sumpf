@@ -1,15 +1,6 @@
 -- might decrease lag a bit
 local minetest = minetest
 
-local function table_contains(v, t)
-	for _,i in pairs(t) do
-		if v == i then
-			return true
-		end
-	end
-	return false
-end
-
 local hut_allowed
 if sumpf.hut_chance > 0 then
 	dofile(minetest.get_modpath("sumpf") .. "/huts.lua")
@@ -21,8 +12,9 @@ else
 end
 
 local plants_enabled = sumpf.enable_plants
+local swampwater = sumpf.swampwater
 
-local c
+local c, is_ground, water_allowed
 local function define_contents()
 	c = {
 		air = minetest.get_content_id("air"),
@@ -46,74 +38,83 @@ local function define_contents()
 		junglegrass = minetest.get_content_id("default:junglegrass"),
 
 		USUAL_STUFF = {
-			minetest.get_content_id("default:dry_shrub"),
-			minetest.get_content_id("default:cactus"),
-			minetest.get_content_id("default:papyrus")
+			[minetest.get_content_id("default:dry_shrub")] = true,
+			[minetest.get_content_id("default:cactus")] = true,
+			[minetest.get_content_id("default:papyrus")] = true
 		},
 		TREE_STUFF = {
-			minetest.get_content_id("default:tree"),
-			minetest.get_content_id("default:leaves"),
-			minetest.get_content_id("default:apple"),
+			[minetest.get_content_id("default:tree")] = true,
+			[minetest.get_content_id("default:leaves")] = true,
+			[minetest.get_content_id("default:apple")] = true,
 		},
 	}
-	c.GROUND = {c.water}
-	for name,data in pairs(minetest.registered_nodes) do
+	local grounds = {[c.water] = true}
+	function is_ground(id)
+		local is = grounds[id]
+		if is ~= nil then
+			return is
+		end
+		local data = minetest.registered_nodes[minetest.get_name_from_content_id(id)]
+		if not data then
+			grounds[id] = false
+			return false
+		end
 		local groups = data.groups
-		if groups then
-			if groups.crumbly == 3
-			or groups.soil == 1 then
-				table.insert(c.GROUND, minetest.get_content_id(name))
-			end
-		end
-	end
-end
-
-local swampwater = sumpf.swampwater
-local water_allowed
-if swampwater then
-	local hard_nodes = {}	--in time makes a table of nodes which are allowed to be next to swampwater
-	local function hard_node(id)
-		if not id then
-			return false
-		end
-		local hard = hard_nodes[id]
-		if hard ~= nil then
-			return hard
-		end
-		local name = minetest.get_name_from_content_id(id)
-		sumpf.inform("<swampwater> testing if "..name.."is a hard node", 3)
-		local node = minetest.registered_nodes[name]
-		if not node then
-			hard_nodes[id] = false
-			return false
-		end
-		local drawtype = node.drawtype
-		if not drawtype
-		or drawtype == "normal" then
-			hard_nodes[id] = true
+		if groups
+		and (groups.crumbly == 3 or groups.soil == 1) then
+			grounds[id] = true
 			return true
 		end
-		hard_nodes[id] = false
+		grounds[id] = false
 		return false
 	end
 
-	--tests if swampwater is allowed to generate at this position
-	function water_allowed(data, area, x, y, z)
-		for _,p in pairs({
-			{0,-1},
-			{0,1},
-			{-1,0},
-			{1,0},
-		}) do
-			local id = data[area:index(x+p[1], y, z+p[2])]
-			if id ~= c.dirtywater
-			and not hard_node(id) then
+	if swampwater then
+		local hard_nodes = {}	--in time makes a table of nodes which are allowed to be next to swampwater
+		local function hard_node(id)
+			if not id then
 				return false
 			end
+			local hard = hard_nodes[id]
+			if hard ~= nil then
+				return hard
+			end
+			local name = minetest.get_name_from_content_id(id)
+			sumpf.inform("<swampwater> testing if "..name.."is a hard node", 3)
+			local node = minetest.registered_nodes[name]
+			if not node then
+				hard_nodes[id] = false
+				return false
+			end
+			local drawtype = node.drawtype
+			if not drawtype
+			or drawtype == "normal" then
+				hard_nodes[id] = true
+				return true
+			end
+			hard_nodes[id] = false
+			return false
 		end
-		return true
+
+		--tests if swampwater is allowed to generate at this position
+		function water_allowed(data, area, x, y, z)
+			for _,p in pairs({
+				{0,-1},
+				{0,1},
+				{-1,0},
+				{1,0},
+			}) do
+				local id = data[area:index(x+p[1], y, z+p[2])]
+				if id ~= c.dirtywater
+				and not hard_node(id) then
+					return false
+				end
+			end
+			return true
+		end
 	end
 end
+
 
 -- perlin noise "hills" are not peaks but looking like sinus curve
 local function upper_rarity(rarity)
@@ -147,10 +148,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local x0,z0,x1,z1 = minp.x,minp.z,maxp.x,maxp.z	-- Assume X and Z lengths are equal
 	local perlin1 = minetest.get_perlin(1123,3, 0.5, perlin_scale)	--Get map specific perlin
 
-	--[[if not (perlin1:get2d({x=x0, y=z0}) > 0.53) and not (perlin1:get2d({x=x1, y=z1}) > 0.53)
-	and not (perlin1:get2d({x=x0, y=z1}) > 0.53) and not (perlin1:get2d({x=x1, y=z0}) > 0.53)
-	and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) then]]
-
 	if not sumpf.always_generate then
 		local biome_allowed
 		for x = x0, x1, 16 do
@@ -169,25 +166,12 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		end
 	end
 
-	--[[if not sumpf.always_generate
-	and not ( perlin1:get2d( {x=x0, y=z0} ) > nosmooth_rarity ) 					--top left
-	and not ( perlin1:get2d( { x = x0 + ( (x1-x0)/2), y=z0 } ) > nosmooth_rarity )--top middle
-	and not (perlin1:get2d({x=x1, y=z1}) > nosmooth_rarity) 						--bottom right
-	and not (perlin1:get2d({x=x1, y=z0+((z1-z0)/2)}) > nosmooth_rarity) 			--right middle
-	and not (perlin1:get2d({x=x0, y=z1}) > nosmooth_rarity)  						--bottom left
-	and not (perlin1:get2d({x=x1, y=z0}) > nosmooth_rarity)						--top right
-	and not (perlin1:get2d({x=x0+((x1-x0)/2), y=z1}) > nosmooth_rarity) 			--left middle
-	and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > nosmooth_rarity) 			--middle
-	and not (perlin1:get2d({x=x0, y=z1+((z1-z0)/2)}) > nosmooth_rarity) then		--bottom middle
-		return
-	end]]
-
 	local t1 = os.clock()
 
 		--Information:
 	sumpf.inform("tries to generate a swamp at: x=["..x0.."; "..x1.."]; y=["..minp.y.."; "..maxp.y.."]; z=["..z0.."; "..z1.."]", 2)
 
-	local divs = (x1-x0)
+	local divs = x1-x0
 	local pr = PseudoRandom(seed+68)
 
 	if not contents_defined then
@@ -195,23 +179,14 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		contents_defined = true
 	end
 
-	--[[local trees = minetest.find_nodes_in_area(minp, maxp, USUAL_STUFF)
-	for i,v in pairs(trees) do
-		minetest.remove_node(v)
-	end]]
 	local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
 	local data = vm:get_data()
 	local area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
 
 	for p_pos in area:iterp(minp, maxp) do	--remove tree stuff
-		if data[p_pos] ~= c.air then
-			local d_p_pos = data[p_pos]
-			for _,nam in pairs(c.TREE_STUFF) do
-				if d_p_pos == nam then
-					data[p_pos] = c.air
-					break
-				end
-			end
+		if data[p_pos] ~= c.air
+		and c.TREE_STUFF[data[p_pos]] then
+			data[p_pos] = c.air
 		end
 	end
 
@@ -277,15 +252,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					for y = ground,ymin,-1 do
 						local p_pos = area:index(x, y, z)
 						local d_p_pos = data[p_pos]
-						for _,nam in pairs(c.USUAL_STUFF) do --remove usual stuff
-							if d_p_pos == nam then
-								data[p_pos] = c.air
-								p_pos = nil
-								break
-							end
-						end
-						if p_pos --else search ground_y
-						and table_contains(d_p_pos, c.GROUND) then
+						if c.USUAL_STUFF[d_p_pos] then --remove usual stuff
+							data[p_pos] = c.air
+						elseif is_ground(d_p_pos) then --else search ground_y
 							ground_y = y
 							break
 						end
