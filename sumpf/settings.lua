@@ -11,7 +11,7 @@ sumpf.smooth = true
 --rarity in %
 sumpf.mapgen_rarity = 4
 
---size of the generated... (has an effect to the rarity, too)
+--size of the generated… (has an effect to the rarity, too)
 sumpf.mapgen_size = 100
 
 --approximate size of smooth transitions
