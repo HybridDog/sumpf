@@ -3,6 +3,7 @@ jungletree
 riesenpilz
 stairs
 bucket?
+fence_registration?
 function_delayer?
 habitat?
 moreblocks?

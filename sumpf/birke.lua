@@ -76,6 +76,14 @@ minetest.register_node("sumpf:mossytree", {
 	sounds = default.node_sound_wood_defaults(),
 })
 
+if minetest.register_fence then
+	minetest.register_fence({fence_of = "sumpf:leaves"})
+	minetest.register_fence({fence_of = "sumpf:tree", texture = "birke_tree.png"},
+		{tiles = {"birke_tree.png"}})
+	minetest.register_fence({fence_of = "sumpf:mossytree", texture = "birke_tree.png^(sumpf_transition.png^[transformR180)"},
+		{tiles = {"birke_tree.png^(sumpf_transition.png^[transformR180)"}})
+end
+
 minetest.register_craft({
 	output = 'default:wood 4',
 	recipe = {{"sumpf:tree"}}
