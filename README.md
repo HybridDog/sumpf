@@ -11,5 +11,4 @@ If you got ideas or found bugs, please tell them to me.
 
 TODO:  
 — find out fitting values for ruined and hut chance  
-— add dried, rotten grass roofing nodes for the ruined hut  
-— 16x16 brick texture
+— add dried, rotten grass roofing nodes for the ruined hut
