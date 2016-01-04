@@ -155,43 +155,45 @@ local function vmanip_spawn_nodes(tab)
 	log("map updated", t1)
 end
 
--- [[ gibt die Positionen innerhalb an und funktioniert irgendwie nicht richtig (Wandprüfung) und erneuert die Wand Positionen
+-- [[ gibt die Positionen innerhalb an (Wandprüfung) und erneuert die Wand Positionen
 local function get_inside_ps(startpos, ps, corners)
-	local todo = {startpos}
+	local todo,n = {startpos},1
 	local avoid = {}
 	local tab2 = {}
 	local itab = {}
 	local new_wall_ps = {}
 	local new_wall_tab = {}
-	while next(todo) do
-		for n,pos in pairs(todo) do
-			for i = -1,1,2 do
-				for _,p in pairs({
-					{x=pos.x+i, z=pos.z},
-					{x=pos.x, z=pos.z+i},
-				}) do
-					local z,x = p.z,p.x
-					if x < corners[1]
-					or x > corners[2]
-					or z < corners[3]
-					or z > corners[4] then
-						return false
-					end
-					if not get(avoid, z,x) then
-						set(avoid, z,x, true)
-						if get(ps, z,x) then
-							set(new_wall_ps, z,x, true)
-							table.insert(new_wall_tab, p)
-						else
-							set(tab2, z,x, true)
-							table.insert(itab, p)
-							table.insert(todo, p)
-						end
+	while n do
+		local pos = todo[n]
+
+		for i = -1,1,2 do
+			for _,p in pairs({
+				{x=pos.x+i, z=pos.z},
+				{x=pos.x, z=pos.z+i},
+			}) do
+				local z,x = p.z,p.x
+				if x < corners[1]
+				or x > corners[2]
+				or z < corners[3]
+				or z > corners[4] then
+					return false
+				end
+				if not get(avoid, z,x) then
+					set(avoid, z,x, true)
+					if get(ps, z,x) then
+						set(new_wall_ps, z,x, true)
+						table.insert(new_wall_tab, p)
+					else
+						set(tab2, z,x, true)
+						table.insert(itab, p)
+						table.insert(todo, p)
 					end
 				end
 			end
-			todo[n] = nil
 		end
+
+		todo[n] = nil
+		n = next(todo)
 	end
 	return tab2, itab, new_wall_ps, new_wall_tab
 end--]]
