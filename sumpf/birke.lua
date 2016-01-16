@@ -59,7 +59,7 @@ minetest.register_node("sumpf:leaves", {
 minetest.register_node("sumpf:tree", {
 	description = "birch trunk",
 	tiles = {"birke_tree_top.png",	"birke_tree_top.png",
-		{name="birke_tree.png", tileable_vertical = false}
+		{name = "birke_tree.png", tileable_vertical = false}
 	},
 	paramtype2 = "facedir",
 	on_place = minetest.rotate_node,
@@ -272,9 +272,10 @@ minetest.register_abm({
 		elseif node.param2 == 1 then
 			node.param2 = 12
 		else
+			minetest.log("error", "[sumpf] legacy: unknown birch trunk param2")
 			return	-- don't destroy houses
 		end
 		minetest.set_node(pos, node)
-		sumpf.inform("a horizontal tree node became changed at "..minetest.pos_to_string(pos), 3, t1)
+		sumpf.inform("legacy: a horizontal tree node became changed at "..minetest.pos_to_string(pos), 3, t1)
 	end
 })
