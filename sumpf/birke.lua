@@ -272,7 +272,7 @@ minetest.register_abm({
 		elseif node.param2 == 1 then
 			node.param2 = 12
 		else
-			minetest.log("error", "[sumpf] legacy: unknown birch trunk param2")
+			minetest.log("error", "[sumpf] legacy: unknown birch trunk param2 "..node.param2.." "..minetest.pos_to_string(pos))
 			return	-- don't destroy houses
 		end
 		minetest.set_node(pos, node)
