@@ -267,7 +267,8 @@ minetest.register_abm({
 	action = function(pos, node)
 		local t1 = os.clock()
 		node.name = "sumpf:tree"
-		if node.param2 == 0 then
+		if node.param2 == 0
+		or node.param2 == 2 then
 			node.param2 = 4
 		elseif node.param2 == 1 then
 			node.param2 = 12
