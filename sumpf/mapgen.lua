@@ -385,7 +385,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				end
 				sumpf.generate_birch(v[2], area, data, pr, param2s)
 			else
-				sumpf.generate_jungletree(v[2], area, data, pr)
+				sumpf.generate_jungletree(v[2], area, data, pr, maxp.y)
 			end
 		end
 		sumpf.inform("trees made", 2, t2)
