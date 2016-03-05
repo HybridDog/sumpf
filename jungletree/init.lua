@@ -190,12 +190,14 @@ local function big_jungletree(pos, height, area, nodes, pr)
 	end
 end
 
+local chunklen = tonumber(minetest.setting_get("chunksize") or 5)*16
+
 function sumpf.generate_jungletree(pos, area, nodes, pr)
 	local h_max = 15
 	-- fix trees on upper chunk corners
-	local h_corner = pos.y % 80
-	if h_corner > 74 then	-- 79+16-h_max-5-1
-		h_max = 89-h_corner	-- 95-h_corner-5-1
+	local h_corner = pos.y % chunklen
+	if h_corner > chunklen-6 then	-- chunklen-1+16-h_max-5-1
+		h_max = chunklen+9-h_corner	-- chunklen+h_max-h_corner-5-1
 	end
 
 	local height = 5 + pr:next(1,h_max)
