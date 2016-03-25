@@ -260,10 +260,9 @@ minetest.register_craft({
 	recipe = {{"sumpf:tree_horizontal"}}
 })
 
-minetest.register_abm({
+minetest.register_lbm({
+	name = "sumpf:birch_legacy",
 	nodenames = {"sumpf:tree_horizontal"},
-	interval = 1,
-	chance = 1,
 	action = function(pos, node)
 		local t1 = os.clock()
 		node.name = "sumpf:tree"
