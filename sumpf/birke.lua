@@ -263,6 +263,7 @@ minetest.register_craft({
 minetest.register_lbm({
 	name = "sumpf:birch_legacy",
 	nodenames = {"sumpf:tree_horizontal"},
+	--run_at_every_load = true,
 	action = function(pos, node)
 		local t1 = os.clock()
 		node.name = "sumpf:tree"

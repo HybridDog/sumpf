@@ -70,7 +70,8 @@ local function define_contents()
 	end
 
 	if swampwater then
-		local hard_nodes = {}	--in time makes a table of nodes which are allowed to be next to swampwater
+		local hard_nodes = {}	--a cache table of nodes which are allowed to be next to swampwater
+		setmetatable(hard_nodes, {__mode = "kv"})
 		local function hard_node(id)
 			if not id then
 				return false
