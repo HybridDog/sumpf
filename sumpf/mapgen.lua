@@ -219,7 +219,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 			--Check if we are in a "Swamp biome"
 			local in_biome = false
-			local test = perlin1:get2d({x=x, y=z})
+			local test = perlin1:get2d({x=x, y=z}) / 1.75
 			if sumpf.always_generate then
 				in_biome = true
 			elseif smooth then
