@@ -13,4 +13,4 @@ TODO:
 — find out fitting values for ruined and hut chance  
 — add dried, rotten grass roofing nodes for the ruined hut  
 — fix that http://imgh.us/screenshot_20160305_162901.png  
-— use settingtypes.txt instead of having the settings in the mod folder
+— use the mapgen decoration function instead of habitat to rarely spawn swamp grass
