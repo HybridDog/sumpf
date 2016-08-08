@@ -238,11 +238,12 @@ end
 
 
 --sumpf = rawget(_G, "sumpf") or {}
-dofile(minetest.get_modpath("sumpf").."/settings.lua")
-dofile(minetest.get_modpath("sumpf").."/functions.lua")
-dofile(minetest.get_modpath("sumpf") .. "/birke.lua")
+local modpath = minetest.get_modpath"sumpf".."/"
+dofile(modpath.."settings.lua")
+dofile(modpath.."functions.lua")
+dofile(modpath .. "birke.lua")
 if sumpf.enable_mapgen then
-	dofile(minetest.get_modpath("sumpf") .. "/mapgen.lua")
+	dofile(modpath .. "mapgen.lua")
 end
 
 
