@@ -677,7 +677,7 @@ local function generate_fresh_hut(area, nodes, tab, floor_y)
 		p = area:index(x,y,z)
 		if (not usual_node(nodes[p])
 			and y == floor_y+1)
-		or not usual_node(p + (floor_y + 1 - y) * area.ystride]) then
+		or not usual_node(nodes[p + (floor_y + 1 - y) * area.ystride]) then
 			nodes[p] = c_glass
 		else
 			nodes[p] = c_wall
