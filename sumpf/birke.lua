@@ -183,9 +183,9 @@ function spawn_birch(pos)
 	local vheight = height+2
 
 	local manip = minetest.get_voxel_manip()
-	local emerged_pos1, emerged_pos2 = manip:read_from_map({x=pos.x-vwidth, y=pos.y, z=pos.z-vwidth},
+	local emin, emax = manip:read_from_map({x=pos.x-vwidth, y=pos.y, z=pos.z-vwidth},
 		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
-	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
+	local area = VoxelArea:new({MinEdge=emin, MaxEdge=emax})
 	local nodes = manip:get_data()
 	local param2s = manip:get_param2_data()
 
