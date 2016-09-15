@@ -99,17 +99,20 @@ local function define_contents()
 
 		--tests if swampwater is allowed to generate at this position
 		function water_allowed(data, area, x, y, z)
-			for _,p in pairs({
-				{0,-1},
-				{0,1},
-				{-1,0},
-				{1,0},
-			}) do
-				local id = data[area:index(x+p[1], y, z+p[2])]
+			local vi = area:index(x, y, z) + 1
+			local offsets = {
+				-2,
+				area.zstride + 1,
+				-2 * area.zstride,
+				0
+			}
+			for i = 1,4 do
+				local id = data[vi]
 				if id ~= c.dirtywater
 				and not hard_node(id) then
 					return false
 				end
+				vi = vi + offsets[i]
 			end
 			return true
 		end
@@ -184,10 +187,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local data = vm:get_data()
 	local area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
 
-	for p_pos in area:iterp(minp, maxp) do	--remove tree stuff
-		if data[p_pos] ~= c.air
-		and c.TREE_STUFF[data[p_pos]] then
-			data[p_pos] = c.air
+	for vi in area:iterp(minp, maxp) do	--remove tree stuff
+		if data[vi] ~= c.air
+		and c.TREE_STUFF[data[vi]] then
+			data[vi] = c.air
 		end
 	end
 
@@ -219,7 +222,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 			--Check if we are in a "Swamp biome"
 			local in_biome = false
-			local test = perlin1:get2d({x=x, y=z}) / 1.75
+			local test = perlin1:get2d{x=x, y=z} / 1.75
 			if sumpf.always_generate then
 				in_biome = true
 			elseif smooth then
@@ -241,24 +244,27 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 				-- skip the air part
 				local ground
-				for y = math.min(heightmap[hmi]+20, maxp.y),ymin,-1 do
-					if data[area:index(x, y, z)] ~= c.air then
+				local ytop = math.min(heightmap[hmi]+20, maxp.y)
+				local vi = area:index(x, ytop, z)
+				for y = ytop,ymin,-1 do
+					if data[vi] ~= c.air then
 						ground = y
 						break
 					end
+					vi = vi - area.ystride
 				end
 
 				local ground_y
 				if ground then
 					for y = ground,ymin,-1 do
-						local p_pos = area:index(x, y, z)
-						local d_p_pos = data[p_pos]
-						if c.USUAL_STUFF[d_p_pos] then --remove usual stuff
-							data[p_pos] = c.air
-						elseif is_ground(d_p_pos) then --else search ground_y
+						local id = data[vi]
+						if c.USUAL_STUFF[id] then --remove usual stuff
+							data[vi] = c.air
+						elseif is_ground(id) then --else search ground_y
 							ground_y = y
 							break
 						end
+						vi = vi - area.ystride
 					end
 				end
 
@@ -271,29 +277,26 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						hut.y = hut.y + 1
 					end
 
-					local p_ground = area:index(x, ground_y, z)
-
-					if data[p_ground] == c.water then	--Dreckseen:
+					if data[vi] == c.water then	--Dreckseen:
 						local h
 						if smooth then
-							h = pr:next(4,5)
+							h = pr:next(4, 5)
 						else
 							h = 5
 						end	--find_node_near may be a laggy function here
 						if minetest.find_node_near({x=x, y=ground_y, z=z}, h, "group:crumbly") then
 						--if data[area:index(x, ground_y-(3+pr:next(1,2)), z)] ~= c.water then
-							local min = math.max(-pr:next(16,20), minp.y-16-ground_y)
-							for y = min,0 do
-								local p_pos = area:index(x, y+ground_y, z)
-								if data[p_pos] == c.water then
-									data[p_pos] = c.dirtywater
+							for _ = 0,math.min(pr:next(16,20), ground_y-minp.y+16) do
+								if data[vi] == c.water then
+									data[vi] = c.dirtywater
 								else
-									data[p_pos] = c.peat
+									data[vi] = c.peat
 								end
+								vi = vi - area.ystride
 							end
 						end
 					else
-						local p_boden = area:index(x, ground_y+1, z)
+						local p_boden = vi + area.ystride
 						local d_p_boden = data[p_boden]
 						local plant_allowed = plants_enabled
 						if swampwater
@@ -302,17 +305,15 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						and pr:next(1,2) == 2
 						and water_allowed(data, area, x, ground_y, z) then
 							plant_allowed = false	--disable plants on swampwater
-							local min = math.max(-pr:next(1,9)-10, minp.y-16-ground_y)
-							for s=0,min,-1 do
-								local p_pos = area:index(x, ground_y+s, z)
-								if data[p_pos] == c.air then
+							for _ = 0, math.min(pr:next(1,9)+10, ground_y-minp.y+16) do
+								if data[vi] == c.air then
 									break
 								end
-								data[p_pos] = c.dirtywater
+								data[vi] = c.dirtywater
+								vi = vi - area.ystride
 							end
 						else
-							local p_uground = area:index(x, ground_y-1, z)
-							local p_uuground = area:index(x, ground_y-2, z)
+							local p_uground = vi - area.ystride
 							if sumpf.wet_beaches
 							and ground_y == 1
 							and d_p_boden == c.air
@@ -324,26 +325,26 @@ minetest.register_on_generated(function(minp, maxp, seed)
 								else
 									data[p_uground] = c.peat
 								end
-								data[p_uuground] = c.peat
+								data[p_uground - area.ystride] = c.peat
 							else --Sumpfboden:
 								data[p_ground] = c.sumpfg
 								data[p_uground] = c.sumpfg
-								data[p_uuground] = c.sumpf2
+								data[p_uground - area.ystride] = c.sumpf2
 							end
-							local min = math.max(-30, minp.y-16-ground_y)
-							for i=-3,min,-1 do
-								local p_pos = area:index(x, ground_y+i, z)
-								local d_p_pos = data[p_pos]
-								if d_p_pos == c.air then
+							vi = vi - 3 * area.ystride
+							for _ = 0,math.min(27, ground_y-minp.y+13) do
+								local id = data[vi]
+								if id == c.air then
 									break
 								end
-								if d_p_pos == c.coal then
-									data[p_pos] = c.sumpfcoal
-								elseif d_p_pos == c.iron then
-									data[p_pos] = c.sumpfiron
+								if id == c.coal then
+									data[vi] = c.sumpfcoal
+								elseif id == c.iron then
+									data[vi] = c.sumpfiron
 								else
-									data[p_pos] = c.sumpfstone
+									data[vi] = c.sumpfstone
 								end
+								vi = vi - area.ystride
 							end
 						end
 

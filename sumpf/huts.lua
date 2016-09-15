@@ -182,11 +182,11 @@ local function get_inside_ps(startpos, ps, corners)
 					set(avoid, z,x, true)
 					if get(ps, z,x) then
 						set(new_wall_ps, z,x, true)
-						table.insert(new_wall_tab, p)
+						new_wall_tab[#new_wall_tab+1] = p
 					else
 						set(tab2, z,x, true)
-						table.insert(itab, p)
-						table.insert(todo, p)
+						itab[#itab+1] = p
+						todo[#todo+1] = p
 					end
 				end
 			end
@@ -592,16 +592,17 @@ local function generate_ruin_hut(area, nodes, tab, floor_y)
 	-- the wall is made of birch wood, the builders didn't know it doesn't last long
 	for _,p in pairs(tab[3]) do
 		local z,y,x = unpack(p)
-		p = area:index(x,y,z)
-		if not hard_node(nodes[p]) then
-			nodes[p] = c_wall
+		local vi = area:index(x,y,z)
+		if not hard_node(nodes[vi]) then
+			nodes[vi] = c_wall
 			if y == floor_y+1 then
-				for y = floor_y-2, floor_y-100, -1 do
-					local p = area:index(x,y,z)
-					if hard_node(nodes[p]) then
+				vi = vi - 3 * area.ystride
+				for _ = 0, 98 do
+					if hard_node(nodes[vi]) then
 						break
 					end
-					nodes[p] = c_wall
+					nodes[vi] = c_wall
+					vi = vi - area.ystride
 				end
 			end
 		end
@@ -656,14 +657,16 @@ local function generate_fresh_hut(area, nodes, tab, floor_y)
 	-- the wall is made of birch wood
 	for _,p in pairs(tab[3]) do
 		local z,y,x = unpack(p)
-		nodes[area:index(x,y,z)] = c_wall
+		local vi = area:index(x,y,z)
+		nodes[vi] = c_wall
 		if y == floor_y+1 then
-			for y = floor_y-2, floor_y-100, -1 do
-				local p = area:index(x,y,z)
-				if hard_node(nodes[p]) then
+			vi = vi - 3 * area.ystride
+			for _ = 0, 98 do
+				if hard_node(nodes[vi]) then
 					break
 				end
-				nodes[p] = c_wall
+				nodes[vi] = c_wall
+				vi = vi - area.ystride
 			end
 		end
 	end
@@ -674,7 +677,7 @@ local function generate_fresh_hut(area, nodes, tab, floor_y)
 		p = area:index(x,y,z)
 		if (not usual_node(nodes[p])
 			and y == floor_y+1)
-		or not usual_node(nodes[area:index(x,floor_y+1,z)]) then
+		or not usual_node(p + (floor_y + 1 - y) * area.ystride]) then
 			nodes[p] = c_glass
 		else
 			nodes[p] = c_wall
@@ -684,56 +687,62 @@ local function generate_fresh_hut(area, nodes, tab, floor_y)
 	-- the primary roofing
 	for _,p in pairs(tab[5]) do
 		local z,y,x = unpack(p)
-		p = area:index(x,y,z)
+		local vi = area:index(x,y,z)
 		-- [[ jungletree pillars for stability
 		if y >= floor_y+8
-		and nodes[p] == c_jungletree then
-			for y = floor_y,y-1 do
-				local p = area:index(x,y,z)
-				if nodes[p] == c_jungletree then
+		and nodes[vi] == c_jungletree then
+			vi = vi + (floor_y - y) * area.ystride
+			for _ = 0,y-1-floor_y do
+				if nodes[vi] == c_jungletree then
 					break
 				end
-				nodes[p] = c_jungletree
+				nodes[vi] = c_jungletree
+				vi = vi + area.ystride
 			end
 		else--]]
+			nodes[vi] = c_primroof
 			if y ~= floor_y+4 then
-				for y = floor_y,y-1 do
-					nodes[area:index(x,y,z)] = c_air
+				vi = vi + (floor_y - y) * area.ystride
+				for _ = 0,y-1-floor_y  do
+					nodes[vi] = c_air
+					vi = vi + area.ystride
 				end
 			end
-			nodes[p] = c_primroof
 		end
 	end
 
 	-- increasing stability a bit the secondary roofing becomes primary if a not air is above it (e.g. leaves)
 	for _,p in pairs(tab[6]) do
 		local z,y,x = unpack(p)
-		p = area:index(x,y,z)
+		local vi = area:index(x,y,z)
 		-- [[ jungletree pillars also here
 		if y >= floor_y+8
-		and nodes[p] == c_jungletree then
-			for y = floor_y,y-1 do
-				local p = area:index(x,y,z)
-				if nodes[p] == c_jungletree then
+		and nodes[vi] == c_jungletree then
+			vi = vi + (floor_y - y) * area.ystride
+			for _ = 0,y-1-floor_y do
+				if nodes[vi] == c_jungletree then
 					break
 				end
-				nodes[p] = c_jungletree
+				nodes[vi] = c_jungletree
+				vi = vi + area.ystride
 			end
 		else--]]
-			local free_above = nodes[area:index(x,y+1,z)] == c_air
+			local free_above = nodes[vi + area.ystride] == c_air
 			if y == floor_y+4 then
 				if free_above
-				and not usual_node(nodes[p]) then
-					nodes[p] = c_secoroof
+				and not usual_node(nodes[vi]) then
+					nodes[vi] = c_secoroof
 				end
 			else
-				for y = floor_y,y-1 do
-					nodes[area:index(x,y,z)] = c_air
-				end
 				if free_above then
-					nodes[p] = c_secoroof
+					nodes[vi] = c_secoroof
 				else
-					nodes[p] = c_primroof
+					nodes[vi] = c_primroof
+				end
+				vi = vi + (floor_y - y) * area.ystride
+				for _ = 0,y-1-floor_y do
+					nodes[vi] = c_air
+					vi = vi + area.ystride
 				end
 			end
 		end

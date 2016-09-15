@@ -99,17 +99,17 @@ local function tree_branch(pos, area, nodes, pr)
 		leaf = pr:next(1,3)
 	end
 
-	nodes[area:index(pos.x, pos.y, pos.z)] = c_jungletree
+	nodes[area:indexp(pos)] = c_jungletree
 	for i = pr:next(1,2), -pr:next(1,2), -1 do
 		for k = pr:next(1,2), -pr:next(1,2), -1 do
-			local p_p = area:index(pos.x+i, pos.y, pos.z+k)
-			if soft_node(nodes[p_p]) then
-				nodes[p_p] = ndtable[leaf]
+			local vi = area:index(pos.x+i, pos.y, pos.z+k)
+			if soft_node(nodes[vi]) then
+				nodes[vi] = ndtable[leaf]
 			end
 			if math.abs(i+k) < 1 then
-				local p_p = area:index(pos.x+i, pos.y+1, pos.z+k)
-				if soft_node(nodes[p_p]) then
-					nodes[p_p] = ndtable[leaf]
+				vi = vi + area.ystride
+				if soft_node(nodes[vi]) then
+					nodes[vi] = ndtable[leaf]
 				end
 			end
 		end
@@ -130,13 +130,15 @@ local function small_jungletree(pos, height, area, nodes, pr)
 		tree_branch(p, area, nodes, pr)
 	end
 
+	local vi = area:index(pos.x, pos.y-1, pos.z)
 	for i = -1, height do
-		nodes[area:index(pos.x, pos.y+i, pos.z)] = c_jungletree
+		nodes[vi] = c_jungletree
+		vi = vi + area.ystride
 	end
 
 	for i = height, 4, -1 do
 		if math.sin(i*i/height) < 0.2
-		and pr:next(0,2) < 1.5 then
+		and pr:next(0,2) ~= 2 then -- < 1.5
 			tree_branch({x=pos.x+pr:next(0,1), y=pos.y+i, z=pos.z-pr:next(0,1)}, area, nodes, pr)
 		end
 	end
@@ -144,12 +146,15 @@ end
 
 local function big_jungletree(pos, height, area, nodes, pr)
 	local h_root = pr:next(0,1)-1
+	local vi = area:index(pos.x, pos.y-2, pos.z)
 	for i = -2, h_root do
-		nodes[area:index(pos.x+1, pos.y+i, pos.z+1)] = c_jungletree
-		nodes[area:index(pos.x+2, pos.y+i, pos.z-1)] = c_jungletree
-		nodes[area:index(pos.x, pos.y+i, pos.z-2)] = c_jungletree
+		nodes[vi + area.zstride + 1] = c_jungletree
+		nodes[vi - area.zstride + 2] = c_jungletree
+		nodes[vi - 2 * area.zstride] = c_jungletree
 
-		nodes[area:index(pos.x-1, pos.y+i, pos.z)] = c_jungletree
+		nodes[vi - 1] = c_jungletree
+
+		vi = vi + area.ystride
 	end
 	for i = height, -2, -1 do
 		if i > 3

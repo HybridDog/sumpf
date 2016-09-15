@@ -114,25 +114,24 @@ end
 
 local function tree_branch(pos, dir, area, nodes, pr, param2s)
 
-	local p_pos = area:indexp(pos)
-	nodes[p_pos] = sumpf_c_tree
+	local vi = area:indexp(pos)
+	nodes[vi] = sumpf_c_tree
 	if dir == 0 then
-		param2s[p_pos] = 4
+		param2s[vi] = 4
 	else
-		param2s[p_pos] = 12
+		param2s[vi] = 12
 	end
 
 	for i = pr:next(1,2), -pr:next(1,2), -1 do
 		for k = pr:next(1,2), -pr:next(1,2), -1 do
-			local p_p = area:index(pos.x+i, pos.y, pos.z+k)
-			if soft_node(nodes[p_p]) then
-				nodes[p_p] = sumpf_c_leaves
+			local vi = area:index(pos.x+i, pos.y, pos.z+k)
+			if soft_node(nodes[vi]) then
+				nodes[vi] = sumpf_c_leaves
 			end
-			local chance = math.abs(i+k)
-			if (chance < 1) then
-				local p_p = area:index(pos.x+i, pos.y+1, pos.z+k)
-				if soft_node(nodes[p_p]) then
-					nodes[p_p] = sumpf_c_leaves
+			if math.abs(i + k) < 1 then
+				vi = vi + area.ystride
+				if soft_node(nodes[vi]) then
+					nodes[vi] = sumpf_c_leaves
 				end
 			end
 		end
@@ -140,11 +139,12 @@ local function tree_branch(pos, dir, area, nodes, pr, param2s)
 end
 
 local function birch(pos, height, area, nodes, pr, param2s)
-	nodes[area:index(pos.x, pos.y, pos.z)] = sumpf_c_mossytree
-	for i = 1, height do
-		local p_p = area:index(pos.x, pos.y+i, pos.z)
-		nodes[p_p] = sumpf_c_tree
-		param2s[p_p] = 0	-- < this is maybe missing in the default mod
+	local vi = area:indexp(pos)
+	nodes[vi] = sumpf_c_mossytree
+	for _ = 1, height do
+		vi = vi + area.ystride
+		nodes[vi] = sumpf_c_tree
+		param2s[vi] = 0
 	end
 
 	for i = height, 4, -1 do
