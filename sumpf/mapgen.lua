@@ -319,7 +319,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							and d_p_boden == c.air
 							and pr:next(1,3) == 1 then
 								plant_allowed = false	--disable plants on swampwater
-								data[p_ground] = c.dirtywater
+								data[vi] = c.dirtywater
 								if pr:next(1,3) == 1 then
 									data[p_uground] = c.dirtywater
 								else
@@ -327,7 +327,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 								end
 								data[p_uground - area.ystride] = c.peat
 							else --Sumpfboden:
-								data[p_ground] = c.sumpfg
+								data[vi] = c.sumpfg
 								data[p_uground] = c.sumpfg
 								data[p_uground - area.ystride] = c.sumpf2
 							end
