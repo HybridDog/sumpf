@@ -120,15 +120,15 @@ local function define_contents()
 end
 
 
--- perlin noise "hills" are not peaks but looking like sinus curve
+-- perlin noise "hills" are not peaks but looking like sinus curve supposedly
 local function upper_rarity(rarity)
-	return math.sign(rarity)*math.sin(math.abs(rarity)*math.pi/2)
+	return math.sin(rarity * math.pi * 0.5)
 end
 
 local rarity = sumpf.mapgen_rarity
 local sumpf_size = sumpf.mapgen_size
 
-local nosmooth_rarity = 1-rarity/50
+local nosmooth_rarity = 1-rarity*0.02
 local perlin_scale = sumpf_size*100/rarity
 local smooth_rarity_max, smooth_rarity_min, smooth_rarity_dif
 local smooth = sumpf.smooth
@@ -382,9 +382,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		local t2 = os.clock()
 		for _,v in pairs(tab) do
 			if v[1] == 1 then
-				if not param2s then
-					param2s = vm:get_param2_data()
-				end
+				param2s = param2s or vm:get_param2_data()
 				sumpf.generate_birch(v[2], area, data, pr, param2s)
 			else
 				sumpf.generate_jungletree(v[2], area, data, pr, maxp.y)
