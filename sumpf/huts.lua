@@ -33,19 +33,19 @@ function sumpf.hut_allowed(pos)
 end
 
 
-local used_nodes = {
-	floor1 = "default:cobble",
-	floor2 = "default:desert_cobble",
-	wall = "default:stone",
-	glass = "default:glass",
-	roof1 = "default:wood",
-	roof2 = "stairs:slab_wood",
-	bef = "wool:white"
-}
+--~ local used_nodes = {
+	--~ floor1 = "default:cobble",
+	--~ floor2 = "default:desert_cobble",
+	--~ wall = "default:stone",
+	--~ glass = "default:glass",
+	--~ roof1 = "default:wood",
+	--~ roof2 = "stairs:slab_wood",
+	--~ bef = "wool:white"
+--~ }
 
-local function log(msg, t)
-	sumpf.inform(msg, 3, t)
-end
+--~ local function log(msg, t)
+	--~ sumpf.inform(msg, 3, t)
+--~ end
 
 
 -- functions for indexing by x and y
@@ -64,15 +64,15 @@ local function set(tab, y,x, data)
 	tab[y] = {[x] = data}
 end
 
-local function remove(tab, y,x)
-	if get(tab, y,x) == nil then
-		return
-	end
-	tab[y][x] = nil
-	if not next(tab[y]) then
-		tab[y] = nil
-	end
-end
+--~ local function remove(tab, y,x)
+	--~ if get(tab, y,x) == nil then
+		--~ return
+	--~ end
+	--~ tab[y][x] = nil
+	--~ if not next(tab[y]) then
+		--~ tab[y] = nil
+	--~ end
+--~ end
 
 local function gtab2tab(tab)
 	local t,n = {},1
@@ -101,59 +101,59 @@ local function gtab2tab(tab)
 end
 
 
-local typ_order = {"floor1", "floor2", "wall", "glass", "roof1", "roof2"}
+--~ local typ_order = {"floor1", "floor2", "wall", "glass", "roof1", "roof2"}
 
-local function vmanip_nodes(tab, nodes, area)
-	for typ,ps in pairs(tab) do
-		local id = minetest.get_content_id(used_nodes[typ_order[typ]])
-		for _,p in pairs(ps) do
-			local z,y,x = unpack(p)
-			nodes[area:index(x,y,z)] = id
-		end
-	end
-end
+--~ local function vmanip_nodes(tab, nodes, area)
+	--~ for typ,ps in pairs(tab) do
+		--~ local id = minetest.get_content_id(used_nodes[typ_order[typ]])
+		--~ for _,p in pairs(ps) do
+			--~ local z,y,x = unpack(p)
+			--~ nodes[area:index(x,y,z)] = id
+		--~ end
+	--~ end
+--~ end
 
-local function vmanip_spawn_nodes(tab)
-	local t1 = os.clock()
+--~ local function vmanip_spawn_nodes(tab)
+	--~ local t1 = os.clock()
 
-	local minz,miny,minx, maxz,maxy,maxx
-	for _,ps in pairs(tab) do
-		for _,p in pairs(ps) do
-			local z,y,x = unpack(p)
-			if not minz then
-				minz = z
-				miny = y
-				minx = x
-				maxz = z
-				maxy = y
-				maxx = x
-			else
-				minz = math.min(z, minz)
-				miny = math.min(y, miny)
-				minx = math.min(x, minx)
-				maxz = math.max(z, maxz)
-				maxy = math.max(y, maxy)
-				maxx = math.max(x, maxx)
-			end
-		end
-	end
-	minp = {x=minx, y=miny, z=minz}
-	maxp = {x=maxx, y=maxy, z=maxz}
+	--~ local minz,miny,minx, maxz,maxy,maxx
+	--~ for _,ps in pairs(tab) do
+		--~ for _,p in pairs(ps) do
+			--~ local z,y,x = unpack(p)
+			--~ if not minz then
+				--~ minz = z
+				--~ miny = y
+				--~ minx = x
+				--~ maxz = z
+				--~ maxy = y
+				--~ maxx = x
+			--~ else
+				--~ minz = math.min(z, minz)
+				--~ miny = math.min(y, miny)
+				--~ minx = math.min(x, minx)
+				--~ maxz = math.max(z, maxz)
+				--~ maxy = math.max(y, maxy)
+				--~ maxx = math.max(x, maxx)
+			--~ end
+		--~ end
+	--~ end
+	--~ minp = {x=minx, y=miny, z=minz}
+	--~ maxp = {x=maxx, y=maxy, z=maxz}
 
-	local manip = minetest.get_voxel_manip()
-	local emerged_pos1, emerged_pos2 = manip:read_from_map(minp, maxp)
-	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
-	local nodes = manip:get_data()
+	--~ local manip = minetest.get_voxel_manip()
+	--~ local emerged_pos1, emerged_pos2 = manip:read_from_map(minp, maxp)
+	--~ local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
+	--~ local nodes = manip:get_data()
 
-	vmanip_nodes(tab, nodes, area)
+	--~ vmanip_nodes(tab, nodes, area)
 
-	manip:set_data(nodes)
-	manip:write_to_map()
-	log("nodes set after ", t1)
-	t1 = os.clock()
-	manip:update_map()
-	log("map updated", t1)
-end
+	--~ manip:set_data(nodes)
+	--~ manip:write_to_map()
+	--~ log("nodes set after ", t1)
+	--~ t1 = os.clock()
+	--~ manip:update_map()
+	--~ log("map updated", t1)
+--~ end
 
 -- [[ gibt die Positionen innerhalb an (Wandprüfung) und erneuert die Wand Positionen
 local function get_inside_ps(startpos, ps, corners)
@@ -266,7 +266,6 @@ end
 -- macht eine Saeule der Wand
 local glass_count = -1
 local function make_wall(tab, z,y,x)
-	local used_block = used_nodes.wall
 	local nam
 	local n = #tab[3]+1
 	tab[3][n] = {z,y-1,x}
