@@ -10,7 +10,8 @@ If you got ideas or found bugs, please tell them to me.
 
 
 TODO:  
-— find out fitting values for ruined and hut chance  
-— add dried, rotten grass roofing nodes for the ruined hut  
-— fix that http://imgh.us/screenshot_20160305_162901.png  
-— use the mapgen decoration function instead of habitat to rarely spawn swamp grass
+* find out fitting values for ruined and hut chance  
+* add dried, rotten grass roofing nodes for the ruined hut  
+* fix that http://imgh.us/screenshot_20160305_162901.png  
+* use the mapgen decoration function instead of habitat to rarely spawn swamp grass
+* code style: 80 characters limit
