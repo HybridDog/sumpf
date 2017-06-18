@@ -101,7 +101,7 @@ end]]
 	end
 })]]
 
---if minetest.setting_get("new_style_leaves") == true then
+--if minetest.settet("new_style_leaves") == true then
 	--leavesimg = {"jungletree_leaves_trans.png"}
 --else
 	--leavesimg = {"jungletree_leaves.png"}

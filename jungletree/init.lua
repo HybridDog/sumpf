@@ -21,13 +21,13 @@ minetest.register_node("jungletree:sapling", {
 	walkable = false,
 	groups = {snappy=2,dig_immediate=3,flammable=2,attached_node=1},
 	on_construct = function(pos)
-		if minetest.setting_getbool("creative_mode") then
+		if minetest.settings:get_bool"creative_mode" then
 			spawn_jungletree(pos)
 		end
 	end
 })
 
-local plantlike_leaves = not minetest.setting_getbool("new_style_leaves")
+local plantlike_leaves = not minetest.settings:get_bool"new_style_leaves"
 local rt2 = math.sqrt(2)
 local tex_sc = (1-(1/rt2))*100-4 --doesn't seem to work right
 local tab = {
@@ -131,7 +131,7 @@ local function small_jungletree(pos, height, area, nodes, pr)
 	end
 
 	local vi = area:index(pos.x, pos.y-1, pos.z)
-	for i = -1, height do
+	for _ = -1, height do
 		nodes[vi] = c_jungletree
 		vi = vi + area.ystride
 	end
@@ -147,7 +147,7 @@ end
 local function big_jungletree(pos, height, area, nodes, pr)
 	local h_root = pr:next(0,1)-1
 	local vi = area:index(pos.x, pos.y-2, pos.z)
-	for i = -2, h_root do
+	for _ = -2, h_root do
 		nodes[vi + area.zstride + 1] = c_jungletree
 		nodes[vi - area.zstride + 2] = c_jungletree
 		nodes[vi - 2 * area.zstride] = c_jungletree

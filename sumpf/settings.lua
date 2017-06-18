@@ -19,11 +19,15 @@ for name,dv in pairs(default_settings) do
 	local setting
 	local setting_name = "sumpf."..name
 	if type(dv) == "boolean" then
-		setting = minetest.setting_getbool(setting_name)
+		setting = minetest.settings:get_bool(setting_name)
 	elseif type(dv) == "number" then
-		setting = tonumber(minetest.setting_get(setting_name))
+		setting = tonumber(minetest.settings:get(setting_name))
 	else
 		error"[sumpf] only boolean and number settings are available"
 	end
-	sumpf[name] = setting == nil and dv or setting
+	if setting == nil then
+		sumpf[name] = dv
+	else
+		sumpf[name] = setting
+	end
 end
