@@ -1,4 +1,4 @@
-local load_time_start = os.clock()
+local load_time_start = minetest.get_us_time()
 
 minetest.register_craft({
 	output = "sumpf:junglestonebrick",
@@ -252,4 +252,10 @@ end
 minetest.register_alias("sumpf:pilz", "riesenpilz:brown")
 
 
-minetest.log("info", string.format("[sumpf] loaded after ca. %.2fs", os.clock() - load_time_start))
+local time = (minetest.get_us_time() - load_time_start) / 1000000
+local msg = "[sumpf] loaded after ca. " .. time .. " seconds."
+if time > 0.01 then
+	print(msg)
+else
+	minetest.log("info", msg)
+end

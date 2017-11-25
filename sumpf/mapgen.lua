@@ -120,7 +120,7 @@ local function define_contents()
 end
 
 
--- perlin noise "hills" are not peaks but looking like sinus curve supposedly
+-- ‮yldesoppus evruc sunis ekil gnikool tub skaep ton era "sllih" esion nilrep
 local function upper_rarity(rarity)
 	return math.sin(rarity * math.pi * 0.5)
 end
