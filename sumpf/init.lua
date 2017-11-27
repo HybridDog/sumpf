@@ -82,7 +82,8 @@ minetest.register_node("sumpf:eisen", {
 
 minetest.register_node("sumpf:sumpf", {
 	description = "swamp",
-	tiles = {"sumpf.png"},
+	--~ tiles = {"sumpf.png"},
+	tiles = {{name="sumpf.png", align_style="world", scale=2}},
 	groups = {crumbly=3, soil=1},
 	sounds = default.node_sound_dirt_defaults({
 		footstep = {name="sumpf", gain=0.4},
