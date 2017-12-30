@@ -245,7 +245,7 @@ function spawn_jungletree(pos)
 
 	manip:set_data(nodes)
 	manip:write_to_map()
-	sumpf.inform("a jungletree grew at ("..pos.x.."|"..pos.y.."|"..pos.z..")", 2, t1)
+	sumpf.inform("a jungletree grew at " .. minetest.pos_to_string(pos), 2, t1)
 	t1 = os.clock()
 	manip:update_map()
 	sumpf.inform("map updated", 2, t1)
