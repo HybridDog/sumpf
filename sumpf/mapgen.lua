@@ -175,7 +175,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		end
 	end
 
-	local t1 = os.clock()
+	local t1 = minetest.get_us_time()
 
 		--Information:
 	sumpf.inform("tries to generate a swamp at: x=["..x0.."; "..x1.."]; y=[" ..
@@ -395,7 +395,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local param2s
 	if num ~= 1 then
 		-- spawn trees
-		local t2 = os.clock()
+		local t2 = minetest.get_us_time()
 		for _,v in pairs(tab) do
 			if v[1] == 1 then
 				param2s = param2s or vm:get_param2_data()
@@ -409,13 +409,13 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 	if hut
 	and hut.y then
-		local t2 = os.clock()
+		local t2 = minetest.get_us_time()
 		sumpf.generate_hut({x=hut.x, y=hut.y, z=hut.z}, area, data, hut.rmin,
 			hut.rmax, hut.ruin)
 		sumpf.inform("hut made", 2, t2)
 	end
 
-	local t2 = os.clock()
+	local t2 = minetest.get_us_time()
 	vm:set_data(data)
 	if param2s then
 		vm:set_param2_data(param2s)
@@ -427,12 +427,12 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 	sumpf.inform("done", 1, t1)
 
-	--[[local t3 = os.clock()
+	--[[local t3 =
 	minetest.after(0, function(param)
 		local tab, minp, maxp, t1, t3 = unpack(param)
 		sumpf.inform("continuing", 2, t3)
 
-		local t2 = os.clock()
+		local t2 =
 		if plants_enabled then	--Trees:
 			for _,v in ipairs(tab) do
 				local p = v[2]
@@ -445,7 +445,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		end
 		sumpf.inform("trees made", 2, t2)
 
-		local t2 = os.clock()
+		local t2 =
 		fix_light(minp, maxp)
 		sumpf.inform("shadows added", 2, t2)
 		sumpf.inform("done", 1, t1)

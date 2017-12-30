@@ -3,7 +3,8 @@ if sumpf.info then
 		if spam <= sumpf.max_spam then
 			local info
 			if t then
-				info = string.format("[sumpf] "..msg.." after ca. %.2fs", os.clock() - t)
+				info = "[sumpf] " .. msg .. (" after ca. %.3g s"):format(
+					(minetest.get_us_time() - t) / 1000000)
 			else
 				info = "[sumpf] "..msg
 			end

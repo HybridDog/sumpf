@@ -219,7 +219,7 @@ function sumpf.generate_jungletree(pos, area, nodes, pr, ymax)
 end
 
 function spawn_jungletree(pos)
-	local t1 = os.clock()
+	local t1 = minetest.get_us_time()
 
 	local pr = jungletree_get_random(pos)
 	local height = 5 + pr:next(1,15)
@@ -253,7 +253,7 @@ function spawn_jungletree(pos)
 	manip:set_data(nodes)
 	manip:write_to_map()
 	sumpf.inform("a jungletree grew at " .. minetest.pos_to_string(pos), 2, t1)
-	t1 = os.clock()
+	t1 = minetest.get_us_time()
 	manip:update_map()
 	sumpf.inform("map updated", 2, t1)
 end

@@ -180,7 +180,7 @@ function sumpf.generate_birch(pos, area, nodes, pr, param2s)
 end
 
 function spawn_birch(pos)
-	local t1 = os.clock()
+	local t1 = minetest.get_us_time()
 
 	local pr = get_random(pos)
 	local height = 3 + pr:next(1,2)
@@ -203,7 +203,7 @@ function spawn_birch(pos)
 	manip:set_param2_data(param2s)
 	manip:write_to_map()
 	sumpf.inform("a birch grew at " .. minetest.pos_to_string(pos), 2, t1)
-	t1 = os.clock()
+	t1 = minetest.get_us_time()
 	manip:update_map()
 	sumpf.inform("map updated", 2, t1)
 end
@@ -274,7 +274,7 @@ minetest.register_lbm({
 	nodenames = {"sumpf:tree_horizontal"},
 	--run_at_every_load = true,
 	action = function(pos, node)
-		local t1 = os.clock()
+		local t1 = minetest.get_us_time()
 		node.name = "sumpf:tree"
 		if node.param2 == 0
 		or node.param2 == 2 then

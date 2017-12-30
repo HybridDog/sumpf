@@ -114,7 +114,6 @@ end
 --~ end
 
 --~ local function vmanip_spawn_nodes(tab)
-	--~ local t1 = os.clock()
 
 	--~ local minz,miny,minx, maxz,maxy,maxx
 	--~ for _,ps in pairs(tab) do
@@ -150,7 +149,6 @@ end
 	--~ manip:set_data(nodes)
 	--~ manip:write_to_map()
 	--~ log("nodes set after ", t1)
-	--~ t1 = os.clock()
 	--~ manip:update_map()
 	--~ log("map updated", t1)
 --~ end
@@ -380,7 +378,7 @@ local default_nparams = {
    persist = 0.6
 }
 local function get_perlin_field(rmin, rmax, nparams)
-	local t1 = os.clock()
+	local t1 = minetest.get_us_time()
 
 	local r = math.ceil(rmax)
 	nparams = nparams or {}
@@ -447,7 +445,8 @@ local function get_perlin_field(rmin, rmax, nparams)
 		end
 	end
 
-	minetest.log("info", string.format("[home_builder] table created after ca. %.2fs", os.clock() - t1))
+	minetest.log("info", ("[home_builder] table created after ca. %.3g s"
+		):format((minetest.get_us_time() - t1) / 1000000))
 	return tab
 end
 
