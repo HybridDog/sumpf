@@ -155,7 +155,8 @@ end
 	--~ log("map updated", t1)
 --~ end
 
--- [[ gibt die Positionen innerhalb an (Wandprüfung) und erneuert die Wand Positionen
+-- [[ gibt die Positionen innerhalb an (Wandprüfung)
+-- und erneuert die Wand Positionen
 local function get_inside_ps(startpos, ps, corners)
 	local todo,n = {startpos},1
 	local avoid = {}
@@ -213,7 +214,9 @@ local function get_floor_ps(ps, ps_list)
 		xmin, xmax = get_minmax_coord(xmin, xmax, p.x)
 		zmin, zmax = get_minmax_coord(zmin, zmax, p.z)
 	end
-	return get_inside_ps({x=math.floor((xmin+xmax)/2), z=math.floor((zmin+zmax)/2)}, ps, {xmin-1, xmax+1, zmin-1, zmax+1})
+	return get_inside_ps(
+		{x = math.floor((xmin + xmax) / 2), z = math.floor((zmin + zmax) / 2)},
+		ps, {xmin-1, xmax+1, zmin-1, zmax+1})
 end
 
 -- gibt die Dach Positionen
@@ -513,7 +516,8 @@ local function get_hut_nodes(pos, rmin, rmax)
 end
 
 
-local hard_nodes = {}	--in time makes a table of nodes where the house can stand on
+-- in time makes a table of nodes where the house can stand on
+local hard_nodes = {}
 local function hard_node(id)
 	if not id then
 		return false
@@ -588,7 +592,8 @@ local function generate_ruin_hut(area, nodes, tab, floor_y)
 		end
 	end
 
-	-- the wall is made of birch wood, the builders didn't know it doesn't last long
+	-- the wall is made of birch wood,
+	-- the builders didn't know it doesn't last long
 	for _,p in pairs(tab[3]) do
 		local z,y,x = unpack(p)
 		local vi = area:index(x,y,z)
@@ -625,7 +630,8 @@ local function generate_ruin_hut(area, nodes, tab, floor_y)
 		end
 	end
 
-	-- increasing stability a bit the secondary roofing becomes primary if a not air is above it (e.g. leaves)
+	-- increasing stability a bit the secondary roofing becomes primary if a not
+	-- air is above it (e.g. leaves)
 	for _,p in pairs(tab[6]) do
 		local z,y,x = unpack(p)
 		p = area:index(x,y,z)
@@ -710,7 +716,8 @@ local function generate_fresh_hut(area, nodes, tab, floor_y)
 		end
 	end
 
-	-- increasing stability a bit the secondary roofing becomes primary if a not air is above it (e.g. leaves)
+	-- increasing stability a bit the secondary roofing becomes primary if a not
+	-- air is above it (e.g. leaves)
 	for _,p in pairs(tab[6]) do
 		local z,y,x = unpack(p)
 		local vi = area:index(x,y,z)

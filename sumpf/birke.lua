@@ -69,8 +69,10 @@ minetest.register_node("sumpf:tree", {
 
 minetest.register_node("sumpf:mossytree", {
 	description = "mossy birch trunk",
-	tiles = {"birke_tree_top.png",	"sumpf.png",
-		{name="birke_tree.png^(sumpf_transition.png^[transformR180)", tileable_vertical = false}
+	tiles = {"birke_tree_top.png",	"sumpf.png", {
+			name = "birke_tree.png^(sumpf_transition.png^[transformR180)",
+			tileable_vertical = false
+		}
 	},
 	groups = {tree=1,snappy=1,choppy=2,oddly_breakable_by_hand=1,flammable=2},
 	sounds = default.node_sound_wood_defaults(),
@@ -78,9 +80,12 @@ minetest.register_node("sumpf:mossytree", {
 
 if minetest.register_fence then
 	minetest.register_fence({fence_of = "sumpf:leaves"})
-	minetest.register_fence({fence_of = "sumpf:tree", texture = "birke_tree.png"},
-		{tiles = {"birke_tree.png"}})
-	minetest.register_fence({fence_of = "sumpf:mossytree", texture = "birke_tree.png^(sumpf_transition.png^[transformR180)"},
+	minetest.register_fence(
+		{fence_of = "sumpf:tree", texture = "birke_tree.png"},
+		{tiles = {"birke_tree.png"}}
+	)
+	minetest.register_fence({fence_of = "sumpf:mossytree",
+		texture = "birke_tree.png^(sumpf_transition.png^[transformR180)"},
 		{tiles = {"birke_tree.png^(sumpf_transition.png^[transformR180)"}})
 end
 
@@ -101,7 +106,8 @@ local sumpf_c_mossytree = minetest.get_content_id("sumpf:mossytree")
 local sumpf_c_tree = minetest.get_content_id("sumpf:tree")
 local sumpf_c_leaves = minetest.get_content_id("sumpf:leaves")
 
-local airlike_cs = {minetest.get_content_id("air"), minetest.get_content_id("ignore")}
+local airlike_cs = {minetest.get_content_id"air",
+	minetest.get_content_id"ignore"}
 local function soft_node(id)
 	for i = 1,#airlike_cs do
 		if airlike_cs[i] == id then
@@ -183,9 +189,11 @@ function spawn_birch(pos)
 	local vheight = height+2
 
 	local manip = minetest.get_voxel_manip()
-	local emin, emax = manip:read_from_map({x=pos.x-vwidth, y=pos.y, z=pos.z-vwidth},
-		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
-	local area = VoxelArea:new({MinEdge=emin, MaxEdge=emax})
+	local emin, emax = manip:read_from_map(
+		{x = pos.x - vwidth, y = pos.y, z = pos.z - vwidth},
+		{x = pos.x + vwidth, y = pos.y + vheight, z = pos.z + vwidth}
+	)
+	local area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
 	local nodes = manip:get_data()
 	local param2s = manip:get_param2_data()
 
@@ -216,12 +224,12 @@ minetest.register_abm({
 -- treecapitator support
 
 if rawget(_G, "treecapitator") then
-	treecapitator.register_tree({
+	treecapitator.register_tree{
 		trees = {"sumpf:tree", "sumpf:mossytree"},
 		leaves = {"sumpf:leaves"},
 		range = 3,
 		fruits = {"sumpf:tree"}
-	})
+	}
 end
 
 
@@ -229,10 +237,10 @@ end
 
 if sumpf.spawn_plants
 and rawget(_G, "habitat") then
-	habitat:generate("sumpf:sapling", "default:dirt_with_grass",
-		nil, nil, 20, 25, 100, 500, {"default:water_source"},30,{"default:desert_sand"})
-	habitat:generate("sumpf:gras", "default:dirt_with_grass",
-		nil, nil, 0, 25, 90, 100, {"default:water_source"},30,{"default:desert_sand"})
+	habitat:generate("sumpf:sapling", "default:dirt_with_grass", nil, nil, 20,
+		25, 100, 500, {"default:water_source"},30,{"default:desert_sand"})
+	habitat:generate("sumpf:gras", "default:dirt_with_grass", nil, nil, 0, 25,
+		90, 100, {"default:water_source"},30,{"default:desert_sand"})
 end
 
 
@@ -240,11 +248,12 @@ end
 
 minetest.register_node("sumpf:tree_horizontal", {
 	description = "horizontal birch trunk",
-	tiles = {"birke_tree.png",	"birke_tree.png",	"birke_tree.png^[transformR90",
-			"birke_tree.png^[transformR90", "birke_tree_top.png"},
+	tiles = {"birke_tree.png", "birke_tree.png", "birke_tree.png^[transformR90",
+		"birke_tree.png^[transformR90", "birke_tree_top.png"},
 	paramtype2 = "facedir",
 	drop = "sumpf:tree",
-	groups = {snappy=1,choppy=2,oddly_breakable_by_hand=1,flammable=2,not_in_creative_inventory=1},
+	groups = {snappy=1, choppy=2, oddly_breakable_by_hand=1, flammable=2,
+		not_in_creative_inventory=1},
 	sounds = default.node_sound_wood_defaults(),
 	on_place = function(stack)
 		local backup = ItemStack(stack)
@@ -273,10 +282,13 @@ minetest.register_lbm({
 		elseif node.param2 == 1 then
 			node.param2 = 12
 		else
-			minetest.log("error", "[sumpf] legacy: unknown birch trunk param2 "..node.param2.." "..minetest.pos_to_string(pos))
+			minetest.log("error",
+				"[sumpf] legacy: unknown birch trunk param2 " .. node.param2 ..
+				" " .. minetest.pos_to_string(pos))
 			return	-- don't destroy houses
 		end
 		minetest.set_node(pos, node)
-		sumpf.inform("legacy: a horizontal tree node became changed at "..minetest.pos_to_string(pos), 3, t1)
+		sumpf.inform("legacy: a horizontal tree node became changed at " ..
+			minetest.pos_to_string(pos), 3, t1)
 	end
 })

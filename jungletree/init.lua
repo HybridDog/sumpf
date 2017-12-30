@@ -55,8 +55,11 @@ if plantlike_leaves then
 		local leaf_name = "jungletree:leaves_"..leaves[color]
 		tab.visual_scale = math.sqrt(rt2)
 		tab.drawtype = "plantlike"
-		tab.tiles = {"jungletree_leaves_"..leaves[color]..".png^[lowpart:"..tex_sc..":jungletree_invmat.png^[makealpha:255,126,126"}
-		tab.inventory_image = minetest.inventorycube("jungletree_leaves_"..leaves[color]..".png")
+		tab.tiles = {"jungletree_leaves_" .. leaves[color] ..
+			".png^[lowpart:" .. tex_sc ..
+			":jungletree_invmat.png^[makealpha:255,126,126"}
+		tab.inventory_image = minetest.inventorycube("jungletree_leaves_" ..
+			leaves[color] .. ".png")
 		tab.drop.items[2].items[1] = leaf_name
 		minetest.register_node(leaf_name, table.copy(tab))
 	end
@@ -80,7 +83,8 @@ local c_leaves_yellow = minetest.get_content_id("jungletree:leaves_yellow")
 local c_jungletree = minetest.get_content_id("default:jungletree")
 local ndtable = {c_leaves_green, c_leaves_red, c_leaves_yellow}
 
-local airlike_cs = {minetest.get_content_id("air"), minetest.get_content_id("ignore")}
+local airlike_cs = {minetest.get_content_id("air"),
+	minetest.get_content_id("ignore")}
 local function soft_node(id)
 	for i = 1,#airlike_cs do
 		if airlike_cs[i] == id then
@@ -139,7 +143,8 @@ local function small_jungletree(pos, height, area, nodes, pr)
 	for i = height, 4, -1 do
 		if math.sin(i*i/height) < 0.2
 		and pr:next(0,2) ~= 2 then -- < 1.5
-			tree_branch({x=pos.x+pr:next(0,1), y=pos.y+i, z=pos.z-pr:next(0,1)}, area, nodes, pr)
+			tree_branch({x=pos.x+pr:next(0,1), y=pos.y+i, z=pos.z-pr:next(0,1)},
+				area, nodes, pr)
 		end
 	end
 end
@@ -160,7 +165,8 @@ local function big_jungletree(pos, height, area, nodes, pr)
 		if i > 3
 		and math.sin(i*i/height) < 0.2
 		and pr:next(0,2) < 1.5 then
-			tree_branch({x=pos.x+pr:next(0,1), y=pos.y+i, z=pos.z-pr:next(0,1)}, area, nodes, pr)
+			tree_branch({x=pos.x+pr:next(0,1), y=pos.y+i, z=pos.z-pr:next(0,1)},
+				area, nodes, pr)
 		end
 
 		if i == height then
@@ -232,9 +238,10 @@ function spawn_jungletree(pos)
 	vheight = height+vheight
 
 	local manip = minetest.get_voxel_manip()
-	local emerged_pos1, emerged_pos2 = manip:read_from_map({x=pos.x-vwidth, y=pos.y+vdepth, z=pos.z-vwidth},
-		{x=pos.x+vwidth, y=pos.y+vheight, z=pos.z+vwidth})
-	local area = VoxelArea:new({MinEdge=emerged_pos1, MaxEdge=emerged_pos2})
+	local emerged_pos1, emerged_pos2 = manip:read_from_map(
+		{x = pos.x - vwidth, y = pos.y + vdepth, z = pos.z - vwidth},
+		{x = pos.x + vwidth, y = pos.y + vheight, z = pos.z + vwidth})
+	local area = VoxelArea:new{MinEdge=emerged_pos1, MaxEdge=emerged_pos2}
 	local nodes = manip:get_data()
 
 	if small then

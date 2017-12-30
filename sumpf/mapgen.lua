@@ -54,7 +54,8 @@ local function define_contents()
 		if is ~= nil then
 			return is
 		end
-		local data = minetest.registered_nodes[minetest.get_name_from_content_id(id)]
+		local data = minetest.registered_nodes[
+			minetest.get_name_from_content_id(id)]
 		if not data then
 			grounds[id] = false
 			return false
@@ -70,7 +71,8 @@ local function define_contents()
 	end
 
 	if swampwater then
-		local hard_nodes = {}	--a cache table of nodes which are allowed to be next to swampwater
+		-- a cache table of nodes which are allowed to be next to swampwater
+		local hard_nodes = {}
 		setmetatable(hard_nodes, {__mode = "kv"})
 		local function hard_node(id)
 			if not id then
@@ -134,9 +136,11 @@ local smooth_rarity_max, smooth_rarity_min, smooth_rarity_dif
 local smooth = sumpf.smooth
 if smooth then
 	local smooth_trans_size = sumpf.smooth_trans_size
-	smooth_rarity_max = upper_rarity(nosmooth_rarity+smooth_trans_size*2/perlin_scale)
-	smooth_rarity_min = upper_rarity(nosmooth_rarity-smooth_trans_size/perlin_scale)
-	smooth_rarity_dif = smooth_rarity_max-smooth_rarity_min
+	smooth_rarity_max = upper_rarity(nosmooth_rarity
+		+ smooth_trans_size * 2 / perlin_scale)
+	smooth_rarity_min = upper_rarity(nosmooth_rarity
+		- smooth_trans_size / perlin_scale)
+	smooth_rarity_dif = smooth_rarity_max - smooth_rarity_min
 end
 nosmooth_rarity = upper_rarity(nosmooth_rarity)
 
@@ -149,8 +153,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		return
 	end
 
-	local x0,z0,x1,z1 = minp.x,minp.z,maxp.x,maxp.z	-- Assume X and Z lengths are equal
-	local perlin1 = minetest.get_perlin(1123,3, 0.5, perlin_scale)	--Get map specific perlin
+	local x0,z0,x1,z1 = minp.x,minp.z,maxp.x,maxp.z
+	--Get map specific perlin
+	local perlin1 = minetest.get_perlin(1123,3, 0.5, perlin_scale)
 
 	if not sumpf.always_generate then
 		local biome_allowed
@@ -173,7 +178,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local t1 = os.clock()
 
 		--Information:
-	sumpf.inform("tries to generate a swamp at: x=["..x0.."; "..x1.."]; y=["..minp.y.."; "..maxp.y.."]; z=["..z0.."; "..z1.."]", 2)
+	sumpf.inform("tries to generate a swamp at: x=["..x0.."; "..x1.."]; y=[" ..
+		minp.y.."; "..maxp.y.."]; z=["..z0.."; "..z1.."]", 2)
 
 	local divs = x1-x0
 	local pr = PseudoRandom(seed+68)
@@ -230,7 +236,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				if test >= smooth_rarity_max
 				or (
 					test > smooth_rarity_min
-					and pr:next(1, 1000) <= ((test-smooth_rarity_min)/smooth_rarity_dif)*1000
+					and pr:next(1, 1000) <= 1000 *
+						(test - smooth_rarity_min) / smooth_rarity_dif
 				) then
 					in_biome = true
 				end
@@ -240,7 +247,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 			if in_biome then
 
-				local ymin = math.max(heightmap[hmi]-5, minp.y) -- -5 because of caves
+				-- subtract 5 because of cave entrances
+				local ymin = math.max(heightmap[hmi]-5, minp.y)
 
 				-- skip the air part
 				local ground
@@ -284,9 +292,14 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						else
 							h = 5
 						end	--find_node_near may be a laggy function here
-						if minetest.find_node_near({x=x, y=ground_y, z=z}, h, "group:crumbly") then
-						--if data[area:index(x, ground_y-(3+pr:next(1,2)), z)] ~= c.water then
-							for _ = 0,math.min(pr:next(16,20), ground_y-minp.y+16) do
+						if minetest.find_node_near({x=x, y=ground_y, z=z}, h,
+							"group:crumbly"
+						) then
+						--if data[area:index(x, ground_y-(3+pr:next(1,2)), z)]
+						--~= c.water then
+							for _ = 0, math.min(pr:next(16, 20),
+								ground_y - minp.y + 16
+							) do
 								if data[vi] == c.water then
 									data[vi] = c.dirtywater
 								else
@@ -304,8 +317,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						and d_p_boden == c.air
 						and pr:next(1,2) == 2
 						and water_allowed(data, area, x, ground_y, z) then
-							plant_allowed = false	--disable plants on swampwater
-							for _ = 0, math.min(pr:next(1,9)+10, ground_y-minp.y+16) do
+							plant_allowed = false --disable plants on swampwater
+							for _ = 0, math.min(pr:next(1, 9) + 10,
+								ground_y - minp.y + 16
+							) do
 								if data[vi] == c.air then
 									break
 								end
@@ -318,7 +333,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							and ground_y == 1
 							and d_p_boden == c.air
 							and pr:next(1,3) == 1 then
-								plant_allowed = false	--disable plants on swampwater
+								-- disable plants on swampwater
+								plant_allowed = false
 								data[vi] = c.dirtywater
 								if pr:next(1,3) == 1 then
 									data[p_uground] = c.dirtywater
@@ -394,7 +410,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	if hut
 	and hut.y then
 		local t2 = os.clock()
-		sumpf.generate_hut({x=hut.x, y=hut.y, z=hut.z}, area, data, hut.rmin, hut.rmax, hut.ruin)
+		sumpf.generate_hut({x=hut.x, y=hut.y, z=hut.z}, area, data, hut.rmin,
+			hut.rmax, hut.ruin)
 		sumpf.inform("hut made", 2, t2)
 	end
 
