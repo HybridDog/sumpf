@@ -203,9 +203,6 @@ function spawn_birch(pos)
 	manip:set_param2_data(param2s)
 	manip:write_to_map()
 	sumpf.inform("a birch grew at " .. minetest.pos_to_string(pos), 2, t1)
-	t1 = minetest.get_us_time()
-	manip:update_map()
-	sumpf.inform("map updated", 2, t1)
 end
 
 minetest.register_abm({

@@ -149,7 +149,6 @@ end
 	--~ manip:set_data(nodes)
 	--~ manip:write_to_map()
 	--~ log("nodes set after ", t1)
-	--~ manip:update_map()
 	--~ log("map updated", t1)
 --~ end
 
