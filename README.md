@@ -15,3 +15,4 @@ TODO:
 * fix that http://imgh.us/screenshot_20160305_162901.png  
 * use the mapgen decoration function instead of habitat to rarely spawn swamp grass
 * code style: 80 characters limit
+* mapgen: use a buffer for vmanip data (memory optimisation)
