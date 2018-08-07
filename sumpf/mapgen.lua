@@ -131,6 +131,7 @@ local smooth_rarity_min = 0.6
 local smooth_rarity_dif = smooth_rarity_max - smooth_rarity_min
 
 local contents_defined
+local data = {}
 minetest.register_on_generated(function(minp, maxp, seed)
 
 	--avoid calculating perlin noises for unneeded places
@@ -176,7 +177,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 
 	local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
-	local data = vm:get_data()
+	vm:get_data(data)
 	local area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
 
 	for vi in area:iterp(minp, maxp) do	--remove tree stuff

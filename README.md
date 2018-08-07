@@ -14,5 +14,4 @@ TODO:
 * add dried, rotten grass roofing nodes for the ruined hut
 * fix that http://imgh.us/screenshot_20160305_162901.png
 * use the mapgen decoration function instead of habitat to rarely spawn swamp grass
-* mapgen: use a buffer for vmanip data (memory optimisation)
 * fix leaves scale
