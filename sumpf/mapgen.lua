@@ -56,7 +56,8 @@ local function define_contents()
 		end
 		local data = minetest.registered_nodes[
 			minetest.get_name_from_content_id(id)]
-		if not data then
+		if not data
+		or data.paramtype == "light" then
 			grounds[id] = false
 			return false
 		end
@@ -122,27 +123,12 @@ local function define_contents()
 end
 
 
--- ‮yldesoppus evruc sunis ekil gnikool tub skaep ton era "sllih" esion nilrep
-local function upper_rarity(rarity)
-	return math.sin(rarity * math.pi * 0.5)
-end
-
-local rarity = sumpf.mapgen_rarity
-local sumpf_size = sumpf.mapgen_size
-
-local nosmooth_rarity = 1-rarity*0.02
-local perlin_scale = sumpf_size*100/rarity
-local smooth_rarity_max, smooth_rarity_min, smooth_rarity_dif
 local smooth = sumpf.smooth
-if smooth then
-	local smooth_trans_size = sumpf.smooth_trans_size
-	smooth_rarity_max = upper_rarity(nosmooth_rarity
-		+ smooth_trans_size * 2 / perlin_scale)
-	smooth_rarity_min = upper_rarity(nosmooth_rarity
-		- smooth_trans_size / perlin_scale)
-	smooth_rarity_dif = smooth_rarity_max - smooth_rarity_min
-end
-nosmooth_rarity = upper_rarity(nosmooth_rarity)
+local perlin_scale = 500
+local nosmooth_rarity = 0.6
+local smooth_rarity_max = 0.64
+local smooth_rarity_min = 0.6
+local smooth_rarity_dif = smooth_rarity_max - smooth_rarity_min
 
 local contents_defined
 minetest.register_on_generated(function(minp, maxp, seed)
