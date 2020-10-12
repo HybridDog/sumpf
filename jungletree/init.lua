@@ -2,7 +2,7 @@ sumpf = rawget(_G, "sumpf") or {}
 
 local jungletree_seed = 112
 
-function jungletree_get_random(pos)
+local function jungletree_get_random(pos)
 	return PseudoRandom(math.abs(pos.x+pos.y*3+pos.z*5)+jungletree_seed)
 end
 

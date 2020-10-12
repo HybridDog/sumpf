@@ -120,12 +120,12 @@ end
 
 local function tree_branch(pos, dir, area, nodes, pr, param2s)
 
-	local vi = area:indexp(pos)
-	nodes[vi] = sumpf_c_tree
+	local vi_pos = area:indexp(pos)
+	nodes[vi_pos] = sumpf_c_tree
 	if dir == 0 then
-		param2s[vi] = 4
+		param2s[vi_pos] = 4
 	else
-		param2s[vi] = 12
+		param2s[vi_pos] = 12
 	end
 
 	for i = pr:next(1,2), -pr:next(1,2), -1 do
