@@ -19,3 +19,4 @@ TODO:
 	more from the normal hut
 * Use the mapgen decoration function instead of habitat to rarely spawn swamp
 	grass and birches
+* Sometimes the huts have visible gaps in the roofs; this should be fixed
