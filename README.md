@@ -19,4 +19,3 @@ TODO:
 	more from the normal hut
 * Use the mapgen decoration function instead of habitat to rarely spawn swamp
 	grass and birches
-* Fix leaves scale
