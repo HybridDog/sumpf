@@ -189,7 +189,7 @@ minetest.register_node("sumpf:dirtywater_flowing", {
 		{name="sumpf_water_flowing.png", backface_culling=false,	animation=ani},
 		{name="sumpf_water_flowing.png", backface_culling=true,	animation=ani}
 	},
-	alpha = 191,
+	use_texture_alpha = "blend",
 	paramtype = "light",
 	walkable = false,
 	pointable = false,
@@ -213,7 +213,7 @@ minetest.register_node("sumpf:dirtywater_source", {
 		{name="sumpf_water_flowing.png", animation=ani}
 	},
 	special_tiles = {{name="sumpf_water_source.png", animation=ani, backface_culling=false},},
-	alpha = 191,
+	use_texture_alpha = "blend",
 	paramtype = "light",
 	walkable = false,
 	pointable = false,
